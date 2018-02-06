@@ -25,8 +25,10 @@
 		<property name="testWhileIdle"><value>true</value></property>
 		<property name="testOnBorrow"><value>false</value></property>
 		<property name="testOnReturn"><value>false</value></property>
+		<!--
 		<property name="validationQuery"><value>select now()</value></property>
 		<property name="validationQueryTimeout"><value>10</value></property>
+		-->
 		<property name="timeBetweenEvictionRunsMillis"><value>60000</value></property>
 		<property name="numTestsPerEvictionRun"><value>100</value></property>
 		<property name="minEvictableIdleTimeMillis"><value>200000</value></property>
