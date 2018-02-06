@@ -78,7 +78,7 @@ public class DashboardController {
     public Object retrieveNumberOfOnlineUsers(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String departmentId = request.getParameter("departmentId");
         String activeDate = request.getParameter("startDate");
-        if (isBlank(request.getParameter(activeDate)))
+        if (isBlank(activeDate))
         {
             SimpleDateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             activeDate = formatDate.format((new Date().getTime() - 30*60*1000));
