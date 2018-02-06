@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.TripDocumentMapper" >
+	<sql id="SELECT_TRIP_DOC">
+			dc_id AS id,
+			dc_tp_id as tripId,
+			dc_name as refName,
+			dc_cm_id as communicationId,
+            dc_size as filesize,
+            IFNULL(cd_${language}, cd_english) as fileType,
+            dc_original_name as originalFileName,
+            dc_file as filename,
+            dc_acomp as currentCompany,
+			dc_acust as currentCustomer,
+			dc_auid as updatedBy,
+			dc_astamp as updateTime
+	</sql>
+	<select id="selectTripDocumentsByEmail"  resultType="TripDocument" parameterType="map">
+		SELECT 
+			<include refid="SELECT_TRIP_DOC"/>
+        FROM EpDocument DC INNER JOIN EpCode CD on CD.cd_key=DC.dc_type  and CD.cd_name='Document Type'
+        WHERE dc_cm_id=#{id}
+        ORDER BY dc_type, dc_file
+	</select>
+	<select id="selectTripDocumentsByRefName"  resultType="TripDocument" parameterType="string">
+		SELECT 
+			dc_id AS id,
+			dc_tp_id as tripId,
+			dc_name as refName,
+			dc_cm_id as communicationId
+        FROM EpDocument DC INNER JOIN EpCode CD on CD.cd_key=DC.dc_type  and CD.cd_name='Document Type'
+        WHERE dc_name=#{value}
+        ORDER BY dc_type, dc_file
+	</select>
+    <select id="selectTripDocuments" resultType="TripDocument" parameterType="map">
+        SELECT 
+			<include refid="SELECT_TRIP_DOC"/>
+        FROM EpDocument DC INNER JOIN EpCode CD on CD.cd_key=DC.dc_type  and CD.cd_name='Document Type'
+        WHERE dc_tp_id=#{id,jdbcType=INTEGER}
+            <if test="noEmail != null and noEmail != ''">
+                and dc_type != 'Email'
+            </if>
+        ORDER BY dc_type, dc_file
+    </select>
+    
+    <select id="selectTripDocument" resultType="TripDocument" parameterType="map">
+        SELECT 
+			<include refid="SELECT_TRIP_DOC"/>
+        FROM EpDocument DC INNER JOIN EpCode CD on CD.cd_key=DC.dc_type  and CD.cd_name='Document Type'
+        WHERE dc_id=#{id,jdbcType=INTEGER}
+
+    </select>
+     <select id="selectTripDocumentsByType" resultType="TripDocument" parameterType="map">
+        SELECT 
+			<include refid="SELECT_TRIP_DOC"/>
+        FROM EpDocument DC INNER JOIN EpCode CD on CD.cd_key=DC.dc_type  and CD.cd_name='Document Type'
+        WHERE dc_tp_id=#{tripid,jdbcType=INTEGER} 
+        	<if test="type != null">
+        		and dc_type=#{type,jdbcType=VARCHAR}
+        	</if>
+        ORDER BY dc_type, dc_file
+    </select>
+    <insert id="insertTripDocument" parameterType="TripDocument">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+		INSERT INTO EpDocument(
+			dc_tp_id,
+			dc_cm_id ,
+            dc_size ,
+            dc_type ,
+            dc_name ,
+            dc_original_name ,
+            dc_file,
+            dc_acomp ,
+			dc_acust ,
+			dc_auid ,
+			dc_astamp 
+	    ) VALUES (
+	    	#{tripId,jdbcType=INTEGER},
+	    	#{communicationId,jdbcType=BIGINT},
+	    	#{filesize,jdbcType=INTEGER},
+	        #{fileType,jdbcType=VARCHAR},
+	        #{refName,jdbcType=VARCHAR},
+	        #{originalFileName,jdbcType=VARCHAR},	
+	        #{filename,jdbcType=VARCHAR},    	     
+			#{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+   <delete id="deleteTripDocument" parameterType="integer">
+        DELETE
+        FROM EpDocument 
+        WHERE dc_id=#{value,jdbcType=INTEGER} 
+
+    </delete>
+    <update id="updateTripDocument" parameterType="TripDocument">
+    	UPDATE EpDocument SET
+    		dc_cm_id= #{communicationId,jdbcType=BIGINT}
+    	WHERE dc_id=#{id,jdbcType=INTEGER}
+    	
+    </update>
+    
+    <insert id="insertDocumentFromUploaded" parameterType="TripDocument">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+		INSERT INTO EpDocument(
+			dc_tp_id,
+			dc_cm_id ,
+            dc_size ,
+            dc_type ,
+            dc_original_name ,
+            dc_file,
+            dc_acomp ,
+			dc_acust ,
+			dc_auid ,
+			dc_astamp 
+	    ) SELECT 
+	    	dc_tp_id,
+			#{communicationId,jdbcType=BIGINT},
+            dc_size ,
+            'Email',
+            dc_original_name ,
+            dc_file,
+            #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+		FROM EpDocument
+		WHERE dc_id	= #{id,jdbcType=INTEGER}
+	   
+    </insert>
+</mapper>

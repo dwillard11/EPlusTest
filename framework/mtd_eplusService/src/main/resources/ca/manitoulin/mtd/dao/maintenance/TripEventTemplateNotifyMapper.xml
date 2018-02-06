@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.TripEventTemplateNotifyMapper" >
+    <sql id="SELECT_EVENTTEMPLATECOST">
+        en_id as id,
+        en_te_id as templateId,
+        en_name as name,
+        en_email as email,
+        en_acomp as currentCompany,
+        en_acust as currentCustomer,
+        en_auid as updatedBy,
+        en_astamp as updateTime
+    </sql>
+    <select id="selectEventTemplateNotifyByTemplateId" resultType="TripEventTemplateNotify" parameterType="integer">
+        SELECT
+        <include refid="SELECT_EVENTTEMPLATECOST" />
+        FROM EpEventTemplateNotify
+        WHERE en_te_id=#{value,jdbcType=INTEGER}
+        ORDER BY en_name
+    </select>
+    <select id="selectEventTemplateNotifyById" resultType="TripEventTemplateNotify" parameterType="integer">
+        SELECT
+        <include refid="SELECT_EVENTTEMPLATECOST" />
+        FROM EpEventTemplateNotify
+        WHERE en_id=#{value,jdbcType=INTEGER}
+    </select>
+    <update id="updateEventTemplateNotify" parameterType="TripEventTemplateNotify">
+        UPDATE EpEventTemplateNotify SET
+        en_name = #{name,jdbcType=VARCHAR},
+        en_email = #{email,jdbcType=VARCHAR},
+        en_acomp = #{currentCompany,jdbcType=VARCHAR},
+        en_acust = #{currentCustomer,jdbcType=VARCHAR},
+        en_auid = #{updatedBy,jdbcType=VARCHAR},
+        en_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE en_id=#{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insertEventTemplateNotify" parameterType="TripEventTemplateNotify">
+        INSERT INTO EpEventTemplateNotify(
+        en_te_id,
+        en_name,
+        en_email,
+        en_acomp,
+        en_acust,
+        en_auid,
+        en_astamp)
+        VALUES (
+        #{templateId,jdbcType=INTEGER},
+        #{name,jdbcType=VARCHAR},
+        #{email,jdbcType=VARCHAR},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <delete id="deleteEventTemplateNotify" parameterType="integer">
+        DELETE FROM EpEventTemplateNotify
+        WHERE en_id=#{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteEventTemplateNotifyByTemplateId" parameterType="integer">
+        DELETE FROM EpEventTemplateNotify
+        WHERE en_te_id=#{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteAllOtherEventTemplateNotifyForCopy" parameterType="integer">
+        DELETE source
+        FROM EpEventTemplate et,
+          EpEventTemplateNotify source,
+          EpEventTemplate cur
+        WHERE et.te_id = source.en_te_id
+            and et.te_type = cur.te_type
+            and cur.te_id = #{id,jdbcType=INTEGER}
+            and et.te_id != #{id,jdbcType=INTEGER}
+            and et.te_type = cur.te_type
+            and et.te_name = cur.te_name;
+    </delete>
+    <insert id="copyEventTemplateNotifyByTemplateId" parameterType="integer">
+        insert into EpEventTemplateNotify(
+            en_te_id,
+            en_name,
+            en_email,
+            en_acomp,
+            en_acust,
+            en_auid,
+            en_astamp)
+        select other.te_id,
+            source.en_name,
+            source.en_email,
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        from EpEventTemplate et,
+          EpEventTemplateNotify source,
+          EpEventTemplate other
+        where et.te_id = source.en_te_id
+		  and et.te_type = other.te_type
+		  and source.en_te_id = #{id,jdbcType=INTEGER}
+          and other.te_id != #{id,jdbcType=INTEGER}
+		  and et.te_type = other.te_type
+          and et.te_name = other.te_name
+    </insert>
+</mapper>

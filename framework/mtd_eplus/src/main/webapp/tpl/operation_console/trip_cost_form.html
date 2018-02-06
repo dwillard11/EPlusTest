@@ -1,0 +1,281 @@
+<form class="form-horizontal" role="form" method="POST" name="costEditForm" ng-submit="ok(costEditForm.$valid)">
+    <div class="modal-header">Capture Cost Editor</div>
+    <div class="modal-body wrapper-lg">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="hidden col-sm-10 control-label text-right">{{tripID}}</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label text-right">Charge Code</label>
+                    <div class="col-sm-4">
+                        <div class="input-group-btn dropdown" dropdown>
+                            <select class="form-control" name="chargeType" id="chargeType"
+                                    ng-options="Option.id as Option.name for Option in chargeCodeOption"
+                                    ng-model="c.chargeCode">
+                            </select>
+                        </div>
+                    </div>
+                    <label class="col-sm-2 control-label text-right">Visible</label>
+                    <div class="col-sm-4">
+                        <div class="input-group-btn dropdown" dropdown>
+                            <select class="form-control" name="visible" id="visible"
+                                    ng-options="Option.id as Option.name for Option in visibleOption"
+                                    ng-model="c.visible">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label text-right">Est. Cost</label>
+                    <div class="col-sm-10">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <input type="number" class="form-control" ng-model="c.estCost" step="0.01" max="99999999" min="0">
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="input-group-btn dropdown" dropdown>
+                                    <select class="form-control"
+                                            ng-options="Option.id as Option.name for Option in currencyOption"
+                                            ng-model="c.estCurrency">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-4"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                <label class="col-sm-2 control-label">Est. Date</label>
+                <div class="col-sm-4">
+                    <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                        <input type="text" class="form-control"
+                               datepicker-popup="yyyy-MM-dd"
+                               ng-model="c.estDate" id="estDate"
+                               is-open="opened" datepicker-options="dateOptions"
+                               ng-="false" close-text="Close"/> <span
+                            class="input-group-btn">
+                                <button type="button" class="btn btn-default"
+                                        ng-click="open($event)">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                    </div>
+                </div>
+                <label class="col-sm-2 control-label">Actual Date</label>
+                <div class="col-sm-4">
+                    <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                        <input type="text" class="form-control"
+                               datepicker-popup="yyyy-MM-dd"
+                               ng-model="c.actDate" id="actDate"
+                               is-open="opened" datepicker-options="dateOptions"
+                               ng-="false" close-text="Close"/> <span
+                            class="input-group-btn">
+                                <button type="button" class="btn btn-default"
+                                        ng-click="open($event)">
+                                    <i class="glyphicon glyphicon-calendar"></i>
+                                </button>
+                            </span>
+                    </div>
+                </div>
+            </div>
+
+                <div class="form-group">
+                <label class="col-sm-2 control-label text-right">Actual Cost</label>
+                <div class="col-sm-10">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <input type="number" class="form-control" ng-model="c.actCost"
+                                   ng-blur="getUSDRate(c.actCurrency)"
+                                   step="0.01" max="99999999" min="0" max="99999999" min="0">
+                        </div>
+                        <div class="col-sm-2">
+                            <div class="input-group-btn dropdown" dropdown>
+                                <select class="form-control"
+                                        ng-options="Option.id as Option.name for Option in currencyOption"
+                                        ng-change="getUSDRate(c.actCurrency)"
+                                        ng-model="c.actCurrency">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4"></div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="form-group">
+                <label class="col-sm-2 control-label">USD Rate</label>
+                <div class="col-sm-4">
+                    <p class="form-control-static">{{c.actUsedRate}}</p>
+                </div>
+                <label class="col-sm-2 control-label">USD Cost</label>
+                <div class="col-sm-4">
+                    <p class="form-control-static">{{c.actUsedCost | currency:'':2}}</p>
+                </div>
+            </div>
+                <div class="form-group">
+                <label class="col-sm-2 control-label text-right">Event</label>
+                <div class="col-sm-4">
+                    <div class="input-group-btn dropdown" dropdown>
+                        <select class="form-control" name="eventId" id="eventId"
+                                ng-change="findEventName(c.eventId, eventsOption)"
+                                ng-options="Option.id as Option.item for Option in eventsOption"
+                                ng-model="c.eventId">
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+                <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">Location</div>
+                        <div class="panel-body">
+                            <div class="hidden form-group">
+                                <div class="col-sm-11">
+                                    <input class="form-control" type="text" id="contactLocationID"
+                                           ng-model="contact.id" disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Search</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <ui-select ng-model="contact.selected" theme="bootstrap"
+                                                   ng-change="selectLocationContact(contact.selected,'cost')">
+                                            <ui-select-match
+                                                    placeholder="Select or search a contact in the list...">
+                                                {{$select.selected.genericInfo}}
+                                            </ui-select-match>
+                                            <ui-select-choices group-by="'customerName'"
+                                                               repeat="item in clients"
+                                                               refresh="searchLocationContact($select.search)"
+                                                               refresh-delay="400">
+                                                <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                            </ui-select-choices>
+                                        </ui-select>
+                                        <span class="input-group-btn">
+                                              <a ng-click="selectLocationContact({},'cost');"
+                                                 class="btn btn-default">
+                                                <span class="fa fa-close"></span>
+                                              </a>
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Contact</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="contactContactName"
+                                               ng-model="contact.contactName" disabled />
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button"
+                                                    ng-click="showContact(contact)"
+                                                    ng-disabled="!contact || !contact.contactId">
+                                                <span class="glyphicon glyphicon-eye-open"></span>
+                                            </button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Name</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group">
+                                        <input class="form-control" type="text" id="contactLocationName"
+                                               ng-model="contact.customerName" disabled/>
+                                        <span class="input-group-btn">
+                                                    <button class="btn btn-default" type="button"
+                                                            ng-click="showEntity(contact)"
+                                                            ng-disabled="!contact || !contact.locationId">
+                                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                                    </button>
+                                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Address</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" type="text"
+                                           ng-model="contact.address1" id="contactAddress"
+                                           disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Postal</label>
+                                <div class="col-sm-3">
+                                    <input class="form-control" type="text"
+                                           ng-model="contact.postalCode" id="contactpostalCode"
+                                           disabled>
+                                </div>
+
+                                <label class="col-sm-2 control-label text-right">City</label>
+                                <div class="col-sm-4">
+                                    <input class="form-control" type="text" id="contactCity"
+                                           ng-model="contact.city"
+                                           disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Province</label>
+                                <div class="col-sm-3">
+                                    <input class="form-control" type="text" id="contactProvince"
+                                           ng-model="contact.stateProvince"
+                                           disabled>
+                                </div>
+
+                                <label class="col-sm-2 control-label text-right">Country</label>
+                                <div class="col-sm-4">
+                                    <input class="form-control" type="text" id="contactCountry"
+                                           ng-model="contact.country"
+                                           disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Phone #</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control" type="text"
+                                           ng-model="contact.busPhone1" id="contactPhoneNum"
+                                           disabled>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Notes</label>
+                                <div class="col-sm-9">
+                                                            <textarea class="form-control" rows="4"
+                                                                      ng-model="contact.notes"
+                                                                      disabled></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label text-right">Description</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" rows="4" ng-model="c.description" id="description"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><strong>Save</strong></button>
+        <button type="button" class="btn btn-danger" ng-click="cancel()"><strong>Cancel</strong></button>
+    </div>
+</form>

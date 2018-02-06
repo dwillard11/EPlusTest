@@ -1,0 +1,103 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">Quote Template Management</h1>
+</div>
+<div class="wrapper-md">
+    <div ng-controller="quotetemplatesctrl">
+        <div class="row">
+            <div class="col-md-3 m-width200">
+                <div class="panel panel-default" >
+                    <div class="panel-heading font-bold">&nbsp;
+                        <button class="btn btn-sm btn-success"  ng-click="addQuote()"> <i class="glyphicon glyphicon-plus"></i> Add
+                        </button>
+                        <button class="btn btn-sm btn-danger"  ng-click="remove()"> <i class="glyphicon glyphicon-minus"></i> Romeve
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div>
+                                <ul id="dataTree" class="ztree" style="height: 500px; overflow:auto;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-9">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
+                            Quote Template Detail
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" name="quoteTemplateForm" method="POST" ng-submit="submit(quoteTemplateForm.$valid)">
+                                <input type="text"  ng-model="id" style="display: none;"/>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Category</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name ="txtCategory" class="form-control"  ng-model="category" placeholder="" required="required" maxlength="50" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Item</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name ="txtItem" class="form-control"  ng-model="item"  placeholder="" required="required" maxlength="50" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Status</label>
+                                    <div class="col-sm-4">
+                                        <select  class="form-control" name ="ddlStatus"
+                                                 ng-options="Option.id as Option.name for Option in statusOption"
+                                                 ng-model="status" required="required">
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6">
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Description</label>
+                                    <div class="col-sm-10">
+                                        <textarea name ="txtDescription" class="form-control" rows="6"  ng-model="description" placeholder="" maxlength="65535"></textarea>
+                                    </div>
+                                </div>
+                                <div class="line b-b line-lg pull-in" style="display: none"></div>
+                                <div class="form-group" style="display: none">
+                                    <label class="col-sm-2 control-label">Audit Company</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditCompany" class="form-control" ng-model="currentCompany" placeholder="" readonly>
+                                    </div>
+                                    <label class="col-sm-2 control-label">Audit User</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditUser" class="form-control" ng-model="updatedBy" placeholder="" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="display: none">
+                                    <label class="col-sm-2 control-label">Audit Customer</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditCustomer" class="form-control" ng-model="currentCustomer" placeholder="" readonly>
+                                    </div>
+                                    <label class="col-sm-2 control-label">Audit Stamp</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditStamp" class="form-control" ng-model="updateTime" placeholder="" readonly>
+                                    </div>
+                                </div>
+
+                                <div class="line line-dashed b-b line-lg pull-in"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button type="button" class="btn btn-default" ng-click="btnCancel()">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

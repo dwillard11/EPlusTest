@@ -1,0 +1,801 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <list-property name="propertyBindings">
+        <structure>
+            <property name="name">odaDriverClass</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaURL</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaUser</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaAutoCommit</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaIsolationMode</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaPassword</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">odaJndiName</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileName</property>
+            <property name="id">79</property>
+        </structure>
+        <structure>
+            <property name="name">OdaConnProfileStorePath</property>
+            <property name="id">79</property>
+        </structure>
+    </list-property>
+    <property name="units">in</property>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">72</property>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="MTePlus Data Source" id="79">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://localhost:3306/mtdirect</property>
+            <property name="odaUser">root</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">cm9vdA==</encrypted-property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="MtEplus Data Set" id="161">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">studentID</property>
+                    <text-property name="displayName">studentID</text-property>
+                    <text-property name="heading">studentID</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">name</property>
+                    <text-property name="displayName">name</text-property>
+                    <text-property name="heading">name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">score</property>
+                    <text-property name="displayName">score</text-property>
+                    <text-property name="heading">score</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">rank</property>
+                    <text-property name="displayName">rank</text-property>
+                    <text-property name="heading">rank</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">class</property>
+                    <text-property name="displayName">class</text-property>
+                    <text-property name="heading">class</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">description</property>
+                    <text-property name="displayName">description</text-property>
+                    <text-property name="heading">description</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pickup_City</property>
+                    <text-property name="displayName">pickup_City</text-property>
+                    <text-property name="heading">pickup_City</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">ready_Time</property>
+                    <text-property name="displayName">ready_Time</text-property>
+                    <text-property name="heading">ready_Time</text-property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">studentID</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">score</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">rank</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">class</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">description</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">pickup_City</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">ready_Time</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">MTePlus Data Source</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">studentID</property>
+                    <property name="nativeName">studentID</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">name</property>
+                    <property name="nativeName">name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">score</property>
+                    <property name="nativeName">score</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">rank</property>
+                    <property name="nativeName">rank</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">class</property>
+                    <property name="nativeName">class</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">description</property>
+                    <property name="nativeName">description</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">pickup_City</property>
+                    <property name="nativeName">pickup_City</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">ready_Time</property>
+                    <property name="nativeName">ready_Time</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select * 
+from students
+where students.studentID = 1;]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>studentID</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>4</design:nativeDataTypeCode>
+            <design:precision>11</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>studentID</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>studentID</design:label>
+            <design:formattingHints>
+              <design:displaySize>11</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>name</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>name</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>score</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>score</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>score</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>rank</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>rank</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>rank</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>class</design:name>
+              <design:position>5</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>class</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>class</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>description</design:name>
+              <design:position>6</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>description</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>description</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>pickup_City</design:name>
+              <design:position>7</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>pickup_City</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>pickup_City</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>ready_Time</design:name>
+              <design:position>8</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>255</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>ready_Time</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>ready_Time</design:label>
+            <design:formattingHints>
+              <design:displaySize>255</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <page-header>
+                <grid id="150">
+                    <column id="151"/>
+                    <column id="152"/>
+                    <column id="153"/>
+                    <row id="154">
+                        <cell id="155">
+                            <label id="158">
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">  Quote#: HC-000001  vERSION: 1</text-property>
+                            </label>
+                        </cell>
+                        <cell id="156">
+                            <label id="159">
+                                <property name="fontWeight">bold</property>
+                                <text-property name="text">Valid Until: 2017-03-01 13:55</text-property>
+                            </label>
+                        </cell>
+                        <cell id="157">
+                            <label id="160">
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">right</property>
+                                <text-property name="text">Page 1 of 1</text-property>
+                            </label>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <text id="3">
+                    <property name="contentType">html</property>
+                    <text-property name="content"><![CDATA[<value-of>new Date()</value-of>]]></text-property>
+                </text>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <image id="34">
+            <property name="marginTop">20pt</property>
+            <property name="marginLeft">230pt</property>
+            <property name="marginBottom">20pt</property>
+            <property name="marginRight">230pt</property>
+            <property name="height">1.0555555555555556in</property>
+            <property name="width">1.4027777777777777in</property>
+            <property name="source">file</property>
+            <expression name="uri" type="constant">mtEplusLogo.png</expression>
+        </image>
+        <text id="35">
+            <property name="fontSize">12pt</property>
+            <property name="marginBottom">10pt</property>
+            <property name="textAlign">center</property>
+            <property name="display">block</property>
+            <property name="contentType">auto</property>
+            <text-property name="content"><![CDATA[Hand Carry Quotation]]></text-property>
+        </text>
+        <grid id="36">
+            <column id="37"/>
+            <column id="38"/>
+            <row id="39">
+                <cell id="40">
+                    <property name="paddingTop">1pt</property>
+                    <property name="paddingLeft">1pt</property>
+                    <property name="paddingRight">1pt</property>
+                    <label id="63">
+                        <property name="marginTop">0pt</property>
+                        <property name="marginBottom">0pt</property>
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Ready Time/Date:</text-property>
+                    </label>
+                </cell>
+                <cell id="41">
+                    <data id="168">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ready_Time</property>
+                                <text-property name="displayName">ready_Time</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["ready_Time"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ready_Time</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="42">
+                <cell id="43">
+                    <property name="paddingLeft">1pt</property>
+                    <label id="64">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Pickup City:</text-property>
+                    </label>
+                </cell>
+                <cell id="44">
+                    <data id="163">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">pickup_City</property>
+                                <text-property name="displayName">pickup_City</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["pickup_City"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">pickup_City</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="45">
+                <cell id="46">
+                    <property name="paddingLeft">1pt</property>
+                    <label id="65">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Destination/Delivery:</text-property>
+                    </label>
+                </cell>
+                <cell id="47">
+                    <data id="164">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">pickup_City</property>
+                                <text-property name="displayName">pickup_City</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["pickup_City"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">pickup_City</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="48">
+                <cell id="49">
+                    <label id="66">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Hand Carry Cost:</text-property>
+                    </label>
+                </cell>
+                <cell id="50">
+                    <data id="165">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ready_Time</property>
+                                <text-property name="displayName">ready_Time</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["ready_Time"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">ready_Time</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="51">
+                <cell id="52">
+                    <label id="67">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Cargo Details:</text-property>
+                    </label>
+                </cell>
+                <cell id="53">
+                    <data id="166">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">score</property>
+                                <text-property name="displayName">score</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["score"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">score</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="54">
+                <cell id="55">
+                    <label id="68">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Terms:</text-property>
+                    </label>
+                </cell>
+                <cell id="56">
+                    <table id="88">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">studentID</property>
+                                <text-property name="displayName">studentID</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["studentID"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                            <structure>
+                                <property name="name">name</property>
+                                <text-property name="displayName">name</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["name"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">score</property>
+                                <text-property name="displayName">score</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["score"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">class</property>
+                                <text-property name="displayName">class</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["class"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">description</property>
+                                <text-property name="displayName">description</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["description"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="95"/>
+                        <detail>
+                            <row id="110">
+                                <cell id="111">
+                                    <data id="169">
+                                        <property name="resultSetColumn">studentID</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="91">
+                                <cell id="92">
+                                    <data id="170">
+                                        <property name="resultSetColumn">name</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="112">
+                                <cell id="113">
+                                    <data id="171">
+                                        <property name="resultSetColumn">score</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="116">
+                                <cell id="117">
+                                    <data id="172">
+                                        <property name="resultSetColumn">class</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="114">
+                                <cell id="115">
+                                    <data id="173">
+                                        <property name="resultSetColumn">description</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+            <row id="57">
+                <cell id="58">
+                    <label id="69">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Duties &amp; Taxes:</text-property>
+                    </label>
+                </cell>
+                <cell id="59">
+                    <table id="100">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">class</property>
+                                <text-property name="displayName">class</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["class"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">description</property>
+                                <text-property name="displayName">description</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["description"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="107"/>
+                        <detail>
+                            <row id="108">
+                                <cell id="109">
+                                    <data id="174">
+                                        <property name="resultSetColumn">class</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="103">
+                                <cell id="104">
+                                    <data id="175">
+                                        <property name="resultSetColumn">description</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+            <row id="60">
+                <cell id="61">
+                    <label id="70">
+                        <property name="paddingLeft">50pt</property>
+                        <text-property name="text">Flight Schedule:</text-property>
+                    </label>
+                </cell>
+                <cell id="62">
+                    <table id="71">
+                        <property name="dataSet">MtEplus Data Set</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">ready_Time</property>
+                                <text-property name="displayName">ready_Time</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["ready_Time"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <column id="78"/>
+                        <detail>
+                            <row id="124">
+                                <cell id="125">
+                                    <data id="176">
+                                        <property name="resultSetColumn">ready_Time</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="74">
+                                <cell id="75">
+                                    <data id="177">
+                                        <property name="resultSetColumn">ready_Time</property>
+                                    </data>
+                                </cell>
+                            </row>
+                            <row id="126">
+                                <cell id="127">
+                                    <data id="178">
+                                        <property name="resultSetColumn">ready_Time</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+        <grid id="131">
+            <column id="132"/>
+            <column id="133"/>
+            <column id="134"/>
+            <column id="135"/>
+            <row id="136">
+                <cell id="137">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <property name="paddingTop">1pt</property>
+                    <label id="201">
+                        <property name="fontWeight">bold</property>
+                        <property name="marginTop">20pt</property>
+                        <property name="marginLeft">20pt</property>
+                        <property name="paddingTop">10em</property>
+                        <text-property name="text">Approved By (Print Name):</text-property>
+                    </label>
+                </cell>
+                <cell id="139">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <property name="paddingTop">1pt</property>
+                    <label id="202">
+                        <property name="fontWeight">bold</property>
+                        <property name="marginTop">20pt</property>
+                        <property name="paddingTop">10em</property>
+                        <text-property name="text">Signature:</text-property>
+                    </label>
+                </cell>
+            </row>
+            <row id="141">
+                <cell id="142">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <property name="paddingTop">1pt</property>
+                    <label id="203">
+                        <property name="fontWeight">bold</property>
+                        <property name="textUnderline">none</property>
+                        <property name="marginLeft">20pt</property>
+                        <text-property name="text">Date Approved (YYYY-MM-DD):</text-property>
+                    </label>
+                </cell>
+                <cell id="144">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <property name="paddingTop">1pt</property>
+                </cell>
+            </row>
+        </grid>
+    </body>
+</report>

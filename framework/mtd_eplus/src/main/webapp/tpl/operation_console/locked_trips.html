@@ -1,0 +1,84 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">Locked Trips</h1>
+</div>
+<div class="wrapper-md" ng-controller="lockedtripsctrl">
+    <div class="panel panel-default">
+        <div class="row wrapper">
+            <label class="col-sm-1 control-label" translate="Division">Division</label>
+            <div class="col-sm-10">
+                <label class="checkbox-inline" ng-repeat="dept in departmentOptions">
+                    <input type="checkbox" id="{{dept.id}}" name="{{dept.name}}"
+                           ng-checked="dept.isCheck" ng-click="getList()" ng-model="dept.isCheck">
+                    {{dept.name}}
+                </label>
+            </div>
+
+            <div class="col-sm-1 btn-group dropdown pull-right m-t-xs">
+                <button class="btn btn-default" data-toggle="dropdown" translate="Export">
+                    Export
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a ng-click="exportpdf(rowCollectionPage,'trip')">PDF</a></li>
+                    <li><a ng-csv="exportcsv(rowCollectionPage,'trip')"
+                           filename="{{csvfilename}}">CSV</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table st-table="displayedCollection" st-safe-src="rowCollectionPage"
+                   class="table table-striped">
+                <thead>
+                <tr>
+                    <th st-sort="id" class="hidden">ID</th>
+                    <th st-sort="refId" translate="Trip #">#</th>
+                    <th st-sort="clientName" translate="Client">Client</th>
+                    <th st-sort="shipperName" translate="Shipper">Shipper</th>
+                    <th st-sort="consigneeName" translate="Consignee">Consignee</th>
+                    <th st-sort="orig" translate="Origination">Orig</th>
+                    <th st-sort="dest" translate="Destination">Dest</th>
+                    <th st-sort="lockedBy" translate="Lock User">Locked By</th>
+                    <th st-sort="locktime" translate="Lock Time">Locked Time</th>
+                    <th style="width: 100px; text-align: center" translate="Action">Action</th>
+                </tr>
+                </thead>
+                <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <td class="hidden"><a class="text-u-l">{{row.id}}</a></td>
+                    <td>{{ row.refId}}</td>
+                    <td>{{ row.clientName}}</td>
+                    <td>{{ row.shipperName }}</td>
+                    <td>{{ row.consigneeName }}</td>
+                    <td>{{ row.orig}}</td>
+                    <td>{{ row.dest }}</td>
+                    <td>{{row.lockedBy}}</td>
+                    <td>{{ row.locktime | date:'yyyy-MM-dd HH:mm'}}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-info" ng-click="updateTrips(row.id)"
+                                    tooltip-placement="bottom" tooltip="unlock"><i class="fa fa-unlock"></i></button>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="10" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s):
+                                {{conllectionLength}}
+                            </small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

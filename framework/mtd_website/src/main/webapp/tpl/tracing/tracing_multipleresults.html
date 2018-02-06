@@ -1,0 +1,75 @@
+<div class="col">
+
+  <div class="bg-light lter b-b wrapper-md hidden-print">
+    <h1 class="m-n font-thin h3">Results for Probill</h1>
+  </div>
+  <div class="wrapper-md" ng-controller="TracingCtrl">
+    <div class="well m-t bg-light lt">
+      <div class="row">
+        <div class="col-xs-6">
+          <p>
+            <label class="col-xs-5"><strong>Freight Bill:</strong></label><label>0021683681</label><br>
+            <label class="col-xs-5"><strong>Pieces:</strong></label><label>4</label><br>
+            <label class="col-xs-5"><strong>Weight:</strong></label><label>80</label><br>
+            <label class="col-xs-5"><strong>Adjusted Weight:</strong></label><label>0</label><br>
+            <label class="col-xs-5"><strong>Bill of Lading:</strong></label><label>NS</label><br>
+            <label class="col-xs-5"><strong>Shipper's Number:</strong></label><label>0021683681</label><br>
+            <label class="col-xs-5"><strong>Shipper:</strong></label><label>MANITOULIN TRANSPORT (ORDAN)</label><br>
+            <label class="col-xs-5"><strong>City:</strong></label><label>MISSISSAUGA</label><br>
+            <label class="col-xs-5"><strong>Province/State:</strong></label><label>ON</label><br>
+            <label class="col-xs-5"><strong>Postal/Zip:</strong></label><label>L5T1T1</label><br>
+          </p>
+        </div>
+        <div class="col-xs-6">
+           <p>
+            <label class="col-xs-5"><strong>Pickup Date:</strong></label><label>2016/06/01</label><br>
+            <label class="col-xs-5"><strong>Delivered on:</strong></label><label>2016/06/06 at 11:30</label><br>
+            <label class="col-xs-5"><strong>Delivery Appt:</strong></label><label>80</label><br>
+            <label class="col-xs-5"><strong>Delivery Code:</strong></label><label>Delivered Clear</label><br>
+            <label class="col-xs-5"><strong>Received By:</strong></label><label>KELSEY</label><br>
+            <label class="col-xs-5"><strong>Purchase Order:</strong></label><label>NS</label><br>
+            <label class="col-xs-5"><strong>Consignee:</strong></label><label>MANITOULIN TRANSPORT</label><br>
+            <label class="col-xs-5"><strong>City:</strong></label><label>CALGARY</label><br>
+            <label class="col-xs-5"><strong>Province/State:</strong></label><label>AB</label><br>
+            <label class="col-xs-5"><strong>Postal/Zip:</strong></label><label>T1Y1B4</label><br>
+          </p>
+        </div>
+      </div>
+    </div>
+    <table st-table="rowCollectionPage" class="table table-striped">
+      <thead>
+        <tr>
+          <th st-sort="piece">Piece</th>
+          <th st-sort="description">Description</th>
+          <th st-sort="weight">Weight</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="row in rowCollectionPage">
+          <td>
+            {{row.piece}}
+          </td>
+          <td>{{row.description}}</td>
+          <td>{{row.weight}}</td>
+
+        </tr>
+      </tbody>
+
+    </table>
+    <div class="line"></div>
+    <p>
+      <span>To view invoice charges for this shipment, click on the Reports tab and search the Financials section.</span>
+      <div class="col-md-3 col-sm-4">
+        <button ui-sref="app.tracing.imagesforprobill">
+            <i class="fa fa-file-image-o">Images</i>
+          </button>
+      </div>
+
+      <div class="col-md-3 col-sm-4">
+        <button ui-sref="app.tracing.multipleresults">
+           Next
+          </button>
+      </div>
+    </p>
+  </div>
+</div>

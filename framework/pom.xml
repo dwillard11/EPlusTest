@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>ca.manitoulin.mtd</groupId>
+        <artifactId>mtd_deps</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+        <relativePath>mtd_deps</relativePath>
+    </parent>
+    <artifactId>framework</artifactId>
+    <version>${framework.version}</version>
+    <packaging>pom</packaging>
+    <name>MTDirect Framework</name>
+    <modules>
+        <module>mtd_core</module>
+        <module>mtd_deps</module>
+        <!--<module>mtd_service</module>-->
+        <module>mtd_support</module>
+        <module>mtd_eplusService</module>
+        <module>mtd_eplus</module>
+        <!--<module>mtd_website</module>-->
+        <module>mtd_mvc</module>
+        <!--<module>mtd_bizService</module>-->
+        <!--<module>mtd_wsprovider</module>-->
+        <module>mtd_wsClient</module>
+        <!--<module>mtd_report</module>-->
+    </modules>
+    <organization>
+        <name>Dapasoft</name>
+        <url>http://www.dapasoft.com</url>
+    </organization>
+    <developers>
+        <developer>
+            <id>Technical Lead</id>
+            <name>Bob Yu</name>
+        </developer>
+    </developers>
+</project>

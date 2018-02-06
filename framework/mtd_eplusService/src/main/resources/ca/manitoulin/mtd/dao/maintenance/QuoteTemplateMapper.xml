@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.QuoteTemplateMapper">
+    <select id="selectQuoteTemplateListByType" resultType="QuoteTemplate">
+        SELECT DISTINCT
+        qt.qt_type as type,
+        IFNULL(c.cd_${language},c.cd_english) as typeDesc,
+        qt.qt_name as name
+        FROM EpQuoteTemplate qt INNER JOIN EpCode c on qt.qt_type = c.cd_key
+        WHERE 1 = 1
+        <if test="tripType != null and tripType != '' ">
+            AND qt.qt_type =  #{tripType,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != '' ">
+            AND qt.qt_name =  #{name,jdbcType=VARCHAR}
+        </if>
+        ORDER BY qt.qt_type, qt.qt_name
+    </select>
+
+    <select id="selectQuoteTemplates" resultType="QuoteTemplate" parameterType="String">
+    SELECT qt_id AS id,
+        qt_type as type,
+        qt_name as name,
+        qt_category_sequence as categorySequence,
+        qt_category as category,
+        qt_sequence as sequence,
+        qt_item as item,
+        qt_desc as description,
+        qt_status AS status
+    FROM EpQuoteTemplate
+    WHERE 1 = 1
+        <if test="tripType != null and tripType != '' ">
+            AND qt_type =  #{tripType,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != '' ">
+            AND qt_name =  #{name,jdbcType=VARCHAR}
+        </if>
+    ORDER BY qt_name, qt_category_sequence, qt_category, qt_sequence, qt_item
+    </select>
+    <insert id="insertQuoteTemplate" parameterType="QuoteTemplate">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpQuoteTemplate(
+            qt_type,
+            qt_name,
+            qt_category_sequence,
+            qt_category,
+            qt_sequence,
+            qt_item,
+            qt_desc,
+            qt_status,
+            qt_acomp,
+            qt_acust,
+            qt_auid,
+            qt_astamp)
+        VALUES (
+            #{type,jdbcType=VARCHAR},
+            #{name,jdbcType=VARCHAR},
+            #{categorySequence,jdbcType=INTEGER},
+            #{category,jdbcType=VARCHAR},
+            #{sequence,jdbcType=INTEGER},
+            #{item,jdbcType=VARCHAR},
+            #{description,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR},
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+    <delete id="deleteQuoteTemplateByCategory" parameterType="map">
+        DELETE FROM EpQuoteTemplate
+        WHERE qt_type =  #{tripType,jdbcType=VARCHAR}
+        AND qt_name =  #{name,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteQuoteTemplate" parameterType="Integer">
+        DELETE FROM EpQuoteTemplate WHERE qt_id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <update id="updateQuoteTemplate" parameterType="QuoteTemplate">
+        UPDATE EpQuoteTemplate SET
+            qt_name = #{name,jdbcType=VARCHAR},
+            qt_type = #{type,jdbcType=VARCHAR},
+            qt_category_sequence = #{categorySequence,jdbcType=INTEGER},
+            qt_category = #{category,jdbcType=VARCHAR},
+            qt_sequence = #{sequence,jdbcType=INTEGER},
+            qt_item = #{item,jdbcType=VARCHAR},
+            qt_desc = #{description,jdbcType=VARCHAR},
+            qt_status = #{status,jdbcType=VARCHAR},
+            qt_acomp = #{currentCompany,jdbcType=VARCHAR},
+            qt_acust = #{currentCustomer,jdbcType=VARCHAR},
+            qt_auid = #{updatedBy,jdbcType=VARCHAR},
+            qt_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE qt_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateQuoteTemplateCategorySequence" parameterType="QuoteTemplate">
+        UPDATE EpQuoteTemplate
+        SET qt_category_sequence = #{categorySequence,jdbcType=INTEGER},
+            qt_sequence = #{sequence,jdbcType=INTEGER},
+            qt_acomp = #{currentCompany,jdbcType=VARCHAR},
+            qt_acust = #{currentCustomer,jdbcType=VARCHAR},
+            qt_auid = #{updatedBy,jdbcType=VARCHAR},
+            qt_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE qt_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateQuoteTemplateSequence" parameterType="QuoteTemplate">
+        UPDATE EpQuoteTemplate
+        SET qt_sequence = #{sequence,jdbcType=INTEGER},
+            qt_acomp = #{currentCompany,jdbcType=VARCHAR},
+            qt_acust = #{currentCustomer,jdbcType=VARCHAR},
+            qt_auid = #{updatedBy,jdbcType=VARCHAR},
+            qt_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE qt_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectQuoteTemplateById" resultType="QuoteTemplate" parameterType="Integer">
+        SELECT qt_id AS id,
+            qt_type as type,
+            qt_name as name,
+            qt_category_sequence as categorySequence,
+            qt_category as category,
+            qt_sequence as sequence,
+            qt_item as item,
+            qt_desc as description,
+            qt_status AS status,
+            qt_acomp AS currentCompany,
+            qt_acust AS currentCustomer,
+            qt_auid AS updatedBy,
+            qt_astamp AS updateTime
+      FROM EpQuoteTemplate
+      WHERE qt_id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getCategorySequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT min(qt_category_sequence)
+        FROM EpQuoteTemplate
+        WHERE qt_name = #{name,jdbcType=VARCHAR}
+        AND qt_category = #{category,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getLastCategorySequenceByName" resultType="Integer" parameterType="map">
+        SELECT max(qt_category_sequence)
+        FROM EpQuoteTemplate
+        WHERE qt_name = #{name,jdbcType=VARCHAR}
+          AND qt_id != #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getItemSequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT max(qt_sequence)
+        FROM EpQuoteTemplate
+        WHERE qt_name = #{name,jdbcType=VARCHAR}
+        AND qt_category = #{category,jdbcType=VARCHAR}
+    </select>
+</mapper>

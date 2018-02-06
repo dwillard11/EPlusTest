@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.TripEventTemplateCostMapper" >
+    <sql id="SELECT_EVENTTEMPLATECOST">
+        ec_id as id,
+        ec_te_id as templateId,
+        ec_cost as estCost,
+        ec_date as estDate,
+        ec_currency as estCurrency,
+        ec_charge_code as chargeCode,
+        ec_charge_desc as chargeDesc,
+        ec_description as description,
+        ec_visible as visible,
+        ec_linked_entity as linkedEntity,
+        ec_linked_entity_contact as linkedEntityContact,
+        ec_acomp as currentCompany,
+        ec_acust as currentCustomer,
+        ec_auid as updatedBy,
+        ec_astamp as updateTime
+    </sql>
+    <select id="selectEventTemplateCostByTemplateId" resultType="TripEventTemplateCost" parameterType="integer">
+        SELECT
+        <include refid="SELECT_EVENTTEMPLATECOST" />
+        FROM EpEventTemplateCost
+        WHERE ec_te_id=#{value,jdbcType=INTEGER}
+    </select>
+    <select id="selectEventTemplateCostById" resultType="TripEventTemplateCost" parameterType="integer">
+        SELECT
+        <include refid="SELECT_EVENTTEMPLATECOST" />
+        FROM EpEventTemplateCost
+        WHERE ec_id=#{value,jdbcType=INTEGER}
+    </select>
+    <update id="updateEventTemplateCost" parameterType="TripEventTemplateCost">
+        UPDATE EpEventTemplateCost SET
+        ec_cost = #{estCost,jdbcType=NUMERIC},
+        ec_date = #{estDate,jdbcType=DATE},
+        ec_currency = #{estCurrency,jdbcType=VARCHAR},
+        ec_charge_code = #{chargeCode,jdbcType=VARCHAR},
+        ec_charge_desc = #{chargeDesc,jdbcType=VARCHAR},
+        ec_description = #{description,jdbcType=VARCHAR},
+        ec_visible = #{visible,jdbcType=VARCHAR},
+        ec_linked_entity = #{linkedEntity,jdbcType=INTEGER},
+        ec_linked_entity_contact = #{linkedEntityContact,jdbcType=INTEGER},
+        ec_acomp = #{currentCompany,jdbcType=VARCHAR},
+        ec_acust = #{currentCustomer,jdbcType=VARCHAR},
+        ec_auid = #{updatedBy,jdbcType=VARCHAR},
+        ec_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE fr_id=#{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insertEventTemplateCost" parameterType="TripEventTemplateCost">
+        INSERT INTO EpEventTemplateCost(
+        ec_te_id,
+        ec_cost,
+        ec_date,
+        ec_currency,
+        ec_charge_code,
+        ec_charge_desc,
+        ec_description,
+        ec_visible,
+        ec_linked_entity,
+        ec_linked_entity_contact,
+        ec_acomp,
+        ec_acust,
+        ec_auid,
+        ec_astamp)
+        VALUES (
+        #{templateId,jdbcType=INTEGER},
+        #{estCost,jdbcType=NUMERIC},
+        #{estDate,jdbcType=DATE},
+        #{estCurrency,jdbcType=VARCHAR},
+        #{chargeCode,jdbcType=VARCHAR},
+        #{chargeDesc,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{visible,jdbcType=VARCHAR},
+        #{linkedEntity,jdbcType=INTEGER},
+        #{linkedEntityContact,jdbcType=INTEGER},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+        <selectKey resultType="int" order="AFTER" keyProperty="id">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+    <delete id="deleteEventTemplateCost" parameterType="integer">
+        DELETE FROM EpEventTemplateCost
+        WHERE ec_id=#{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteEventTemplateCostByTemplateId" parameterType="integer">
+        DELETE FROM EpEventTemplateCost
+        WHERE ec_te_id=#{value,jdbcType=INTEGER}
+    </delete>
+</mapper>

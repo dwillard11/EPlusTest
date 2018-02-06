@@ -1,0 +1,263 @@
+<div class="bg-light lter b-b wrapper-md">
+	<h1 class="m-n font-thin h3">Probill Results</h1>
+</div>
+<div class="wrapper-md" ng-controller="ResultForProbillCtrl">
+	<div ng-show="isShowDetails" class="row">
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="col-lg-2">
+						<strong>{{probill.guaranteedDelivery}}</strong>
+					</div>
+					<div class="col-lg-4"></div>
+					<div class="col-lg-2"></div>
+					<div class="col-lg-4"></div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+					<div class="col-lg-2">
+						<strong>Freight Bill:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.formattedProbillNumber}}</div>
+					<div class="col-lg-2">
+						<strong>Pickup Date:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.formattedPickupDate}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Pieces:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.pieces}}</div>
+					<div class="col-lg-2">
+						<strong>{{probill.deliveryOnLabel}}</strong>
+					</div>
+					<div class="col-lg-4">{{probill.deliveryOn}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Weight:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.weight}}</div>
+					<div class="col-lg-2">
+						<strong>{{probill.deliveryApptLabel}}</strong>
+					</div>
+					<div class="col-lg-4">{{probill.deliveryApptValue}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Adjusted Weight:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.adjWeight}}</div>
+					<div class="col-lg-2">
+						<strong>{{probill.deliveryCodeLabel}}</strong>
+					</div>
+
+					<div
+						ng-if="probill.deliveryCodeLabel != '' && probill.deliveryCodeLabel != null"
+						class="col-lg-4">{{probill.deliveryCodeValue}}</div>
+					<div
+						ng-if="probill.deliveryCodeLabel == '' || probill.deliveryCodeLabel == null"
+						class="col-lg-4" ng-bind-html="probill.deliveryCodeValue"></div>
+
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+					<div class="col-lg-2">
+						<strong>Bill of Lading:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.bolNumber}}</div>
+					<div class="col-lg-2">
+						<strong>Received By:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.receivedBy}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Shipper's Number:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.shipperNumber}}</div>
+					<div class="col-lg-2">
+						<strong>Purchase Order:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.poNumber}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Shipper:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.shipper}}</div>
+					<div class="col-lg-2">
+						<strong>Consignee:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.consignee}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>City:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.shipperCity}}</div>
+					<div class="col-lg-2">
+						<strong>City:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.consigneeCity}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Province/State:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.shipperProvince}}</div>
+					<div class="col-lg-2">
+						<strong>Province/State:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.consigneeProvince}}</div>
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+
+					<div class="col-lg-2">
+						<strong>Postal/Zip:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.shipperZip}}</div>
+					<div class="col-lg-2">
+						<strong>Postal/Zip:</strong>
+					</div>
+					<div class="col-lg-4">{{probill.consigneeZip}}</div>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+		</div>
+
+		<div class="col-lg-12" ng-show="showPieces">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table st-table="rowCollectionPage4" class="table table-striped">
+						<thead>
+							<tr>
+								<th st-sort="pieces">Pieces</th>
+								<th st-sort="description">Description</th>
+								<th st-sort="weight" align="right">Weight</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in rowCollectionPage4">
+								<td>{{row.pieces}}</td>
+								<td>{{row.description}}</td>
+								<td>{{row.weight}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+		</div>
+
+		<div class="col-lg-12" ng-show="showManifest">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<table st-table="rowCollectionPage2" class="table table-striped">
+						<thead>
+							<tr>
+								<th st-sort="number">Manifest</th>
+								<th st-sort="type">Type</th>
+								<th st-sort="fromCity">From</th>
+								<th st-sort="fromDayOfWeek">Day</th>
+								<th st-sort="formattedFromDate">Date</th>
+								<th st-sort="formattedFromTime">Time</th>
+								<th st-sort="toCity">To</th>
+								<th st-sort="toDayOfWeek">Day</th>
+								<th st-sort="formattedToDate">Date</th>
+								<th st-sort="formattedToTime">Time</th>
+								<th st-sort="status">Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in rowCollectionPage2">
+								<td>{{row.number}}</td>
+								<td>{{row.type}}</td>
+								<td>{{row.fromCity}}</td>
+								<td>{{row.fromDayOfWeek}}</td>
+								<td>{{row.formattedFromDate}}</td>
+								<td>{{row.formattedFromTime}}</td>
+								<td>{{row.toCity}}</td>
+								<td>{{row.toDayOfWeek}}</td>
+								<td>{{row.formattedToDate}}</td>
+								<td>{{row.formattedToTime}}</td>
+								<td ng-if="row.statusTooltip != '' && row.statusTooltip != null"
+									class="font-bold" popover="{{row.statusTooltip}}"
+									popover-trigger="mouseenter">{{row.status}}</td>
+								<td ng-if="row.statusTooltip == '' || row.statusTooltip == null">
+									{{row.status}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+		</div>
+
+
+		<div class="col-lg-12" ng-show="showCustomer">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="col-lg-4">
+						<strong>{{probill.interlineLabel}}</strong> <label>
+							{{probill.interlineValue}}</label>
+
+					</div>
+					<div class="col-lg-4">
+						<strong>Revenue:</strong> <label> {{probill.revenue}}</label>
+					</div>
+					<div class="col-lg-4">
+						<strong>Discount:</strong> <label> {{probill.discount}}</label>
+					</div>
+
+					<div class="line line-dashed b-b line-lg pull-in"></div>
+					<table st-table="rowCollectionPage" class="table table-striped">
+						<thead>
+							<tr>
+								<th>Pieces</th>
+								<th>Code</th>
+								<th>HAZ</th>
+								<th>PK</th>
+								<th>Description</th>
+								<th>Weight</th>
+								<th>Rate</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="row in rowCollectionPage">
+								<td>{{row.pieces}}</td>
+								<td>{{row.code}}</td>
+								<td>{{row.haz}}</td>
+								<td>{{row.pk}}</td>
+								<td>{{row.description}}</td>
+								<td align="right">{{row.weight}}</td>
+								<td>{{row.rate}}</td>
+								<td align="right">{{row.amount}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-12">
+			To view invoice charges for this shipment, click on the Reports tab
+			and search for the Financials section.
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+		</div>
+
+		<div class="col-lg-12">
+			<button type="button" class="btn btn-default" ng-click="viewImages()">
+				View Images</button>
+			<button type="button" class="btn btn-default" ng-show="isShowBack"
+				ng-click="backOriginal()">Back</button>
+			
+			<div class="btn-group dropdown dropup" dropdown>
+				<a class="btn btn-default" dropdown-toggle tooltip="Share"><i class="icon-share"></i></a>
+				<div class="dropdown-menu" style="width:380px;">
+					<input type="text" id="copyTarget" value="{{shareurl}}" style="width:250px;"> <button id="copyButton" >Copy to clipboard</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div ng-show="!isShowDetails" class="row">
+		<i class="fa fa-spin fa-refresh"></i>
+	</div>
+</div>

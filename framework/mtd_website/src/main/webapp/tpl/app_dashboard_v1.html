@@ -1,0 +1,31 @@
+<div class="hbox hbox-auto-xs hbox-auto-sm" ng-init="app.settings.asideFolded = false; app.settings.asideDock = false;">
+	<!-- main -->
+	<div class="col">
+		<div class="bg-light lter b-b wrapper-md">
+			<h1 class="m-n font-thin h3">Announcements</h1>
+		</div>
+		<div class="wrapper-md" ng-controller="announcementsCtrl">
+			<div class="row">
+				<div class="col-sm-12">
+					<div class="blog-post" ng-repeat="announcement in announcements">
+						<div class="panel">
+							<div class="wrapper-lg">
+								<h2 class="m-t-none">
+									<a href>{{announcement.title}}</a>
+								</h2>
+								<div ng-bind-html="announcement.content"></div>
+								<div class="line line-lg b-b b-light"></div>
+								<div class="text-muted">
+									<i class="fa fa-clock-o text-muted"></i>
+									{{announcement.dateBegin}}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- / main -->
+
+</div>

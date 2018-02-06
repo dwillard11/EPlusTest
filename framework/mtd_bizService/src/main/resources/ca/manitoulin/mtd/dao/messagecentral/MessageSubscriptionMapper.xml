@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.messagecentral.MessageSubscriptionMapper" >
+ 
+	<select id="selectSubscriptions" resultType="MessageSubscription" parameterType="map">
+		SELECT CFDATEADD as requestedDate,
+			CFTIMEADD as requestedTime,
+			case when CFEXPIRY = 0 then null else  timestamp_format(char(CFEXPIRY),'yyyyMMdd')  end as expiryDate,
+			CASE WHEN CFPRO ='*ALL' THEN 'All Probills' ELSE CFPRO END as probillNo,
+			ATACTDESC as activityDescription,
+			b.ATACTION as activityCode,
+			CFNOTIFY as notification,
+			CASE WHEN CFNOTIFY = 'E' THEN 'No' ELSE 'Yes' END as messageCentral,
+			CFEMAIL as email,
+			CFSEQUENCE as id
+		FROM ${schema}.mcp100 as a, ${schema}.mcp120 as b
+		WHERE a.CFACTION=b.ATACTION 
+			and (CFUSER = #{userid,		jdbcType=VARCHAR} 
+			and CFCOMPMTD = UPPER(#{company,		jdbcType=VARCHAR}) 
+			and CFACCOUNT = #{useraccount, jdbcType=VARCHAR}) 
+			and (CFEXPIRY >= integer(VARCHAR_FORMAT(timestamp_iso(current date),'yyyyMMdd'))  or CFEXPIRY = 0)
+		ORDER BY CFDATEADD, CFTIMEADD
+	
+	
+	</select>  
+	
+	<select id="selectSubscription" resultType="MessageSubscription" parameterType="map">
+		SELECT CFDATEADD as requestedDate,
+			CFTIMEADD as requestedTime,
+			case when CFEXPIRY = 0 then null else  timestamp_format(char(CFEXPIRY),'yyyyMMdd')  end as expiryDate,
+			CASE WHEN CFPRO ='*ALL' THEN NULL ELSE CFPRO END as probillNo,
+			CFACTION as activityCode,
+			CFNOTIFY as notification,
+			CFEMAIL as email,
+			CFSEQUENCE as id
+		FROM ${schema}.mcp100 
+		WHERE CFSEQUENCE = #{id, jdbcType=VARCHAR}
+	
+	
+	</select>  
+	<insert id="insertSubscription" parameterType="map">
+		<selectKey keyProperty="id" resultType="string" order="BEFORE">
+	    SELECT seqnum FROM www.mdpseqfile WHERE TBKEY = 'MCSEQ'
+	  	</selectKey>
+	  	INSERT INTO ${schema}.mcp100
+						(CFACCOUNT, CFACTION, CFPRO, CFEMAIL, CFUSER, CFCOMPMTD, CFCUSTMTD, CFNOTIFY, 
+							CFDATEADD, CFTIMEADD, CFEXPIRY, CFSEQUENCE)
+    					VALUES
+    					(#{user.account, jdbcType=VARCHAR},
+    					#{object.activityCode, jdbcType=VARCHAR},
+    					<choose>
+    						<when test="object.probillNo == null">
+    						'*ALL',
+    						</when>
+    						<otherwise>
+    						#{object.probillNo, jdbcType=VARCHAR},
+    						</otherwise>
+    					</choose>
+    					<choose>
+    						<when test="object.email == null">
+    						' ',
+    						</when>
+    						<otherwise>
+    						#{object.email, jdbcType=VARCHAR},
+    						</otherwise>
+    					</choose>
+    					
+    					#{user.id, jdbcType=VARCHAR},
+    					#{user.company, jdbcType=VARCHAR},
+    					#{user.customer, jdbcType=VARCHAR},
+    					#{object.notification, jdbcType=VARCHAR},
+    					#{object.requestedDate, jdbcType=DATE},
+    					#{object.requestedTime, jdbcType=TIME},
+    					#{object.expiryDateInInteger, jdbcType=DECIMAL},
+    					#{id}
+    					)
+	</insert>
+	
+	<update id="updateSubscription" parameterType="map">
+	UPDATE ${schema}.mcp100
+		  				SET CFACTION = #{object.activityCode, jdbcType=VARCHAR}, 
+		  					CFPRO = 
+						<choose>
+    						<when test="object.probillNo == null">
+    						'*ALL',
+    						</when>
+    						<otherwise>
+    						#{object.probillNo, jdbcType=VARCHAR},
+    						</otherwise>
+    					</choose>
+		  					CFEMAIL = 
+		  				<choose>
+    						<when test="object.email == null">
+    						' ',
+    						</when>
+    						<otherwise>
+    						#{object.email, jdbcType=VARCHAR},
+    						</otherwise>
+    					</choose>	
+		  					
+		  					CFNOTIFY = #{object.notification, jdbcType=VARCHAR},
+		  					CFEXPIRY = #{object.expiryDateInInteger, jdbcType=DECIMAL}
+        				WHERE CFSEQUENCE = #{object.id, jdbcType=VARCHAR}
+	</update>
+	
+	<delete id="deleteSubscription" parameterType="map">
+		DELETE 
+						FROM ${schema}.mcp100
+		  				WHERE CFSEQUENCE=#{id, jdbcType=VARCHAR}
+	</delete>
+</mapper>

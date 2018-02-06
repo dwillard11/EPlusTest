@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.tracing.ProbillMapper">
+
+	<sql id="SQL_PROBILL">
+	SELECT
+		P.FHPRO as probillNumber,
+		P.FHTOTP as pieces,
+		(CASE WHEN P.FHDDAT = '0' THEN NULL ELSE P.FHDDAT END)as deliveryDate,
+		(CASE WHEN P.FHDTIM = '0' THEN NULL ELSE P.FHDTIM END) as deliveryTime,
+		P.FHSWGT as weight,
+		(CASE WHEN P.FHDADT = '0' THEN NULL ELSE P.FHDADT END) as deliveryApptDate,
+		(CASE WHEN P.FHDATM = '0' THEN NULL ELSE P.FHDATM END) as deliveryApptTime,
+		P.FHRWGT as adjWeight,
+		P.FHBL as bolNumber,
+		P.FHSNUM as shipperNumber,
+		P.FHPO as poNumber,
+		P.FHSN as cargoControlNumber,
+		P.FHSNM as shipper,
+		P.FHCNM as consignee,
+		P.FHSCT as shipperCity,
+		P.FHCCT as consigneeCity,
+		P.FHSST as shipperProvince,
+		P.FHCST as consigneeProvince,
+		P.FHSZIP as shipperZip,
+		P.FHCZIP as consigneeZip,
+		CITY.CNNAT AS consigneeCountry,
+		P.FHXT as transferTo,
+		P.FHXB6 as guaranteedDeliveryCode,
+		P.FHOT as terminalId,
+		(CASE WHEN P.FHTP = '0' THEN NULL ELSE  P.FHTP END) as probillETA,
+		RP.FHFPC as fromCarrierDiscountPercentage,
+		RP.FHTPC as toCarrierDiscountPercentage,
+		RP.FHPF$ as fromCarrierRevenue,
+		RP.FHPT$ as toCarrierRevenue,
+		RP.FHALLD as discountAmount,
+		RP.FHALLP as discountPercentage,
+		RP.FHXF as transferedFromCarrier,
+		RP.FHXT as transferedToCarrier,
+		( CASE WHEN RP.FHXFBD != '0' THEN RP.FHXFBD ELSE RP.FHPUDT END  ) as pickupDate,
+		RP.FHBBC as deliveryCode,
+		CO.DELDESC as deliveryCodeDesp,
+		(CASE WHEN P103.INETAD = '0' THEN NULL ELSE P103.INETAD END) AS etaDate,
+		(CASE WHEN P103.INEXT1 = '0' THEN NULL ELSE P103.INEXT1 END) AS rescheduledDate,
+		P103.INBBC as rescheduledReasonCode,
+		(CASE WHEN P103.INTETA = '0' THEN NULL ELSE P103.INTETA END) as toCarrierETA
+	FROM ${schema}.FRL00142 P 
+		LEFT JOIN ${schema}.FRP001 RP ON RP.FHPRO=P.FHPRO
+		LEFT JOIN WWW.DELCODES CO ON RP.FHBBC=CO.DELCODE 
+		LEFT JOIN ${schema}.AAP060 CITY ON CITY.CNCITY = P.FHCCT  AND CITY.CNST = P.FHCST
+		LEFT JOIN ${schema}.FRP103 P103 ON P103.INPRO = P.FHPRO	
+	</sql>
+	
+	<sql id="SQL_TRACE_BY_DATE_LIST">
+		FHPRO as probillNumber,
+		FHPUDT as pickupDate,
+		FHSNM as shipper,
+		RTRIM(FHSCT) || ', '|| FHSST as shipperCity,
+		FHCNM as consignee,
+		RTRIM(FHCCT) || ', '||FHCST as consigneeCity,
+		FHDDAT as deliveryDate,
+		(CASE WHEN FHDTIM = '0' THEN NULL ELSE FHDTIM END) as deliveryTime,
+		FHBL as bolNumber,
+		FHPO as poNumber,
+		FHSWGT as weight,
+		FHRWGT as adjWeight,
+		FHTRM as terms,
+		FHSNUM as shipperNumber,
+		FHXT as transferTo
+	</sql>
+
+	<select id="selectProbillByNumber" resultType="Probill" parameterType="Map">
+	
+	<include refid="SQL_PROBILL" />
+	
+	WHERE P.FHPRO = #{probillNumber, jdbcType=VARCHAR} 
+	</select>
+	<!-- deprecated, move into retrieval SQL - 2016/8/11
+	<select id="selectProbillExtByNumber" resultType="Probill" parameterType="Map">
+	SELECT ( CASE WHEN FHXFBD != '0' THEN FHXFBD ELSE FHPUDT END  ) as pickupDate,
+			FHBBC as deliveryCode,
+			DELDESC as deliveryCodeDesp
+	FROM ${schema}.FRP001 RP LEFT JOIN WWW.DELCODES CO ON FHBBC=CO.DELCODE 
+	WHERE FHPRO = #{probillNumber, jdbcType=VARCHAR} 
+	
+	</select>
+	 -->
+	<select id="selectPiecesByProbill" resultType="PackingPiece" parameterType="Map">
+	SELECT FDPCS as pieces,
+			FDDES as description,
+			FDWGT as weight
+	FROM ${schema}.FRP002 
+	WHERE FDPRO = #{probillNumber, jdbcType=VARCHAR} 
+		AND FDPCS &gt; 0 AND FDWGT &gt; 0
+    ORDER BY FDLIN 
+	</select>	
+	<select id="selectReceivedByProbill" resultType="String" parameterType="Map">
+	SELECT MDRNAM
+                                 FROM ${schema}.DSLM8102x
+                                 WHERE MDPRO = #{probillNumber, jdbcType=VARCHAR} 
+ 								order by MDDDAT desc
+	
+	</select>	
+	
+	<select id="selectProbillByBOL" resultType="Probill" parameterType="Map">
+		
+		<include refid="SQL_PROBILL" />
+        
+          WHERE P.FHBL = #{bol, jdbcType=VARCHAR}
+                    
+			AND (P.FHSCD   IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+
+			OR P.FHCCD  IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+        	OR P.FHBTC    IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>			
+			)           
+	</select>	
+	<select id="selectProbillByShipper" resultType="Probill" parameterType="Map">
+	
+		<include refid="SQL_PROBILL" />
+        
+        WHERE P.FHSNUM = #{shipper, jdbcType=VARCHAR}
+	</select>	
+	<select id="selectProbillByPO" resultType="Probill" parameterType="Map">
+	 
+		<include refid="SQL_PROBILL" />
+   
+    WHERE P.FHPO = #{po, jdbcType=VARCHAR}
+					
+
+	</select>	
+	<select id="selectProbillNumberByPickupNumber" resultType="String" parameterType="Map">
+	SELECT PAPRO
+	FROM  ${schema}.DSP090
+                                          WHERE PANUM =  #{pickupNumber, jdbcType=VARCHAR} and papro &gt; 0
+  
+
+	</select>	
+	<select id="selectPickupStatusDetailByPickupNumber" resultType="PickupStatusDetail" parameterType="Map">
+	SELECT PHNUM as refNumber, 
+		PHDAT as statusDate, 
+		PHTIM as statusTime, 
+		PHCOD as action, 
+		PHCOMM as comments
+    			 		FROM ${schema}.DSP093
+    			 		WHERE PHNUM = #{pickupNumber, jdbcType=VARCHAR} 
+                        and PHCOD in ('ACK','ACP','ADD','ARV','EML','EPU','ESP','PCK','REF','REG','RLD','SHP','STR','STT')
+
+				 		ORDER BY PHDAT, PHTIM
+	  
+
+	</select>
+	<select id="selectPartnerProbillByPickupDate" resultType="Probill" parameterType="Map">
+	SELECT 
+	<include refid="SQL_TRACE_BY_DATE_LIST" />
+	FROM ${schema}.FRP001 as Pro
+	WHERE ( Pro.FHXT IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+
+			OR Pro.FHXF IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+			
+			) 
+	
+	AND ( Pro.FHPUDT &gt;= #{dateBegin, jdbcType=DECIMAL}  AND Pro.FHPUDT &lt;= #{dateEnd, jdbcType=DECIMAL} )
+    ORDER BY FHPUDT, FHPRO
+	
+	</select>	
+	<select id="selectProbillByPickupDate" resultType="Probill" parameterType="Map">
+	SELECT 
+	<include refid="SQL_TRACE_BY_DATE_LIST" />
+	FROM ${schema}.FRP001 as Pro
+	WHERE ( Pro.FHSCD  IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+
+			OR Pro.FHCCD  IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+        OR Pro.FHBTC   IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+        OR Pro.FHFP   IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+			
+			) 
+	
+	AND ( Pro.FHPUDT &gt;= #{dateBegin, jdbcType=DECIMAL}  AND Pro.FHPUDT &lt;= #{dateEnd, jdbcType=DECIMAL} )
+    ORDER BY FHPUDT, FHPRO
+	</select>
+	<select id="selectPartnerProbillByDeliveryDate" resultType="Probill" parameterType="Map">
+	SELECT 
+		<include refid="SQL_TRACE_BY_DATE_LIST" />
+	FROM ${schema}.frl00148  as Pro, ${schema}.dslm8102   as Rec
+	 WHERE   Pro.FHPRO=Rec.MDPRO and Pro.FHXF IN
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+	
+	AND ( Pro.FHDDAT  &gt;= #{dateBegin, jdbcType=DECIMAL}  AND Pro.FHDDAT  &lt;= #{dateEnd, jdbcType=DECIMAL} )
+    order by FHDDAT
+	
+	</select>	
+	<select id="selectProbillByDeliveryDate" resultType="Probill" parameterType="Map">
+	SELECT 
+		<include refid="SQL_TRACE_BY_DATE_LIST" />
+	FROM ${schema}.frl00148  as Pro, ${schema}.dslm8102   as Rec
+	WHERE Pro.FHPRO=Rec.MDPRO and  (Pro.FHSCD   IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+
+			OR Pro.FHCCD  IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+        	OR Pro.FHFP   IN 
+		<foreach collection="accounts" item="account"
+                    index="index" open="(" close=")" separator=",">
+                    #{account, jdbcType=VARCHAR}
+        </foreach>
+			
+			) 
+	
+	AND ( Pro.FHPUDT &gt;= #{dateBegin, jdbcType=DECIMAL}  AND Pro.FHPUDT &lt;= #{dateEnd, jdbcType=DECIMAL} )
+    order by FHDDAT
+	</select>
+	<select id="selectImages" resultType="Attachment" parameterType="Map">
+	SELECT DOCID as id, SCYMD as scanDate,RTRIM(DOCTYP) as fileType
+				FROM ASGLIB.ASG001
+				WHERE NUMINDEX = #{probillNumber, jdbcType=VARCHAR} AND SCSYS = #{systemCode, jdbcType=VARCHAR}
+				ORDER BY SCYMD
+	</select>
+	
+	<select id="callManifestProc" statementType="CALLABLE" parameterType="ProbillStoredProcedureParam">
+		{ CALL MTDIRECT.MTC001(
+		#{probillNumber, mode=INOUT, jdbcType=VARCHAR, javaType=string}, 
+		#{systemCode, mode=INOUT, jdbcType=VARCHAR, javaType=string}, 
+		#{returnCode, mode=INOUT, jdbcType=VARCHAR, javaType=string})}
+	</select>
+	<select id="selectManifestByProbill" resultType="ManifestInfo" parameterType="map">
+	<![CDATA[
+	select 
+		
+		TMP.VMOT||'-'|| TMP.VMSEQX as number,
+		TMP.VMSTAT as type,
+		TMP.VMOPN as fromCityCode,
+		TMP.Y2K010 as fromDate,
+		TMP.VMATO as fromTime,
+		TMP.VMIPN as  toCityCode,
+		TMP.Y2K009 as toDate,
+		TMP.VMATI as toTime,
+		TMP.VMTRIP as dispathId,
+		TMP.LINE as lineId,
+		TMP.IN72 as deliveryField,
+		TMP.MDBBC as deliveryStatus,
+		TMP.Y2K008 as deliveryDate,
+		TMP.MDATIM as deliveryTime,
+		TMP.MDRNAM as receivedBy
+	FROM QTEMP.MTW001 TMP 
+	
+	Where  TMP.PRO = #{probillNumber, jdbcType=VARCHAR}
+	
+	Order By TMP.Y2K010 desc, TMP.VMATO desc, TMP.LINE desc
+	]]>
+	</select>		
+	
+	<select id="callImageProc" statementType="CALLABLE" parameterType="map">
+	{CALL MTDIRECT.GETIMG(#{imageId, mode=IN, jdbcType=VARCHAR}, 
+	#{probillNumber, mode=IN, jdbcType=VARCHAR}, 
+	#{systemCode, mode=IN, jdbcType=VARCHAR})}
+	</select>
+	
+	<select id="selectProbillNumberByPickupDate" resultType="string" parameterType="Page">
+	SELECT 
+		FHPRO
+	FROM ${params.schema}.FRP001 as Pro
+	WHERE Pro.FHPUDT &gt;= #{params.dateBegin, jdbcType=DECIMAL}  AND Pro.FHPUDT &lt;= #{params.dateEnd, jdbcType=DECIMAL} 
+    ORDER BY FHPRO
+	</select>	
+	
+	<select id="selectPartnerChargeInfo" resultType="PartnerChargeInfo" parameterType="map">
+	<![CDATA[
+		SELECT 
+				FDPCS as pieces,
+				FDCMCL as code,
+				FDHAZ as haz,
+				FDPKGC as pk,
+				FDDES as description,
+				FDWGT as weight,
+				FDRAT as rate,
+				FDAMT as amount
+        FROM ${schema}.FRP001 p1
+                    LEFT JOIN  ${schema}.FRP002 p2 ON ( p1.FHPRO =  p2.FDPRO)
+        WHERE FDCMCL <> 'DNP' AND FDCMCL <> 'SPLIT' 
+        	AND p1.FHPRO = #{probillNumber, jdbcType=VARCHAR}
+        	AND p2.FDOT = #{terminalId, jdbcType=VARCHAR}
+	]]>
+	</select>
+	
+	<select id="selectPartnerShowIndicator" resultType="string" parameterType="map">
+		SELECT 'Y'
+		FROM ${schema}.AAP002
+		WHERE TBDKEY = 'MTFBSC' and
+		        TBDAK1 =  #{userAccount, jdbcType=VARCHAR} 
+	</select>
+</mapper>

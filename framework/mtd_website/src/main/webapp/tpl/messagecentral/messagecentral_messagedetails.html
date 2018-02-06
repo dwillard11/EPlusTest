@@ -1,0 +1,33 @@
+<div class="bg-light lter b-b wrapper-md">
+	<h1 class="m-n font-thin h3">Message Central - View Messages</h1>
+</div>
+<div class="wrapper-md" ng-controller="MessageDetailsCtrl">
+	<div  class="panel panel-default">
+		<div ng-show="isShowDetails" class="panel-body">
+			<div class="col-lg-12">
+				<strong>Delivery Status for Probill: </strong><a class="text-u-l" ng-click="seeDetails(message.probillNo)"><strong>{{message.formattedProbillNumber}}</strong></a>
+			</div>
+			<div ng-repeat="row in message.detailData">
+				<div class="line line-dashed b-b line-lg pull-in"></div>
+				<div class="col-lg-2">{{row.HEADING}}</div>
+				<div class="col-lg-4">{{row.DATA}}</div>
+			</div>
+
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="col-lg-12">
+				<button ng-show="isShowBack" class="btn btn-default" ui-sref="app.messagecentral.viewmessages">Back</button>
+				<button class="btn btn-danger hidden" ui-sref="app.messagecentral.viewmessages">Delete</button>
+        		<div class="btn-group dropdown dropup" dropdown>
+					<a class="btn btn-default" dropdown-toggle tooltip="Share"><i class="icon-share"></i></a>
+					<div class="dropdown-menu" style="width:380px;">
+						<input type="text" id="copyTarget" value="{{shareurl}}" style="width:250px;"> <button id="copyButton" >Copy to clipboard</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div ng-show="!isShowDetails" class="panel-body">
+			<i class="fa fa-spin fa-refresh"></i>
+		</div>
+	</div>
+	
+</div>

@@ -1,0 +1,88 @@
+<form class="form-horizontal" role="form" method="POST" name="invoiceItemEditForm" ng-submit="ok(invoiceItemEditForm.$valid)">
+    <div class="modal-header">Invoice Item Editor</div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="hidden col-sm-10 control-label text-right">{{invoiceId}}</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Invoice Items</label>
+                    <div class="col-sm-3">
+                        <div class="input-group-btn dropdown" dropdown>
+                            <select class="form-control" ng-model="i.chargeCode" ng-change="findChargeDesc(i.chargeCode)">
+                                <option ng-repeat="item in invoiceDescCodeOption" value="{{item.id}}" >{{item.name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Charge Desc</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" ng-model="i.item" id="chargeDesc" value="{{i.item}}" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Charge</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="number" step="0.01" class="form-control" ng-model="i.amount" max="99999999" min="0">
+                        </div>
+                    </div>
+                    <label class="col-sm-3 control-label">Sequence</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <input type="number" class="form-control" ng-model="i.sequence" value="{{i.sequence}}" max="99999" min="0"
+                                   required>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Tax Code</label>
+                    <div class="col-sm-3">
+                        <div class="input-group-btn dropdown" dropdown>
+                            <select class="form-control" ng-model="i.taxCode"
+                                    ng-change="findTaxCodeValue(i.taxCode, taxCodeOption)">
+                                <option ng-repeat="item in taxCodeOption" value="{{item.id}}">{{item.id}}</option>
+                            </select>
+                        </div>
+
+
+                    </div>
+                    <label class="col-sm-3 control-label">Tax Code Value</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <p class="form-control-static">{{i.taxCodeValue * 100 | number:2}}%</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Tax Amount</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <p class="form-control-static">{{(i.amount * i.taxCodeValue) | currency:'':2}}</p>
+                        </div>
+                    </div>
+                    <label class="col-sm-3 control-label">Total</label>
+                    <div class="col-sm-3">
+                        <div class="input-group">
+                            <p class="form-control-static">{{(i.amount +i.amount*i.taxCodeValue) | currency:'':2}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><strong>Save</strong></button>
+        <button type="button" class="btn btn-danger" ng-click="cancel()"><strong>Cancel</strong></button>
+    </div>
+</form>

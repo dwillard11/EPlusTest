@@ -1,0 +1,160 @@
+<div class="wrapper-md" ng-controller="invoicectrl">
+    <div class="bg-light lter b-b wrapper-md">
+        <div class="row">
+            <div class="col-sm-6 col-xs-12">
+                <h1 class="m-n font-thin h3">Invoices List</h1>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="row wrapper">
+                <label class="col-sm-1 control-label">Division</label>
+                <div class="col-sm-11">
+                    <label class="checkbox-inline" ng-repeat="dept in departmentOptions">
+                        <input type="checkbox" id="{{dept.id}}" name="{{dept.name}}"
+                               ng-checked="isSelectedDept(dept.id)" ng-click="updateSelectDept($event,dept.id)">
+                        {{dept.name}}
+                    </label>
+                </div>
+        </div>
+
+        <div class="row wrapper">
+            <label class="col-sm-1 control-label">Start Date</label>
+            <div class="col-sm-2">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="dropdown" role="button"
+                       data-toggle="dropdown" data-target="#">
+                        <div class="input-group"><input type="text" class="form-control"
+                                                        data-ng-model="from"
+                                                        id="from"><span
+                                class="input-group-addon"><i
+                                class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="from"
+                                        data-datetimepicker-config="{ dropdownSelector: '#dropdown', startView: 'day',minView: 'day', modelType: 'YYYY-MM-DD'}"/>
+                    </ul>
+                </div>
+            </div>
+
+
+            <label class="col-sm-1 control-label">End Date</label>
+            <div class="col-sm-2">
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="dropdown1" role="button"
+                       data-toggle="dropdown" data-target="#">
+                        <div class="input-group"><input type="text" class="form-control"
+                                                        data-ng-model="to"
+                                                        id="to"><span
+                                class="input-group-addon"><i
+                                class="glyphicon glyphicon-calendar"></i></span>
+                        </div>
+                    </a>
+                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                        <datetimepicker data-ng-model="to"
+                                        data-datetimepicker-config="{ dropdownSelector: '#dropdown1', startView: 'day',minView: 'day', modelType: 'YYYY-MM-DD'}"/>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="input-group  pull-right m-t-xs">
+                    <input type="text" class="input form-control" placeholder="Search"
+                           ng-model="advsearchfilter">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="advsearch()">Search</button>
+                    </span>
+                </div>
+            </div>
+
+            <div class="col-sm-3">
+                <div class="btn-group dropdown pull-right m-t-xs">
+                    <button class="btn btn-default" data-toggle="dropdown">
+                        Export
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="exportpdf(rowCollectionPage,'invoice')">PDF</a></li>
+                        <li><a ng-csv="exportcsv(rowCollectionPage,'invoice')"
+                               filename="{{csvfilename}}">CSV</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table search-invoice-model="advsearchfilter" st-table="displayedCollection"
+               st-safe-src="rowCollectionPage"
+               class="table table-striped">
+            <thead>
+                <tr>
+                    <th st-sort="id" class="hidden">ID</th>
+                    <th st-sort="refNum">Invoice #</th>
+                    <th st-sort="serviceType">Service Type</th>
+                    <th st-sort="invoiceTo">Invoice To</th>
+                    <th st-sort="shipper">Shipper</th>
+                    <th st-sort="billingCurrency">Currency</th>
+                    <th st-sort="totalAmount">Total</th>
+                    <th st-sort="invoiceDate">Date</th>
+                    <th style="width: 60px; text-align: center">Action</th>
+                </tr>
+            </thead>
+            <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <td class="hidden"><a class="text-u-l">{{row.id}}</a></td>
+                    <td>{{ row.refNum}}</td>
+                    <td>{{ row.serviceType}}</td>
+                    <td>{{ row.billedClient }}</td>
+                    <td>{{ row.shipper }}</td>
+                    <td>{{ row.billingCurrency}}</td>
+                    <td>{{ row.totalAmount| currency:'':2}}</td>
+                    <td>{{ row.invoiceDate| date:'yyyy-MM-dd'}}</td>
+                    <td style="white-space: nowrap">
+                        <div class="buttons">
+                            <button class="btn btn-sm btn-danger"
+                                    ng-click="showInvoice(row.tripId, row.id, 'read','invoice')"
+                                    tooltip-placement="bottom"
+                                    tooltip="ReadOnly"><i class="fa fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info"
+                                    ng-click="showInvoice(row.tripId, row.id, 'edit','invoice')"
+                                    tooltip-placement="bottom"
+                                    tooltip="Edit"><i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-info" ng-show="row.documentId>0"  ng-click="downloadFile(row.documentId)"
+                                    tooltip-placement="bottom"
+                                    tooltip="Download">
+                                <i class="fa fa-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger"
+                                    ng-click="removeInvoice(row.id)"
+                                    tooltip-placement="bottom"
+                                    tooltip="Delete"><i
+                                    class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+            <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="9" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        </div>
+    </div>
+</div>

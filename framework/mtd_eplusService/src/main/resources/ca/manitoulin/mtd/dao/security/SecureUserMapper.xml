@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.SecureUserMapper">
+	<sql id="SQL_SELECT_USER">
+		eu.eu_id as id,
+		eu_dp_id as depId,
+        eu.eu_comp as company,
+        eu.eu_cust as customer,
+        eu.eu_uid as uid,
+        eu.eu_status as status,
+        eu_default_currency as defaultCurrency
+        
+	</sql>
+    <select id="selectSecureUsers" resultType="SecureUser" parameterType="map">
+        SELECT
+            eu.eu_id as id,
+            eu_dp_id as depId,
+            eu.eu_comp as company,
+            eu.eu_cust as customer,
+            eu.eu_uid as uid,
+            IFNULL(EC.cd_${language},EC.cd_english) as status,
+            eu_default_currency as defaultCurrency
+        FROM EpUser eu LEFT OUTER JOIN EpCode EC ON eu.eu_status = EC.cd_key AND EC.cd_name = 'Status'
+        WHERE eu.eu_uid LIKE #{searchKey,jdbcType=VARCHAR}
+        ORDER BY eu.eu_id
+    </select>
+    <insert id="insertSecureUser" parameterType="SecureUser">
+        <selectKey resultType="java.lang.String" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpUser(
+        eu_dp_id,
+        eu_comp,
+        eu_cust,
+        eu_uid,
+        eu_status,
+        eu_default_currency,
+        eu_acomp,
+        eu_acust,
+        eu_auid,
+        eu_astamp)
+        VALUES (
+        #{depId,jdbcType=INTEGER},
+        #{company,jdbcType=VARCHAR},
+        #{customer,jdbcType=VARCHAR},
+        #{uid,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{defaultCurrency,jdbcType=VARCHAR},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <delete id="deleteSecureUser" parameterType="Integer">
+        DELETE FROM EpUser WHERE eu_id = #{id,jdbcType=INTEGER}
+    </delete>
+    <update id="updateSecureUser" parameterType="SecureUser">
+        UPDATE EpUser SET
+        eu_comp = #{company,jdbcType=VARCHAR},
+        eu_cust = #{customer,jdbcType=VARCHAR},
+        eu_uid = #{uid,jdbcType=VARCHAR},
+        eu_status = #{status,jdbcType=VARCHAR},
+        eu_default_currency = #{defaultCurrency,jdbcType=VARCHAR},
+        eu_acomp = #{currentCompany,jdbcType=VARCHAR},
+        eu_acust = #{currentCustomer,jdbcType=VARCHAR},
+        eu_auid = #{updatedBy,jdbcType=VARCHAR},
+        eu_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE eu_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="selectSecureUserByID" resultType="SecureUser">
+        SELECT 
+		<include refid="SQL_SELECT_USER" />    
+		FROM EpUser eu 
+        WHERE eu_id = #{id,jdbcType=INTEGER}
+    </select>
+
+	<select id="selectUserByUID" resultType="SecureUser" parameterType="string">
+        SELECT
+        eu.eu_id as id,
+        eu.eu_dp_id as depId,
+        eu.eu_comp as company,
+        eu.eu_cust as customer,
+        eu.eu_uid as uid,
+        eu.eu_status as status,
+        eu.eu_default_currency as defaultCurrency,
+        ed.dp_shortname as currentDepCode
+		FROM EpUser eu
+        LEFT JOIN EpDivision ed on ed.dp_id = eu.eu_dp_id
+        WHERE eu_uid = #{value,jdbcType=VARCHAR}
+    </select>
+    <select id="selectUserFromPMTUserByUID" parameterType="string" resultType="SecureUser">
+        select
+        MUFNAME as firstname,
+        MULNAME as lastname,
+        mucomp as company,
+        mucust as customer,
+        mupwd as password,
+        muuid as uid from PMTUSR
+        where muuid = #{uid,jdbcType=VARCHAR}
+    </select>
+
+    <insert id="insertUserRole" parameterType="map">
+        INSERT INTO EpUserRole (eur_eu_id, eur_er_id, er_acomp, er_acust, er_auid, er_astamp)
+        VALUES (#{userId,jdbcType=INTEGER},
+            #{roleId,jdbcType=INTEGER},
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+    <delete id="deleteUserRole" parameterType="Integer">
+        DELETE FROM EpUserRole
+        WHERE eur_eu_id = #{userId,jdbcType=INTEGER}
+    </delete>
+
+    <insert id="insertUserDivision" parameterType="map">
+        INSERT INTO EpUserDivision (eud_eu_id, eud_dp_id, eud_acomp, eud_acust, eud_auid, eud_astamp)
+        VALUES (#{userId,jdbcType=INTEGER},
+            #{departmentId,jdbcType=INTEGER},
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+    <delete id="deleteUserDivision" parameterType="Integer">
+        DELETE FROM EpUserDivision
+        WHERE eud_eu_id = #{userId,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectDepartmentsByUserID" resultType="Organization" parameterType="Integer">
+        SELECT
+            dp.dp_id AS id,
+            dp.dp_status AS status,
+            dp.dp_name AS name,
+            dp.dp_shortname AS shortName
+        from EpDivision dp where dp.dp_id in (
+        select eud_dp_id
+        from EpUserDivision
+        where eud_eu_id = #{userId,jdbcType=INTEGER})
+    </select>
+
+    <select id="selectUserByIdAndPassword" resultType="SecureUser">
+        select
+        MUFNAME as firstname,
+        MULNAME as lastname,
+        mucomp as company,
+        mucust as customer,
+        mupwd as password,
+        muuid as uid from PMTUSR
+        where muuid = #{userId,jdbcType=VARCHAR} and mupwd = #{password, jdbcType=VARCHAR}
+    </select>
+    
+     <select id="selectPMTUserById" resultType="SecureUser">
+        select
+	        MUFNAME as firstname,
+	        MULNAME as lastname,
+	        MUCOMP as company,
+	        MUCUST as customer,
+	        MUPWD as password,
+	        MUUID as uid ,
+	        MUDOMAIN as domain
+        from PMTUSR
+        where MUUID = #{value,jdbcType=VARCHAR} 
+    </select>
+    
+    <update id="updateUserLastActionInfo" parameterType="string">
+    	UPDATE EpUser
+    	SET eu_active_timestamp = now()
+    	<!--UTC_TIMESTAMP() -->
+    	WHERE eu_uid=#{value, jdbcType=VARCHAR}
+    </update>
+</mapper>

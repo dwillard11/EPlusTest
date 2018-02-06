@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.TripCostMapper" >
+	<sql id="SELECT_TRIP_COST">
+			ct_id AS id,
+			ct_tp_id as tripId,
+            ct_est_date as estDate,
+            ct_est_cost as estCost,
+            ct_est_currency as estCurrency,
+            ct_act_date as actDate,
+            ct_act_cost as actCost,
+            ct_act_currency as actCurrency,
+        	ct_linked_entity as linkedEntity,
+        	ct_linked_entity_contact as linkedEntityContact,
+            ct_amount as amount,
+            ct_charge_code as chargeCode,
+            ct_charge_desc as chargeDesc,
+            ct_act_usd_cost as actUsedCost,
+            ct_act_usd_rate as actUsedRate,
+            ct_description as description,
+            ct_visible as visible,
+            ct_ev_id as eventId,
+            ev_item as eventItem,
+            ct_acomp as currentCompany,
+			ct_acust as currentCustomer,
+			ct_auid as updatedBy,
+			ct_astamp as updateTime
+	</sql>
+    <select id="selectTripCosts" resultType="TripCost" parameterType="Integer">
+        SELECT 
+			<include refid="SELECT_TRIP_COST"/>
+            ,em_name as linkedEntityName
+            ,CONCAT(IFNULL(et_fname,''), ' ', IFNULL(et_lname,'')) as linkedContactName
+        FROM EpCost
+            LEFT JOIN EpEvent ON ct_ev_id=ev_id
+            LEFT JOIN EpEntityLocation ON ct_linked_entity = EpEntityLocation.el_id
+            LEFT JOIN EpEntity ON ct_linked_entity_contact = EpEntity.et_id
+            LEFT JOIN EpEntityMaster ON el_em_id=em_id
+        WHERE ct_tp_id=#{tripId,jdbcType=INTEGER}
+        <if test="showAll == false">
+        	AND (ct_visible IS NULL OR ct_visible = '1')
+        </if>
+    </select>
+    <select id="selectTripCostById" resultType="TripCost" parameterType="Integer">
+         SELECT 
+			<include refid="SELECT_TRIP_COST"/>
+        FROM EpCost
+        LEFT JOIN EpEvent ON ct_ev_id=ev_id
+        WHERE ct_id=#{value,jdbcType=INTEGER}
+    </select>
+
+    <select id="selectTripCostsByEventId" resultType="TripCost" parameterType="Integer">
+        SELECT
+        <include refid="SELECT_TRIP_COST"/>
+        FROM EpCost
+        LEFT JOIN EpEvent ON ct_ev_id=ev_id
+        WHERE ct_ev_id=#{eventId,jdbcType=INTEGER}
+        <if test="showAll == false">
+            AND (ct_visible IS NULL OR ct_visible = '1')
+        </if>
+    </select>
+    <insert id="insertTripCost" parameterType="TripCost">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpCost(
+			ct_tp_id,
+            ct_est_date,
+            ct_est_cost,
+            ct_est_currency ,
+            ct_act_date,
+            ct_act_cost ,
+            ct_act_currency,
+            ct_amount,
+            ct_charge_code ,
+            ct_charge_desc ,
+            ct_act_usd_cost,
+            ct_act_usd_rate,
+            ct_description,
+            ct_visible,
+            ct_ev_id,
+            ct_linked_entity,
+            ct_linked_entity_contact,
+            ct_acomp,
+	        ct_acust,
+	        ct_auid,
+	        ct_astamp
+	    ) VALUES (
+	    	#{tripId,jdbcType=INTEGER},
+	    	#{estDate,jdbcType=DATE},
+	        #{estCost,jdbcType=NUMERIC},
+	        #{estCurrency,jdbcType=VARCHAR},
+	    	#{actDate,jdbcType=DATE},
+	        #{actCost,jdbcType=NUMERIC},
+	        #{actCurrency,jdbcType=VARCHAR},
+	        #{amount,jdbcType=NUMERIC},	        
+	        #{chargeCode,jdbcType=VARCHAR},	        
+	        (SELECT cd_english FROM EpCode WHERE cd_name='Charge Code' and cd_key=#{chargeCode,jdbcType=VARCHAR}),
+	        #{actUsedCost,jdbcType=NUMERIC},
+	        #{actUsedRate,jdbcType=NUMERIC},
+	        #{description,jdbcType=VARCHAR},
+	        #{visible,jdbcType=VARCHAR},
+	        #{eventId,jdbcType=INTEGER},
+	        #{linkedEntity,jdbcType=INTEGER},
+            #{linkedEntityContact,jdbcType=INTEGER},
+	        #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <update id="updateTripCost" parameterType="TripCost">
+        UPDATE EpCost SET
+            ct_est_date			=#{estDate,jdbcType=DATE},
+            ct_est_cost			=#{estCost,jdbcType=NUMERIC},
+            ct_est_currency		=#{estCurrency,jdbcType=VARCHAR} ,
+            ct_act_date			=#{actDate,jdbcType=DATE},
+            ct_act_cost			=#{actCost,jdbcType=NUMERIC} ,
+            ct_act_currency		=#{actCurrency,jdbcType=VARCHAR},
+            ct_amount			=#{amount,jdbcType=NUMERIC},
+            ct_charge_code 		=#{chargeCode,jdbcType=VARCHAR},
+            ct_charge_desc 		= (SELECT cd_english FROM EpCode WHERE cd_name='Charge Code' and cd_key=#{chargeCode,jdbcType=VARCHAR}),
+            ct_act_usd_cost		=#{actUsedCost,jdbcType=NUMERIC},
+            ct_act_usd_rate 	=#{actUsedRate,jdbcType=NUMERIC},
+            ct_description		= #{description,jdbcType=VARCHAR},
+            ct_visible			= #{visible,jdbcType=VARCHAR},
+            ct_ev_id			= #{eventId,jdbcType=INTEGER},
+            ct_linked_entity          = #{linkedEntity,jdbcType=INTEGER},
+            ct_linked_entity_contact  = #{linkedEntityContact,jdbcType=INTEGER},
+            ct_acomp 			= #{currentCompany,jdbcType=VARCHAR},
+            ct_acust 			= #{currentCustomer,jdbcType=VARCHAR},
+            ct_auid 			= #{updatedBy,jdbcType=VARCHAR},
+            ct_astamp 			= NOW() <!--UTC_TIMESTAMP() -->
+        WHERE ct_id 			= #{id,jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateLinkedEntity" parameterType="map">
+     	UPDATE EpCost SET            
+            ct_linked_entity    = #{entity,jdbcType=INTEGER}
+        WHERE ct_id 			= #{costId,jdbcType=INTEGER}
+    </update>
+    
+    <delete id="deleteTripCost" parameterType="Integer">
+        DELETE FROM EpCost WHERE ct_id = #{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteTripCostsByTrip" parameterType="Integer">
+        DELETE FROM EpCost WHERE ct_tp_id = #{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteTripEventCostsByTrip" parameterType="Integer">
+        DELETE FROM EpCost WHERE ct_tp_id = #{value,jdbcType=INTEGER} and ct_ev_id > 0
+    </delete>
+    <delete id="deleteTripCostsByEvent" parameterType="Integer">
+        DELETE FROM EpCost WHERE ct_ev_id = #{eventId,jdbcType=INTEGER}
+    </delete>
+</mapper>

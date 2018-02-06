@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.BusinessCodeMapper">
+    <select id="selectBusinessCode" resultType="AppEnum" parameterType="string">
+        SELECT cd_id AS id,
+		     cd_name AS categoryCode,
+		     cd_status AS status,
+		     cd_sequence AS sortingOrder,
+		     cd_description AS remarks,
+		     cd_key AS code,
+		     cd_english AS label,
+		     cd_english as label_english,
+		     cd_french as label_french,
+		     cd_chinese as label_chinese,
+		     cd_german as label_german,
+		     cd_spanish as label_spanish
+     FROM EpCode
+     WHERE EpCode.cd_name = #{value,jdbcType=VARCHAR}
+     ORDER BY cd_sequence, cd_id
+ </select>
+    <select id="getEpCodeById" resultType="AppEnum" parameterType="string">
+        SELECT cd_id AS id,
+        cd_name AS categoryCode,
+        cd_status AS status,
+        cd_sequence AS sortingOrder,
+        cd_description AS remarks,
+        cd_key AS code,
+        cd_english AS label,
+        cd_english as label_english,
+        cd_french as label_french,
+        cd_chinese as label_chinese,
+        cd_german as label_german,
+        cd_spanish as label_spanish
+        FROM EpCode
+        WHERE EpCode.cd_key = #{key,jdbcType=VARCHAR}
+        ORDER BY cd_sequence, cd_id
+    </select>
+    <select id="getEpCodeListByType" resultType="AppEnum" parameterType="map">
+        SELECT cd_id AS id,
+	        cd_description AS remarks,
+	        cd_key AS code,
+	        IFNULL(cd_${language},cd_english) as label	        
+        FROM EpCode
+        WHERE EpCode.cd_name = #{key,jdbcType=VARCHAR} and cd_status = "Active"
+        ORDER BY cd_sequence, cd_id
+    </select>
+    <select id="selectCodeCategory" resultType="String">
+        SELECT DISTINCT cd_name AS categoryCode
+        FROM EpCode
+        ORDER BY cd_name
+    </select>
+    <insert id="insertBusinessCode" parameterType="AppEnum">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpCode(
+            cd_name,
+            cd_status,
+            cd_sequence,
+            cd_description,
+            cd_key,
+            cd_english,
+            cd_french,
+            cd_chinese ,
+            cd_german ,
+            cd_spanish ,
+            cd_acomp,
+            cd_acust,
+            cd_auid,
+            cd_astamp)
+        VALUES (
+            #{categoryCode,jdbcType=VARCHAR},
+            #{status,jdbcType=VARCHAR},
+            #{sortingOrder,jdbcType=INTEGER},
+            #{remarks,jdbcType=VARCHAR},
+            #{code,jdbcType=VARCHAR},
+            #{label_english,jdbcType=VARCHAR},
+            #{label_french,jdbcType=VARCHAR},
+            #{label_chinese,jdbcType=VARCHAR},
+            #{label_german,jdbcType=VARCHAR},
+            #{label_spanish,jdbcType=VARCHAR},
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+ </insert>
+    <delete id="deleteBusinessCode" parameterType="Integer">
+        DELETE FROM EpCode WHERE cd_id = #{id,jdbcType=INTEGER}
+    </delete>
+    <update id="updateBusinessCode" parameterType="AppEnum">
+        UPDATE EpCode SET
+            cd_name = #{categoryCode,jdbcType=VARCHAR},
+            cd_status = #{status,jdbcType=VARCHAR},
+            cd_sequence = #{sortingOrder,jdbcType=INTEGER},
+            cd_description = #{remarks,jdbcType=VARCHAR},
+            cd_key = #{code,jdbcType=VARCHAR},
+            cd_english = #{label_english,jdbcType=VARCHAR},
+            cd_french =#{label_french,jdbcType=VARCHAR},
+		     cd_chinese =#{label_chinese,jdbcType=VARCHAR},
+		     cd_german=#{label_german,jdbcType=VARCHAR},
+		     cd_spanish =#{label_spanish,jdbcType=VARCHAR},
+            cd_acomp = #{currentCompany,jdbcType=VARCHAR},
+            cd_acust = #{currentCustomer,jdbcType=VARCHAR},
+            cd_auid = #{updatedBy,jdbcType=VARCHAR},
+            cd_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE cd_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getCountry" resultType="AppEnum">
+        SELECT DISTINCT
+          ep_country_code AS code,
+          ep_country AS label
+        FROM EpProvinceState
+        ORDER BY ep_country
+    </select>
+
+    <select id="getProvinceByCountry" resultType="AppEnum" parameterType="string">
+        SELECT ep_id AS id,
+            ep_code AS code,
+            ep_description AS label
+        FROM EpProvinceState
+        WHERE ep_country_code = #{country,jdbcType=VARCHAR}
+        ORDER BY ep_description, ep_id
+    </select>
+
+    <select id="getMultipileLanguageByText" resultType="AppEnum" parameterType="string">
+        SELECT max(CASE WHEN LALANG = 'French' THEN LATRANS ELSE NULL END) AS label_french,
+            max(CASE WHEN LALANG = 'Chinese' THEN LATRANS ELSE NULL END) AS label_chinese,
+            max(CASE WHEN LALANG = 'German' THEN LATRANS ELSE NULL END) AS label_german,
+            max(CASE WHEN LALANG = 'Spanish' THEN LATRANS ELSE NULL END) AS label_spanish
+        FROM `language`
+        WHERE LACOMP = 'EPLUS' AND LAMSG = #{textStr,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getEntityContactCountry" resultType="AppEnum">
+        SELECT DISTINCT
+            PS.ep_country_code AS code,
+            PS.ep_country AS label
+        FROM EpProvinceState PS, EpEntity EE
+        WHERE PS.ep_country_code = EE.et_online_country
+        ORDER BY PS.ep_country
+    </select>
+</mapper>

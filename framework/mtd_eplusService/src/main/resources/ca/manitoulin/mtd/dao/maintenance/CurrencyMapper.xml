@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.CurrencyMapper">
+	
+    <select id="selectUSDRate" resultType="java.math.BigDecimal">
+        SELECT 
+        	case when (CVRSN is null or  CVRSN= '') then 1 else cast(CVRSN as decimal(10,4)) end as rate
+        FROM CURRENCY 
+        WHERE CURCODE=#{value}
+        ORDER BY DATESET DESC
+        LIMIT 1
+    </select>
+    
+</mapper>

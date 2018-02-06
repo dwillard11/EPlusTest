@@ -1,0 +1,1290 @@
+<div class="wrapper-md" ng-controller="quotedetailsctrl" dw-loading="sample-1" dw-loading-options="{active: true,spinner: false}">
+
+    <div class="bg-light lter b-b wrapper-md">
+        <div class="row">
+            <div class="col-sm-6 col-xs-12">
+                <h1 class="m-n font-thin h3">Operations Console – Quotes</h1>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="row wrapper">
+            <div class="col-sm-4">
+                <label class="col-sm-5 control-label text-left" style="padding-top:10px;">Quote #</label>
+                <div class="col-sm-7">
+                    <p class="form-control-static" style="font-size:18px; font-weight:bold;">{{quote.quoteRefNo}}</p>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                    <label  class="col-sm-5 control-label text-left">Division:</label>
+                    <div class="col-sm-7">
+                        <select name="tripDept" id="tripDept" class="form-control" name="ddlTripDept"
+                                ng-options="Option3.id as Option3.name for Option3 in departmentOptions"
+                                ng-model="quote.departmentId" ng-disabled="true">
+                        </select>
+                    </div>
+
+            </div>
+        </div>
+        <div class="panel-body min-content">
+            <tabset justified="true" class="tab-container">
+                <tab heading="Quote Editor" class="font-bold" >
+                    <div class="row wrapper">
+
+                        <div class="col-sm-4">
+                            <label class="col-sm-5 control-label text-left">Quote Type</label>
+                            <div class="col-sm-7">
+                                <select name="quoteType" id="quoteType" class="form-control" name="ddlQuoteType"
+                                        ng-options="Option.id as Option.name for Option in quoteTypeOption"
+                                        ng-model="quote.type" ng-disabled="!activeSaveButton">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="col-sm-5 control-label text-left">Quote Status</label>
+                            <div class="col-sm-7">
+                                <select name="quoteStatus" id="quoteStatus" class="form-control" name="ddlQuoteStatus"
+                                        ng-options="Option2.id as Option2.name for Option2 in quoteStatusOption"
+                                        ng-model="quote.status" ng-disabled="isReadOnly" required="required">
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4">
+                            <label for="expireDate" class="col-sm-5 control-label text-left">Expire Date</label>
+                            <div class="col-sm-7">
+                                <div class="dropdown">
+                                    <a class="dropdown-toggle" id="dropdown2" role="button"
+
+                                       data-toggle="dropdown" data-target="#">
+                                        <div class="input-group"><input type="text" class="form-control"
+                                                                        data-ng-model="expireDate"
+                                                                        id="expireDate" ng-disabled="!activeSaveButton"><span
+                                                class="input-group-addon"><i
+                                                class="glyphicon glyphicon-calendar"></i></span>
+                                        </div>
+                                    </a>
+                                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                                        <datetimepicker data-ng-model="expireDate" ng-disabled="!activeSaveButton"
+
+                                                        data-datetimepicker-config="{ dropdownSelector: '#dropdown2',modelType: 'YYYY-MM-DD HH:mm'}"/>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                        <p class="col-sm-12"></p>
+                        <div class="col-sm-4">
+                            <label class="col-sm-5 control-label text-left">Authorized By</label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" ng-model="quote.authorizedBy" ng-disabled="!activeSaveButton">
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="col-sm-5 control-label text-left">PO#/Auth#</label>
+                            <div class="col-sm-7">
+                                <input type="text" class="form-control" ng-model="quote.authorizationNo" ng-disabled="!activeSaveButton">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row min-row">
+                        <div class="col-lg-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Client</div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" method="post">
+                                        <div class="hidden form-group">
+                                            <div class="col-sm-11">
+                                                <input class="form-control" type="text" id="clientLocationEntityID"
+                                                       ng-model="client.id" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Search</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <ui-select ng-model="client.selected" theme="bootstrap"
+                                                               ng-disabled="!activeSaveButton"
+                                                               ng-change="selectLocation(client.selected,'client')">
+                                                        <ui-select-match
+                                                                placeholder="Select or search a client in the list...">
+                                                            {{$select.selected.genericInfo}}
+                                                        </ui-select-match>
+                                                        <ui-select-choices group-by="'customerName'"
+                                                                           repeat="item in clients "
+                                                                           refresh="searchLocation($select.search)"
+                                                                           refresh-delay="400">
+                                                            <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'client');"
+                                                                      ng-disabled="!activeSaveButton"
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Name</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input class="form-control" type="text" id="clientLocationEntityName"
+                                                           ng-model="client.customerName" disabled />
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(client)" ng-disabled="!client || !client.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Address</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="client.address1" id="clientAddress"
+                                                       disabled>
+                                            </div>
+                                        </div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label text-right">Postal</label>
+											<div class="col-sm-10">
+												<input class="form-control" type="text"
+													   ng-model="client.postalCode" 
+													   disabled>
+											</div>
+										</div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">City</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" id="clientCity"
+                                                       ng-model="client.city"
+                                                       disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Province</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text" id="clientProvince"
+                                                       ng-model="client.stateProvince"
+                                                       disabled>
+                                            </div>
+                                            
+                                            <label class="col-sm-2 control-label text-right">Country</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text" id="clientCountry"
+                                                       ng-model="client.country"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                         <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Phone #</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="client.busPhone1" id="clientPhoneNum"
+                                                       disabled>
+                                            </div>
+                                         </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Notes</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="client.notes"
+                                                          disabled></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Shipper
+                                    <button class="btn btn-sm btn-info pull-right text-right"  ng-click="copyToClient('shipper')"
+                                            ng-disabled="!activeSaveButton || shipper.id == '' || shipper.id == null "
+                                            tooltip-placement="bottom"
+                                            tooltip="Copy To Client">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" method="post">
+                                        <div class="hidden form-group">
+                                            <div class="col-sm-11">
+                                                <input class="form-control" type="text" id="shipperLocationEntityID"
+                                                       ng-model="shipper.id" disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Search</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+
+                                                    <ui-select ng-model="shipper.selected" theme="bootstrap"
+                                                               ng-disabled="!activeSaveButton"
+                                                               ng-change="selectLocation(shipper.selected,'shipper')">
+                                                        <ui-select-match
+                                                                placeholder="Select or search a client in the list...">
+                                                            {{$select.selected.genericInfo}}
+                                                        </ui-select-match>
+                                                        <ui-select-choices group-by="'customerName'"
+                                                                           repeat="item in clients "
+                                                                           refresh="searchLocation($select.search)"
+                                                                           refresh-delay="400">
+                                                            <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'shipper');"
+                                                                      ng-disabled="!activeSaveButton"
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Name</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input class="form-control" type="text" id="shipperLocationEntityName"
+                                                           ng-model="shipper.customerName" disabled />
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(shipper)" ng-disabled="!shipper || !shipper.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Address</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="shipper.address1"
+                                                       disabled>
+                                            </div>
+                                        </div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label text-right">Postal</label>
+											<div class="col-sm-10">
+												<input class="form-control" type="text"
+													   ng-model="shipper.postalCode" 
+													   disabled>
+											</div>
+										</div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">City</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="shipper.city"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Province</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="shipper.stateProvince"
+                                                       disabled>
+                                            </div>
+                                            <label class="col-sm-2 control-label text-right">Country</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="shipper.country"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Phone #</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="shipper.busPhone1"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Notes</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="shipper.notes"
+                                                          disabled></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Drop Shipper</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="quote.dropShipperName"
+                                                       value="{{quote.dropShipperName}}">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Consignee
+                                    <button class="btn btn-sm btn-info pull-right text-right"
+                                            ng-disabled="!activeSaveButton || consignee.id == '' || consignee.id == null "
+                                            ng-click="copyToClient('consignee')"
+                                            tooltip-placement="bottom"
+                                            tooltip="Copy To Client">
+                                        <i class="fa fa-copy"></i>
+                                    </button>
+                                </div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" role="form">
+                                        <div class="hidden form-group">
+                                            <div class="col-sm-9">
+                                                <input class="form-control" type="text"
+                                                       ng-model="consignee.id" id="locationEntityID"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Search</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+
+
+                                                    <ui-select ng-model="consignee.selected" theme="bootstrap"
+                                                               ng-disabled="!activeSaveButton"
+                                                               ng-change="selectLocation(consignee.selected,'consignee')">
+                                                        <ui-select-match
+                                                                placeholder="Select or search a client in the list...">
+                                                            {{$select.selected.genericInfo}}
+                                                        </ui-select-match>
+                                                        <ui-select-choices group-by="'customerName'"
+                                                                           repeat="item in clients "
+                                                                           refresh="searchLocation($select.search)"
+                                                                           refresh-delay="400">
+                                                            <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'consignee');"
+                                                                      ng-disabled="!activeSaveButton"
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Name</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input class="form-control" type="text" id="locationEntityName"
+                                                           ng-model="consignee.customerName" disabled />
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(consignee)" ng-disabled="!consignee || !consignee.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Address</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="consignee.address1" id="address"
+                                                       disabled>
+                                            </div>
+                                        </div>
+										<div class="form-group">
+											<label class="col-sm-2 control-label text-right">Postal</label>
+											<div class="col-sm-10">
+												<input class="form-control" type="text"
+													   ng-model="consignee.postalCode" 
+													   disabled>
+											</div>
+										</div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">City</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text" ng-model="consignee.city"
+                                                       id="city"
+                                                       disabled>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Province</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="consignee.stateProvince" id="province"
+                                                       disabled>
+                                            </div>
+                                            <label class="col-sm-2 control-label text-right">Country</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="consignee.country" id="country"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+
+                                            <label class="col-sm-2 control-label text-right">Phone #</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="consignee.busPhone1" id="phoneNum"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Notes</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="consignee.notes"
+                                                          disabled></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Drop Consignee</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="quote.dropCosigneeName"
+                                                       value="{{quote.dropCosigneeName}}">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Billed Client</div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" method="post">
+                                        <div class="hidden form-group">
+                                            <div class="col-sm-11">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.id" disabled>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Search</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <ui-select ng-model="billedClient.selected" theme="bootstrap"
+                                                               ng-disabled="!activeSaveButton"
+                                                               ng-change="selectLocation(billedClient.selected,'billedClient')">
+                                                        <ui-select-match
+                                                                placeholder="Select or search a client in the list...">
+                                                            {{$select.selected.genericInfo}}
+                                                        </ui-select-match>
+                                                        <ui-select-choices group-by="'customerName'"
+                                                                           repeat="item in clients "
+                                                                           refresh="searchLocation($select.search)"
+                                                                           refresh-delay="400">
+                                                            <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                        </ui-select-choices>
+                                                    </ui-select>
+                                                    <span class="input-group-btn">
+                                                              <a ng-click="selectLocation({},'billedClient');"
+                                                                 ng-disabled="!activeSaveButton"
+                                                                 class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </a>
+                                                            </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Name</label>
+                                            <div class="col-sm-10">
+                                                <div class="input-group">
+                                                    <input class="form-control" type="text"
+                                                           ng-model="billedClient.customerName" disabled/>
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button"
+                                                                ng-click="showEntity(billedClient)"
+                                                                ng-disabled="!billedClient || !billedClient.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Address</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.address1"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Postal</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.postalCode"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">City</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.city"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Province</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.stateProvince"
+                                                       disabled>
+                                            </div>
+                                            <label class="col-sm-2 control-label text-right">Country</label>
+                                            <div class="col-sm-4">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.country"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Phone #</label>
+                                            <div class="col-sm-10">
+                                                <input class="form-control" type="text"
+                                                       ng-model="billedClient.busPhone1"
+                                                       disabled>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label text-right">Notes</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="billedClient.notes"
+                                                          disabled></textarea>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Freight List</div>
+                                <div class="row wrapper">
+                                    <div class="col-sm-4 m-b-xs">
+                                    </div>
+                                    <div class="col-sm-4  m-b-xs"></div>
+                                    <div class="col-sm-4  m-b-xs">
+                                        <div class="btn-group dropdown pull-right m-t-xs">
+                                            <button class="btn btn-default" data-toggle="dropdown">
+                                                Export
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a ng-click="exportpdf(rowFreightsPage,'freight')">PDF</a></li>
+                                                <li><a ng-csv="exportcsv(rowFreightsPage,'freight')"
+                                                       filename="{{csvfilename}}">CSV</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group  pull-right m-t-xs">
+                                            <span>
+                                              <script type="text/ng-template" id="myModalContent.html">
+                                                <div ng-include="'tpl/operation_console/add_freight_form.html'"></div>
+                                              </script>
+                                                <button class="btn btn-success" ng-show="activeSaveButton"
+                                                        ng-click="handlefreight(tripid, '', 'add',freightMeasure)">Add Item</button>
+                                            </span>
+                                        </div>
+                                        <div class="input-group pull-right m-t-xs">
+
+                                            <label class="col-sm-3 control-label m-t-xs text-right">UOM</label>
+                                            <div class="col-sm-8">
+                                                <select class="form-control" ng-disabled="!activeSaveButton"
+                                                        ng-options="Option.id as Option.name for Option in measureOption"
+                                                        ng-model="freightMeasure" required="required"
+                                                        ng-change="changeMeasure(tripid,freightMeasure)">
+                                                </select>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-striped" st-table="displayedFreights"
+                                           st-safe-src="rowFreightsPage">
+                                        <thead>
+                                        <tr>
+                                            <th class="hidden" st-sort="id">id</th>
+                                            <th st-sort="item">Desc Goods</th>
+                                            <th style="display: none" st-sort="description">Description</th>
+                                            <th st-sort="estimatedPieces">Pieces</th>
+                                            <th st-sort="estimatedDimension">Est Dim</th>
+                                            <th st-sort="estimatedWeight">Est Weight</th>
+                                            <th st-sort="estimatedCost">Est Value</th>
+                                            <th style="width: 60px; text-align: center">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody ng-show="!isLoading">
+                                        <tr ng-repeat="row in displayedFreights">
+                                            <td class="hidden">{{row.id}}</td>
+                                            <td>{{row.item}}</td>
+                                            <td style="display: none" >{{row.description}}</td>
+                                            <td>{{row.estimatedPieces}}</td>
+                                            <td>{{row.estimatedDimension}}</td>
+                                            <td>{{row.estimatedWeight}} {{row.estimatedUOM}}</td>
+                                            <td>{{row.estimatedCurrency}} {{row.estimatedCost}}</td>
+                                            <td style="white-space: nowrap">
+                                                <div class="buttons">
+                                                    <button class="btn btn-sm btn-info" ng-show="activeSaveButton"
+                                                            ng-click="handlefreight(tripid, row, 'edit',freightMeasure)"><i
+                                                            class="fa fa-edit"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Edit"></i></button>
+                                                    <button class="btn btn-sm btn-danger" ng-show="activeSaveButton"
+                                                            ng-click="removeFreight(row)"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Delete"><i
+                                                            class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                        <tbody ng-show="isLoading">
+                                        <tr>
+                                            <td colspan="6" class="text-center"><i
+                                                    class="fa fa-spin fa-refresh"></i></td>
+                                        </tr>
+                                        </tbody>
+                                        <tfoot>
+                                        <td colspan="2" class="text-left">
+                                            <div>
+                                                <small class="text-muted inline m-t-sm m-b-sm">Total item(s):
+                                                    {{conllectionLength}}
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td colspan="5" class="text-center">
+
+                                        </td>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="!activeSaveButton">Back
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="activeSaveButton"
+                                        translate="Cancel">Cancel
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('exit')" ng-show="activeSaveButton">
+                                    Save and Exit
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('keep')" ng-show="activeSaveButton">
+                                    Save Quote
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="hidden btn btn-default " type="button" ng-click="createPDF()">
+                                    Create PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Terms & Conditions" class="font-bold" ng-click="loadTreeMode(tripid,'load')">
+                    <div class="row" dw-loading="sample-2" dw-loading-options="{active: false,spinner: false}">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <button class="btn btn-sm btn-default" ng-click="ShowTree()"
+                                            ng-show="activeSaveButton">
+                                        Import T&C Template
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="!isFirstImportTree" class="col-md-3 m-width200">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">
+                                    <button class="btn btn-sm btn-success" ng-click="addCondition()"
+                                            ng-show="activeSaveButton"><i
+                                            class="glyphicon glyphicon-plus"></i> Add
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" ng-click="removeCondition()"
+                                            ng-show="activeSaveButton"><i
+                                            class="glyphicon glyphicon-minus"></i> Remove
+                                    </button>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="form-horizontal">
+                                        <div>
+                                            <ul id="dataTree" class="ztree"
+                                                style="height: 500px; overflow:auto;"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="!isFirstImportTree" class="col-md-9">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">
+                                    Detail
+                                </div>
+                                <div class="panel-body">
+                                    <form class="form-horizontal" name="conditionsForm" method="POST"
+                                          ng-submit="submitConditions(conditionsForm.$valid,'keep')">
+                                        <input type="text" ng-model="id" id="txQuoteID" style="display: none;"/>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Trip Type</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" name="ddlTripType" id="ddlTripType"
+                                                        ng-options="Option.id as Option.name for Option in tripOption"
+                                                        ng-model="t.type" required="required">
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Quote Name</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="txtQuoteName" id="txtQuoteName"
+                                                       class="form-control"
+                                                       ng-model="t.name" placeholder="" required="required"
+                                                       maxlength="50"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Category</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="txtCategory" class="form-control"
+                                                       id="txtCategory"
+                                                       ng-model="t.category" placeholder="" required="required"
+                                                       maxlength="50"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Item</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" name="txtItem" class="form-control"
+                                                       id="txtItem"
+                                                       ng-model="t.item" placeholder="" required="required"
+                                                       maxlength="50"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Sequence</label>
+                                            <div class="col-sm-4">
+                                                <input type="number" id="txtSequence" name="txtSequence"
+                                                       class="form-control" ng-model="t.sequence"
+                                                       required="required"/>
+                                            </div>
+                                            <div class="col-sm-6">
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Description</label>
+                                            <div class="col-sm-10">
+                                                        <textarea name="txtDescription" class="form-control" rows="6"
+                                                                  id="txtDescription"
+                                                                  ng-model="t.description" placeholder=""
+                                                                  maxlength="65535"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="line b-b line-lg pull-in"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Audit Company</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" name="txtAuditCompany" class="form-control"
+                                                       ng-model="currentCompany" placeholder="" readonly>
+                                            </div>
+                                            <label class="col-sm-2 control-label">Audit User</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" name="txtAuditUser" class="form-control"
+                                                       ng-model="updatedBy" placeholder="" readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">Audit Customer</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" name="txtAuditCustomer" class="form-control"
+                                                       ng-model="currentCustomer" placeholder="" readonly>
+                                            </div>
+                                            <label class="col-sm-2 control-label">Audit Stamp</label>
+                                            <div class="col-sm-4">
+                                                <input type="text" name="txtAuditStamp" class="form-control"
+                                                       ng-model="updateTime" placeholder="" readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="line line-dashed b-b line-lg pull-in"></div>
+                                        <div class="col-lg-12">
+                                            <div class="btn-group  pull-right m-t-xs">
+                                                <button class="btn btn-danger " type="button"
+                                                        ng-click="cancel()" ng-show="!activeSaveButton">Back
+                                                </button>
+                                            </div>
+                                            <div class="btn-group  pull-right m-t-xs">
+                                                <button class="btn btn-danger " type="button"
+                                                        ng-click="cancel()" ng-show="activeSaveButton"
+                                                        translate="Cancel">Cancel
+                                                </button>
+                                            </div>
+                                            <div class="btn-group  pull-right m-t-xs">
+                                                <button class="btn btn-success " type="button" ng-click="submitConditions(conditionsForm.$valid,'exit')" ng-show="activeSaveButton">
+                                                    Save and Exit
+                                                </button>
+                                            </div>
+                                            <div class="btn-group  pull-right m-t-xs">
+                                                <button type="submit" class="btn btn-success"
+                                                        ng-show="activeSaveButton">Save T&C
+                                                </button>
+                                            </div>
+                                            <div class="btn-group  pull-right m-t-xs">
+                                                <button class="hidden btn btn-default " type="button" ng-click="createPDF()">
+                                                    Create PDF
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Comm Center" class="font-bold" active="activityCommCenter"  ng-click="showTripEmails(tripid)">
+                    <div class="row" dw-loading="sample-3" dw-loading-options="{active: true,spinner: false}">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Messages</div>
+                                <div class="wrapper">
+                                    <div class="row">
+                                        <div class="col-sm-3 m-b-xs">
+                                            <label for="txtDateFrom" class="col-sm-4 control-label m-t-xs">Date From:</label>
+                                            <div class="col-sm-8">
+                                                <div class="dropdown" >
+                                                    <a class="dropdown-toggle" id="dropdown999" role="button"
+                                                       data-toggle="dropdown" data-target="#">
+                                                        <div class="input-group"><input type="text" class="form-control"
+                                                                                        ng-model="dateFrom"
+                                                                                        id="txtDateFrom"><span
+                                                                class="input-group-addon"><i
+                                                                class="glyphicon glyphicon-calendar"></i></span>
+                                                        </div>
+                                                    </a>
+                                                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                                                        <datetimepicker data-ng-model="dateFrom"
+                                                                    data-datetimepicker-config="{ dropdownSelector: '#dropdown999',modelType: 'YYYY-MM-DD HH:mm'}"/>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2 m-b-xs">
+                                            <label for="txtDateTo" class="col-sm-3 control-label m-t-xs">To:</label>
+                                            <div class="col-sm-9">
+                                                <div class="dropdown" >
+                                                    <a class="dropdown-toggle" id="dropdown998" role="button"
+                                                       data-toggle="dropdown" data-target="#">
+                                                        <div class="input-group"><input type="text" class="form-control"
+                                                                                        ng-model="dateTo"
+                                                                                        id="txtDateTo"><span
+                                                                class="input-group-addon"><i
+                                                                class="glyphicon glyphicon-calendar"></i></span>
+                                                        </div>
+                                                    </a>
+                                                    <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dLabel">
+                                                        <datetimepicker data-ng-model="dateTo"
+                                                                    data-datetimepicker-config="{ dropdownSelector: '#dropdown998',modelType: 'YYYY-MM-DD HH:mm'}"/>
+                                                    </ul>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2 m-b-xs">
+                                            <label class="col-sm-4 control-label m-t-xs">Label:</label>
+                                            <div class="col-sm-8">
+                                                <select name="txtLabel" id="txtLabel" class="form-control" name="txtLabel"
+                                                        ng-options="Option.id as Option.name for Option in searchLabelOptions"
+                                                        ng-model="searchLabel" >
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2 m-b-xs">
+                                            <label class="control-label m-t-xs" for="chkIncludeDelete">Include Delete Email</label>
+                                            <input type="checkbox"  id="chkIncludeDelete" ng-model="includeDelete" />
+                                        </div>
+
+                                        <div class="col-sm-2 m-b-xs">
+                                            <div class="col-sm-12">
+                                                <div class="input-group">
+                                                    <input type="text" class="input form-control" placeholder="search from, to, subject or content"
+                                                           ng-model="searchContent">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="searchEmails(tripid, dateFrom, dateTo, searchContent, searchLabel, includeDelete)">Search</button>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1 m-b-xs">
+                                            <div class="btn-group  pull-right m-t-xs">
+                                            <span>
+                                              <script type="text/ng-template" id="editTripEmail.html">
+                                                <div ng-include="'tpl/operation_console/trip_email.html'"></div>
+                                              </script>
+                                                <button class="btn btn-success"
+                                                        ng-click="sendEmail('','compose')">Compose</button>
+                                            </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive" >
+                                    <table class="table table-striped" st-table="displayedEmails"
+                                           st-safe-src="tripEmails">
+                                        <thead>
+                                        <tr>
+                                            <th class="hidden" st-sort="id">id</th>
+                                            <th style="width: 20px; text-align: center" st-sort="type">Type</th>
+                                            <th style="width: 120px; text-align: center" st-sort="mailFrom">From</th>
+                                            <th style="width: 120px; text-align: center" st-sort="mailTo">To</th>
+                                            <th style="width: 120px; text-align: center" st-sort="subject">Subject</th>
+                                            <th style="width: 180px; text-align: center" st-sort="label">Label</th>
+                                            <th style="width: 110px; text-align: center" st-sort="created">Date</th>
+                                            <th style="width: 80px; text-align: center" st-sort="numberOfAttachments">Attach</th>
+                                            <th style="width: 60px; text-align: center" st-sort="readStatus">Read</th>
+                                            <th style="width: 130px; text-align: center">Re-Link</th>
+                                            <th style="width: 140px;text-align: center">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody ng-show="!loadingEmails">
+                                        <tr ng-repeat="row in displayedEmails">
+                                            <td class="hidden">{{row.id}}</td>
+                                            <td>{{row.type}}</td>
+                                            <td>{{row.mailFrom}}</td>
+                                            <td>{{row.mailTo}}</td>
+                                            <td>{{row.subject}}</td>
+                                            <td>
+                                                <select class="form-control" ng-change="markLabel(row.id, row.label)"
+                                                        ng-model="row.label" ng-init="(!row.label)? row.label: ''" ng-style="selectStyle(row.label)">
+                                                    <option value="{{Option.id}}" ng-repeat="Option in searchLabelOptions" ng-bind="Option.name" ng-style="selectStyle(Option)">
+                                                    </option>
+                                                </select>
+                                            </td>
+                                            <td>{{row.created | date:'yyyy-MM-dd HH:mm:ss' }}</td>
+                                            <td style="white-space: nowrap">
+                                                <script type="text/ng-template" id="copyDocPanel.html">
+                                                    <div ng-include="'tpl/operation_console/copy_doc_panel.html'"></div>
+                                                </script>
+                                                <div class="btn-group" dropdown >
+                                                    <button ng-show="row.numberOfAttachments > 0"
+                                                            class="btn btn-sm btn-Info dropdown-toggle"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Attachment" dropdown-toggle><i
+                                                            class="fa fa-paperclip"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu pull-right" style="overflow:auto;position:absolute;top:0px;">
+                                                        <li ng-repeat="item in row.attachments">
+                                                            <a href="downloaddocument?id={{item.id}}">
+                                                                    {{item.originalFileName}}
+                                                            </a>
+                                                            <button class="btn btn-xs btn-default">
+                                                                <a href="downloaddocument?id={{item.id}}">
+                                                                    view
+                                                                </a>
+                                                            </button>
+                                                            <button class="btn btn-xs btn-success" ng-click="showCopyPanel(item)">
+                                                                Copy to Documents
+                                                            </button>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="width: 2px;">
+                                                <i ng-if="row.processedStatus =='Deleted'" class="text-danger">Deleted</i>
+                                                <i ng-if="row.processedStatus !='Deleted' && row.type=='In' && (row.readStatus==null || row.readStatus=='')" class="text-info">New</i>
+                                                <i ng-if="row.processedStatus !='Deleted' && row.type=='In' && row.readStatus=='U'" class="text-danger">Unread</i>
+                                                <i ng-if="row.processedStatus !='Deleted' && row.type=='In' && row.readStatus=='R'" class="text-success">Read</i>
+                                            </td>
+                                            <td style="white-space: nowrap">
+                                                <div class="input-group" ng-if="row.type=='In'">
+                                                    <input type="text" class="form-control" ng-model="row.refId" style="width:90px">
+                                                    <span class="input-group-btn">
+                                                        <button class="btn btn-default" style="width:65px; padding-left: 5px"  ng-click="updateLink(row.id, row.refId,'relink')">Re-Link</button>
+                                                    </span>
+                                                </div>
+                                            </td>
+                                            <td style="white-space: nowrap">
+                                                <script type="text/ng-template" id="viewEmail.html">
+                                                    <div ng-include="'tpl/operation_console/view_email.html'"></div>
+                                                </script>
+                                                <div class="buttons">
+                                                    <button class="btn btn-sm btn-primary"
+                                                            ng-click="sendEmail(row,'edit')"
+                                                            ng-show="activeSaveButton && row.processedStatus !='Deleted' && row.type == 'Draft'"
+                                                            tooltip-placement="bottom" tooltip="edit"><i
+                                                            class="fa fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-success"
+                                                            ng-click="viewEmail(row.id,'Y')"
+                                                            ng-show="row.type != 'Draft'"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="View"><i class="fa fa-eye"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary"
+                                                            ng-click="sendEmail(row,'reply')"
+                                                            ng-show="activeSaveButton && row.processedStatus !='Deleted' && row.type != 'Draft'"
+                                                            tooltip-placement="bottom" tooltip="reply"><i
+                                                            class="fa  fa-mail-reply"></i></button>
+                                                    <button class="btn btn-sm btn-primary"
+                                                            ng-click="sendEmail(row,'replyAll')"
+                                                            ng-show="activeSaveButton && row.processedStatus !='Deleted' && row.type != 'Draft'"
+                                                            tooltip="reply all"><i class="fa fa-mail-reply-all"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-info"
+                                                            ng-click="markEmail(row.id,'unread')"
+                                                            ng-show="row.readStatus!='U' && row.processedStatus !='Deleted' && row.type != 'Draft'"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Unread"><i class="fa fa-eye-slash"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                            ng-click="updateLink(row.id,row.cloneTripId,'unlink')"
+                                                            ng-show="row.type=='In' && row.processedStatus !='Deleted' && row.type != 'Draft'"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Unlink"><i class="fa fa-unlink"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-danger"
+                                                            ng-show="row.processedStatus != 'Deleted'"
+                                                            ng-click="removeEmail(row.id)"
+                                                            tooltip-placement="bottom"
+                                                            tooltip="Delete">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-primary"
+                                                            ng-show="row.processedStatus == 'Deleted'"
+                                                            ng-click="undeleteEmail(row.id)"
+                                                            tooltip-placement="bottom" tooltip="Undelete"><i
+                                                            class="fa fa-mail-reply"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                        <tbody ng-show="loadingEmails">
+                                        <tr>
+                                            <td colspan="10" class="text-center"><i
+                                                    class="fa fa-spin fa-refresh"></i></td>
+                                        </tr>
+                                        </tbody>
+                                        <tfoot>
+                                        <tr>
+                                            <td colspan="2" class="text-left">
+                                                <div>
+                                                    <small class="text-muted inline m-t-sm m-b-sm">Total item(s):
+                                                        {{tripEmails.length}}
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td colspan="5" class="text-center">
+
+                                            </td>
+                                        </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12">
+
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="!activeSaveButton">Back
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="activeSaveButton"
+                                        translate="Cancel">Cancel
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('exit')" ng-show="activeSaveButton">
+                                    Save and Exit
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('keep')" ng-show="activeSaveButton">
+                                    Save Quote
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </tab>
+                <tab heading="Generated Documents" class="font-bold" active="activityDoc" ng-click="editdocs()">
+                    <div class="row" dw-loading="sample-4" dw-loading-options="{active: false,spinner: false}">
+                        <div class="col-lg-12">
+                            <div class="panel panel-default">
+                                <div class="panel-heading font-bold">Generated Docs</div>
+                                <div class="row wrapper">
+                                    <div class="col-sm-4 m-b-xs">
+                                        <div class="btn-group pull-left m-t-xs">
+                                            <button class="btn btn-success" type="button" ng-click="btnQuotePDF(tripid)"
+                                                    translate="QUOTE">
+                                                QUOTE
+                                            </button>
+                                            <button class="btn btn-success" type="button" ng-click="showPickup(tripid, 'edit','pickup')"
+                                                    >
+                                                Pu/Del
+                                            </button>
+                                            <button class="btn btn-success" type="button" ng-click="showBOL(tripid, 'edit','bol')"
+                                                    translate="BOL">
+                                                BOL
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-5"></div>
+                                    <div class="col-sm-3">
+                                        <div class="btn-group  pull-right m-t-xs">
+                                            <span>
+                                              <script type="text/ng-template" id="uploaddoc.html">
+                                                <div ng-include="'tpl/operation_console/trip_upload_form.html'"></div>
+                                              </script>
+                                                <button class="btn btn-success"
+                                                        ng-click="uploadDocs(tripid)"
+                                                        ng-show="activeSaveButton">Upload</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table st-table="displayedDocs" st-safe-src="doclist" class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th class="hidden" st-sort="id">id</th>
+                                            <th st-sort="fileType">File Type</th>
+                                            <th st-sort="originalFileName">File Name</th>
+                                            <th st-sort="filesize">File Size</th>
+                                            <th st-sort="updateTime">Created Date</th>
+                                            <th st-sort="updatedBy">Created By</th>
+                                            <th style="width: 60px; text-align: center">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody ng-show="!loadingdocs">
+                                        <tr ng-repeat="row in displayedDocs">
+                                            <td class="hidden">{{row.id}}</td>
+                                            <td>{{row.fileType}}</td>
+                                            <td>{{row.originalFileName}}</td>
+                                            <td>{{row.filesize }} KB</td>
+                                            <td>{{row.updateTime | date:'yyyy-MM-dd' }}</td>
+                                            <td>{{row.updatedBy}}</td>
+                                            <td style="white-space: nowrap">
+                                                <button class="btn btn-sm btn-info" ng-click="downloadFile(row.id)"
+                                                        tooltip-placement="bottom" ng-show="activeSaveButton"
+                                                        tooltip="Download">
+                                                    <i class="fa fa-download"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                        <tbody ng-show="loadingdocs">
+                                        <tr>
+                                            <td colspan="6" class="text-center"><i
+                                                    class="fa fa-spin fa-refresh"></i></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="!activeSaveButton">Back
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-danger " type="button"
+                                        ng-click="cancel()" ng-show="activeSaveButton"
+                                        translate="Cancel">Cancel
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('exit')" ng-show="activeSaveButton">
+                                    Save and Exit
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="btn btn-success " type="button" ng-click="handleQuote('keep')" ng-show="activeSaveButton">
+                                    Save Quote
+                                </button>
+                            </div>
+                            <div class="btn-group  pull-right m-t-xs">
+                                <button class="hidden btn btn-default " type="button" ng-click="createPDF()">
+                                    Create PDF
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+
+    <div class="modal fade" id="treeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Import T&C Template</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="originalTreeBox">
+                        <ul id="originalTree" class="ztree" style="overflow:auto;height:450px;"></ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" ng-click="ImportTree()">Import</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

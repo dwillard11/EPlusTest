@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.DeliveryCodeMapper">
+
+	<select id="selectCodeDescription" parameterType="string" resultType="string">
+	SELECT DELDESC
+                FROM  WWW.DELCODES    
+                WHERE DELCODE = #{code, jdbcType=VARCHAR}
+	</select>
+	
+</mapper>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.reports.ReportMapper">
+	<select id="getTSAAuthorizedAgentByAirportReporting" resultType="CustomerLocation" parameterType="map">
+		SELECT etl.el_id as id,
+			em.em_id as customerId,
+			em.em_name as customerName,
+			etl.el_quick_name as quickName,
+			etl.el_address1 as address1,
+			etl.el_bus_phone1 as busPhone1,
+			etl.el_fax as fax,
+			etl.el_email as email,
+			etl.el_tsa_contact as tsaContact,
+			etl.el_tsa_airport as tsaAirport
+		FROM EpEntityMaster em, EpEntityLocation etl
+		WHERE etl.el_em_id = em.em_id
+		AND etl.el_tsa = '1'
+		<if test="tsaAirport != null and tsaAirport != ''">
+			and etl.el_tsa_airport like concat('%',#{tsaAirport, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="address != null and address != ''">
+			and etl.el_address1 like concat('%',#{address, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="quickName != null and quickName != ''">
+			and em.em_name like concat('%',#{quickName, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and (etl.el_tsa_airport like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR em.em_name like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_quick_name like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_address1 like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_bus_phone1 like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_bus_phone2 like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_email like  concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR etl.el_tsa_contact like  concat('%',#{searchKey, jdbcType=VARCHAR},'%'))
+		</if>
+		order by em.em_name ASC, etl.el_quick_name ASC, etl.el_address1 ASC
+	</select>
+
+    <select id="getTripReport" resultType="Trip" parameterType="map">
+		SELECT tp.tp_id as id,
+			tp.tp_pickup_date as pickupDate,
+			tp.tp_delivery_date as deliveryDate,
+			CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) as shipperName,
+			CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) as consigneeName,
+			tp.tp_pod_name as podName,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			tp.tp_reference as refId
+		FROM EpTrip tp
+		LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+		LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+		LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+		LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+		LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+		LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE 1 = 1
+		<if test=" departmentIdList != null">
+			and tp.tp_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+                    index="index" open="(" close=")" separator=",">
+                    #{depId, jdbcType=INTEGER}
+        	</foreach>
+		</if>
+		<if test="tripNum != null and tripNum != ''">
+			and (tp.tp_reference like concat('%',#{tripNum, jdbcType=VARCHAR},'%') or CONCAT(dep.dp_shortname,'-',tp.tp_reference) = #{tripNum, jdbcType=VARCHAR})
+		</if>
+		<if test="pickupDate != null and pickupDate != ''">
+			AND <![CDATA[tp.tp_pickup_date >= #{pickupDate}]]>
+			AND <![CDATA[DATE_ADD(tp.tp_pickup_date,INTERVAL -1 DAY) < #{pickupDate}]]>
+		</if>
+		<if test="deliveryDate != null and deliveryDate != ''">
+			AND <![CDATA[tp.tp_delivery_date >= #{deliveryDate}]]>
+			AND <![CDATA[DATE_ADD(tp.tp_delivery_date,INTERVAL -1 DAY) < #{deliveryDate}]]>
+		</if>
+		<if test="shipperName != null and shipperName != ''">
+			AND CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) like concat('%',#{shipperName, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="consigneeName != null and consigneeName != ''">
+			AND CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{consigneeName, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="podName != null and podName != ''">
+			AND tp.tp_pod_name like concat('%',#{podName, jdbcType=VARCHAR},'%')
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and (CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR tp.tp_pod_name like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(dep.dp_shortname,'-',tp.tp_reference) like concat('%',#{searchKey, jdbcType=VARCHAR},'%'))
+		</if>
+		order by length(tp_reference) DESC, tp.tp_reference DESC
+    </select>
+
+	<select id="getCurrencyReportByDepartment" resultType="Trip" parameterType="map">
+		SELECT tp.tp_id as id,
+			CONCAT(mClient.em_name, ', ', pClient.el_city, ', ', pClient.el_state_prov) as clientName,
+			tp.tp_pickup_date as pickupDate,
+			tp.tp_delivery_date as deliveryDate,
+			CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) as shipperName,
+			CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) as consigneeName,
+			<!--tp.tp_pcs AS totalPieces,-->
+			<!--tp.tp_wt as totalWeight,-->
+			<!--tp.tp_charge_wt as chargedWeight,-->
+			actPieces AS totalPieces,
+			actWeight as totalWeight,
+			chargeWeight as chargedWeight,
+			tp.tp_freight_units as freightUnits,
+			tc.ct_act_usd_cost as totalCost,
+			IFNULL(inv.iv_billing_amount, tp.tp_amt_to_bill) as amountInvoiced,
+			IFNULL(inv.iv_billing_currency, tp.tp_amt_bill_currency) as billCurrency,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			tp.tp_reference as refId,
+			IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+			IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+			inv.iv_id as invoiceId,
+			inv.iv_invoiceno as invoiceNo
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+			LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+			LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+			LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+			LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+			LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+			LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+			LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+			INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+			LEFT OUTER JOIN (SELECT ec.ct_tp_id, SUM(ct_act_cost) as ct_act_cost, SUM(ct_act_usd_cost) AS ct_act_usd_cost FROM EpCost ec GROUP BY ec.ct_tp_id) tc ON tp.tp_id = tc.ct_tp_id
+			LEFT JOIN EpInvoice inv on tp.tp_id = inv.iv_tp_id
+			LEFT OUTER JOIN (SELECT fr_tp_id, sum(fr_act_pieces) AS actPieces, sum(fr_act_weight) AS actWeight, sum(fr_act_charge_weight) AS chargeWeight
+							FROM EpFreight GROUP BY fr_tp_id) item ON tp.tp_id = item.fr_tp_id
+		WHERE 1 = 1
+    <if test=" departmentIdList != null">
+        and tp.tp_dp_id in
+        <foreach collection="departmentIdList" item="depId"
+                 index="index" open="(" close=")" separator=",">
+            #{depId, jdbcType=INTEGER}
+        </foreach>
+    </if>
+    <if test="startDate != null and startDate != ''">
+        AND <![CDATA[tp.tp_pickup_date >= #{startDate}]]>
+    </if>
+    <if test="endDate != null and endDate != ''">
+        AND <![CDATA[DATE_ADD(tp.tp_pickup_date,INTERVAL -1 DAY) < #{endDate}]]>
+    </if>
+    <if test="clientName != null and clientName != ''">
+        AND CONCAT(mClient.em_name, ', ', pClient.el_city, ', ', pClient.el_state_prov) like concat('%',#{clientName, jdbcType=VARCHAR},'%')
+    </if>
+    <if test="shipperName != null and shipperName != ''">
+        AND CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) like concat('%',#{shipperName, jdbcType=VARCHAR},'%')
+    </if>
+    <if test="consigneeName != null and consigneeName != ''">
+        AND CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{consigneeName, jdbcType=VARCHAR},'%')
+    </if>
+    <if test="tripNum != null and tripNum != ''">
+        and (tp.tp_reference like concat('%',#{tripNum, jdbcType=VARCHAR},'%') or CONCAT(dep.dp_shortname,'-',tp.tp_reference) = #{tripNum, jdbcType=VARCHAR})
+    </if>
+    <if test="'OPEN' eq tripStatus">
+        and tp.tp_status  IN ('QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH')
+    </if>
+    <if test="'CLOSE' eq tripStatus">
+        and tp.tp_status IN ('CLO','ARC')
+    </if>
+    <if test="'DEL' eq tripStatus">
+        and tp.tp_status IN ('DEL')
+    </if>
+    <if test="'ALL' eq tripStatus">
+        and tp.tp_status IN ('QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH','DEL','CLO','ARC')
+    </if>
+    <if test="currency != null and currency != ''">
+        AND IFNULL(inv.iv_billing_currency, tp.tp_amt_bill_currency) = #{currency, jdbcType=VARCHAR}
+    </if>
+    <if test="searchKey != null and searchKey != ''">
+        and (CONCAT(dep.dp_shortname,'-',tp.tp_reference) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR IFNULL(qType.cd_${language}, qType.cd_english) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CONCAT(mClient.em_name, ', ', pClient.el_city, ', ', pClient.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CONCAT(mShipper.em_name, ', ', pShipper.el_city, ', ', pShipper.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_freight_units like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_amt_bill_currency like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR inv.iv_invoiceno like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CAST(ROUND(tp.tp_pcs,2) AS char(20)) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CAST(ROUND(tp.tp_wt,2) AS char(20)) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CAST(ROUND(tp.tp_charge_wt,2) AS char(20)) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CAST(ROUND(tc.ct_act_cost,2) AS char(20)) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CAST(ROUND(IFNULL(inv.iv_billing_amount, tp.tp_amt_to_bill),2) AS char(20)) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        )
+    </if>
+    order by length(tp_reference) DESC, tp.tp_reference DESC
+</select>
+
+<select id="getSaleReporting" resultType="Trip" parameterType="map">
+    SELECT tp.tp_id as id,
+    CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) as consigneeName,
+    tp.tp_pcs AS totalPieces,
+    tp.tp_wt as totalWeight,
+    tp.tp_charge_wt as chargedWeight,
+    tp.tp_freight_units as freightUnits,
+    tc.ct_act_cost as totalCost,
+    tp.tp_amt_to_bill as amountInvoiced,
+    tp.tp_amt_bill_currency as billCurrency,
+    tp.tp_dp_id as departmentId,
+    dep.dp_shortname as departmentShortName,
+    tp.tp_reference as refId
+    FROM EpTrip tp
+    LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+    LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+    LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+    LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+    LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+    LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+    INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+    LEFT OUTER JOIN (SELECT ec.ct_tp_id, SUM(ct_act_cost) AS ct_act_cost FROM EpCost ec GROUP BY ec.ct_tp_id) tc ON tp.tp_id = tc.ct_tp_id
+    WHERE 1 = 1
+    <if test=" departmentIdList != null">
+        and tp.tp_dp_id in
+        <foreach collection="departmentIdList" item="depId"
+                 index="index" open="(" close=")" separator=",">
+            #{depId, jdbcType=INTEGER}
+        </foreach>
+    </if>
+    <if test="currency != null and currency != ''">
+        AND tp.tp_amt_bill_currency = #{currency, jdbcType=VARCHAR}
+    </if>
+    <if test="searchKey != null and searchKey != ''">
+        and (CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_freight_units like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_amt_bill_currency like concat('%',#{searchKey, jdbcType=VARCHAR},'%'))
+    </if>
+    order by length(tp_reference) DESC, tp.tp_reference DESC
+</select>
+
+<select id="getServiceReporting" resultType="Trip" parameterType="map">
+    SELECT tp.tp_id as id,
+        CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) as consigneeName,
+        tp.tp_pcs AS totalPieces,
+        tp.tp_wt as totalWeight,
+        tp.tp_charge_wt as chargedWeight,
+        tp.tp_freight_units as freightUnits,
+        tc.ct_act_cost as totalCost,
+        tp.tp_amt_to_bill as amountInvoiced,
+        tp.tp_amt_bill_currency as billCurrency,
+        tp.tp_type as type,
+        IFNULL(qType.cd_${language},qType.cd_english) as typeDesp,
+        tp.tp_dp_id as departmentId,
+        dep.dp_shortname as departmentShortName,
+        tp.tp_reference as refId
+    FROM EpTrip tp LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+    LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+    LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+    LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+    LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+    LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+    LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+    INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+    LEFT OUTER JOIN (SELECT ec.ct_tp_id, SUM(ct_act_cost) AS ct_act_cost FROM EpCost ec GROUP BY ec.ct_tp_id) tc ON tp.tp_id = tc.ct_tp_id
+    WHERE 1 = 1
+    <if test=" departmentIdList != null">
+        and tp.tp_dp_id in
+        <foreach collection="departmentIdList" item="depId"
+                 index="index" open="(" close=")" separator=",">
+            #{depId, jdbcType=INTEGER}
+        </foreach>
+    </if>
+    <if test="consigneeName != null and consigneeName != ''">
+        AND CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{consigneeName, jdbcType=VARCHAR},'%')
+    </if>
+    <if test="currency != null and currency != ''">
+        AND tp.tp_amt_bill_currency = #{currency, jdbcType=VARCHAR}
+    </if>
+    <if test="searchKey != null and searchKey != ''">
+        and (CONCAT(mCong.em_name, ', ', pCong.el_city, ', ', pCong.el_state_prov) like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_freight_units like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR tp.tp_amt_bill_currency like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR qType.cd_english like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+        OR CONCAT(dep.dp_shortname,'-',tp.tp_reference) like concat('%',#{searchKey, jdbcType=VARCHAR},'%'))
+    </if>
+    order by length(tp_reference) DESC, tp.tp_reference DESC
+</select>
+
+<select id="getCostReporting" resultType="Trip" parameterType="map">
+    SELECT tp.tp_id as id,
+        CONCAT(mClient.em_name, ', ', pClient.el_city, ', ', pClient.el_state_prov) as clientName,
+        tp.tp_pickup_date as pickupDate,
+        tp.tp_delivery_date as deliveryDate,
+        ec.ct_charge_code AS chargeCode,
+        ec.ct_description AS chargeDesc,
+        ec.ct_act_cost AS totalCost,
+        ec.ct_act_currency as billCurrency,
+        tp.tp_dp_id as departmentId,
+        dep.dp_shortname as departmentShortName,
+        tp.tp_reference as refId,
+        CONCAT(IFNULL(et_fname,''), ' ', IFNULL(et_lname,'')) as linkedContactName
+    FROM EpTrip tp
+        LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+        LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+        LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+        LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+        LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+        LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+        INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+        LEFT JOIN EpCost ec ON tp.tp_id = ec.ct_tp_id
+        LEFT JOIN EpEntityLocation ON ct_linked_entity = EpEntityLocation.el_id
+        LEFT JOIN EpEntity ON ct_linked_entity_contact = EpEntity.et_id
+        LEFT JOIN EpEntityMaster ON EpEntityLocation.el_em_id = EpEntityMaster.em_id
+        LEFT JOIN EpCode ChargeCode on ChargeCode.cd_key = ec.ct_charge_code and ChargeCode.cd_name='Charge Code'
+    WHERE 1 = 1
+    <if test=" departmentIdList != null">
+        and tp.tp_dp_id in
+        <foreach collection="departmentIdList" item="depId"
+                 index="index" open="(" close=")" separator=",">
+            #{depId, jdbcType=INTEGER}
+        </foreach>
+    </if>
+    <if test="tripNum != null and tripNum != ''">
+        and (tp.tp_reference like concat('%',#{tripNum, jdbcType=VARCHAR},'%') or CONCAT(dep.dp_shortname,'-',tp.tp_reference) = #{tripNum, jdbcType=VARCHAR})
+    </if>
+    <if test="startDate != null and startDate != ''">
+        AND <![CDATA[tp.tp_pickup_date >= #{startDate}]]>
+    </if>
+    <if test="endDate != null and endDate != ''">
+        AND <![CDATA[DATE_ADD(tp.tp_pickup_date,INTERVAL -1 DAY) < #{endDate}]]>
+    </if>
+    <!--
+    <if test="pickupDate != null and pickupDate != ''">
+        AND <![CDATA[tp.tp_pickup_date >= #{pickupDate}]]>
+        AND <![CDATA[DATE_ADD(tp.tp_pickup_date,INTERVAL -1 DAY) < #{pickupDate}]]>
+    </if>
+    <if test="deliveryDate != null and deliveryDate != ''">
+        AND <![CDATA[tp.tp_delivery_date >= #{deliveryDate}]]>
+        AND <![CDATA[DATE_ADD(tp.tp_delivery_date,INTERVAL -1 DAY) < #{deliveryDate}]]>
+    </if>
+    -->
+		<if test="chargeCode != null and chargeCode != ''">
+			AND ec.ct_charge_code = #{chargeCode, jdbcType=VARCHAR}
+		</if>
+		<if test="chargeDetail != null and chargeDetail != ''">
+			AND (ec.ct_charge_desc like concat('%',#{chargeDetail, jdbcType=VARCHAR},'%') OR ec.ct_description like concat('%',#{chargeDetail, jdbcType=VARCHAR},'%'))
+		</if>
+        <if test="currency != null and currency != ''">
+            AND tp.tp_amt_bill_currency = #{currency, jdbcType=VARCHAR}
+        </if>
+        <if test="searchKey != null and searchKey != ''">
+            and (ec.ct_charge_code like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR ec.ct_charge_desc like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR tp.tp_amt_bill_currency like concat('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR CONCAT(dep.dp_shortname,'-',tp.tp_reference) like concat('%',#{searchKey, jdbcType=VARCHAR},'%'))
+        </if>
+        order by length(tp_reference) DESC, tp.tp_reference DESC
+    </select>
+</mapper>

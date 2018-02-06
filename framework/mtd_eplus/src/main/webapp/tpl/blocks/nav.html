@@ -1,0 +1,26 @@
+<!-- list -->
+<ul class="nav">
+    <li ng-repeat="(key, value) in permission | groupBy:'groupName' ">
+        <a href class="auto">
+      <span class="pull-right text-muted">
+        <i class="fa fa-fw fa-angle-right text"></i>
+        <i class="fa fa-fw fa-angle-down text-active"></i>
+      </span>
+            <i class="icon-settings icon"></i>
+            <span class="font-bold">{{key| translate}}</span>
+        </a>
+        <ul class="nav nav-sub dk">
+            <li class="nav-sub-header">
+                <a href>
+                    <span>{{key| translate}}</span>
+                </a>
+            </li>
+            <li ng-repeat="secondLevelSideMenu in value | unique: 'menuName'">
+                <a ui-sref="{{secondLevelSideMenu.url}}">
+                    <i class="icon icon-globe"></i>
+                    <span>{{secondLevelSideMenu.menuName| translate}}</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+</ul>

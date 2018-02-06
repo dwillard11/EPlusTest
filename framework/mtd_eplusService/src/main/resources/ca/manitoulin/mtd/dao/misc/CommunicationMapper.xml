@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.CommunicationMapper" >
+	<sql id="SELECT_COMM">
+			cm_id as id,
+   			cm_tp_id as tripId,
+   			cm_dp_id as departmentId,
+            cm_category as category,
+            cm_type as type,
+            REPLACE(cm_subject, ' ', ' ') as subject,
+            cm_email as email,
+            cm_created as created,
+            cm_from as mailFrom,
+            cm_to as mailTo,
+            cm_cc as mailCc,
+            cm_bcc as mailBcc,
+            cm_read as readStatus,
+            cm_status as processedStatus,
+            IFNULL(cm_label, "") as label,
+            cm_acomp as currentCompany,
+			cm_acust as currentCustomer,
+			cm_auid as updatedBy,
+			cm_astamp  as updateTime
+	</sql>
+    
+    <insert id="insert" parameterType="CommunicationEmail">
+        <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpCommunication(
+			cm_tp_id ,
+          	cm_dp_id,
+            cm_category ,
+            cm_type ,
+            cm_subject ,
+            cm_content ,
+            cm_email,
+            cm_created,
+            cm_from,
+            cm_to,
+            cm_cc,
+            cm_bcc,
+            cm_status,
+            cm_label,
+            cm_acomp ,
+			cm_acust ,
+			cm_auid ,
+			cm_astamp 
+	    ) VALUES (
+	    	#{tripId,jdbcType=INTEGER},
+            #{departmentId, jdbcType=INTEGER},
+	    	#{category,jdbcType=VARCHAR},
+	    	#{type,jdbcType=VARCHAR},
+	    	#{subject,jdbcType=VARCHAR},	    	
+	        #{content,jdbcType=VARCHAR},
+	        #{email,jdbcType=VARCHAR},
+			NOW(), <!--UTC_TIMESTAMP(), -->
+	        #{mailFrom,jdbcType=VARCHAR},
+	        #{mailTo,jdbcType=VARCHAR},
+            #{mailCc,jdbcType=VARCHAR},
+            #{mailBcc,jdbcType=VARCHAR},
+            #{processedStatus, jdbcType=VARCHAR},
+            #{label, jdbcType=VARCHAR}, 
+	        #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+			NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+
+	<update id="update" parameterType="CommunicationEmail">
+		UPDATE EpCommunication
+		SET cm_tp_id=#{tripId,jdbcType=INTEGER},
+		<if test="departmentId != null">
+			cm_dp_id = #{departmentId,jdbcType=INTEGER},
+		</if>
+		cm_category = #{category,jdbcType=VARCHAR},
+		cm_type = #{type,jdbcType=VARCHAR},
+		cm_subject = #{subject,jdbcType=VARCHAR},
+		cm_content = #{content,jdbcType=VARCHAR},
+		cm_email = #{email,jdbcType=VARCHAR},
+		cm_from =#{mailFrom,jdbcType=VARCHAR},
+		cm_to = #{mailTo,jdbcType=VARCHAR},
+		cm_cc = #{mailCc,jdbcType=VARCHAR},
+		cm_bcc = #{mailBcc,jdbcType=VARCHAR},
+		cm_status = #{processedStatus, jdbcType=VARCHAR},
+		cm_label = #{label, jdbcType=VARCHAR},
+		cm_acomp=#{currentCompany,jdbcType=VARCHAR},
+		cm_acust =#{currentCustomer,jdbcType=VARCHAR},
+		cm_auid =#{updatedBy,jdbcType=VARCHAR},
+		cm_astamp = NOW()
+		WHERE  cm_id=	#{id,jdbcType=BIGINT}
+	</update>
+
+	<select id="searchEmails" resultType="CommunicationEmail">
+		SELECT <include refid="SELECT_COMM"/>
+			,'' as content
+			,COUNT(dc_id) as numberOfAttachments
+		FROM EpCommunication EC LEFT JOIN EpDocument ED ON EC.cm_id = ED.dc_cm_id
+		WHERE cm_tp_id = #{tripId,jdbcType=INTEGER}
+			AND IFNULL(cm_status,'UnProcessed') != 'UnProcessed'
+		<if test=" isAdmin == null or isAdmin == false">
+			AND (cm_status is NULL OR cm_status != 'Deleted')
+		</if>
+        <if test=" dateFrom != null">
+            AND cm_created &gt;= #{dateFrom}
+        </if>
+        <if test=" dateTo != null">
+			AND <![CDATA[DATE_ADD(cm_created, INTERVAL -60 SECOND) < #{dateTo}]]>
+        </if>
+        <if test="label != null and label != ''">
+        	AND cm_label=#{label,jdbcType=VARCHAR}
+        </if>
+		<if test=" searchKey != null">
+			AND (cm_from like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or cm_to like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or cm_content like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or  cm_subject like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') )
+		</if>
+		
+		GROUP BY cm_id
+		ORDER BY cm_created DESC
+	</select>
+
+   <select id="selectById" resultType="CommunicationEmail">
+   		SELECT 
+			<include refid="SELECT_COMM"/>
+			,cm_content as content
+	   		,CASE WHEN cm_type = 'In' THEN cm_email ELSE cm_from END AS defaultEmail
+		FROM EpCommunication EC
+	   		LEFT JOIN EpDivision D ON EC.cm_dp_id = D.dp_id
+		WHERE cm_id = #{value}
+		
+   </select>
+   <select id="selectUnlinked" resultType="CommunicationEmail">
+   		SELECT 
+   		<include refid="SELECT_COMM"/>
+		   ,'' as content
+		   ,dep.dp_shortname as departmentShortName,
+            tp.tp_reference as refId
+		FROM EpCommunication ep
+	   	LEFT JOIN EpTrip tp on tp.tp_id = ep.cm_tp_id
+	   	LEFT JOIN EpDivision dep ON ep.cm_dp_id=dep.dp_id
+		WHERE  cm_type='In'
+		AND ((cm_status='UnProcessed' AND cm_tp_id IS NOT NULL) OR cm_tp_id IS NULL)
+		<if test=" departmentIdList != null">
+			and cm_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+                    index="index" open="(" close=")" separator=",">
+                    #{depId, jdbcType=INTEGER}
+        	</foreach>
+		</if>
+		ORDER BY cm_created DESC
+   </select>
+	<select id="selectUnlinkedByConditions" resultType="CommunicationEmail" parameterType="map">
+		SELECT
+		<include refid="SELECT_COMM"/>
+			,'' as content
+			,dep.dp_shortname as departmentShortName,
+			tp.tp_reference as refId
+		FROM EpCommunication ep
+		LEFT JOIN EpTrip tp on tp.tp_id = ep.cm_tp_id
+		LEFT JOIN EpDivision dep ON ep.cm_dp_id=dep.dp_id
+		WHERE 1 = 1
+		<if test="'' eq includeOut">
+			AND (cm_type = 'In' OR cm_type = 'Draft')
+		</if>
+		<!--
+		AND ((
+		<choose>
+			<when test="isAdmin == true">
+				cm_status in ('UnProcessed' ,'Deleted')
+			</when>
+			<otherwise>
+				cm_status in ('UnProcessed')
+			</otherwise>
+		</choose>
+			AND cm_tp_id IS NOT NULL) OR cm_tp_id IS NULL)
+		-->
+		<if test=" isAdmin != true">
+			AND cm_status != 'Deleted'
+		</if>
+		<if test=" dateFrom != null">
+			AND cm_created >= #{dateFrom}
+		</if>
+		<if test=" dateTo != null">
+			AND <![CDATA[DATE_ADD(cm_created, INTERVAL -60 SECOND) < #{dateTo}]]>
+		</if>
+		<if test="label != null and label != ''">
+        	AND cm_label=#{label,jdbcType=VARCHAR}
+        </if>
+		<if test=" searchKey != null">
+			AND (cm_from like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or cm_to like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or cm_content like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') or  cm_subject like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%') )
+		</if>
+		AND ((cm_status is NULL OR cm_status != 'Deleted') OR #{includeDelete,jdbcType=VARCHAR} = 'Y')
+		AND ((cm_status is NULL OR cm_status = 'UnProcessed' or cm_tp_id IS NULL) OR #{includeProcessed,jdbcType=VARCHAR} = 'Y')
+
+		<if test=" departmentIdList != null">
+			and cm_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+					 index="index" open="(" close=")" separator=",">
+				#{depId, jdbcType=INTEGER}
+			</foreach>
+		</if>
+		ORDER BY cm_created DESC
+	</select>
+   <delete id="deletePyshically">
+   		DELETE FROM EpCommunication
+   		WHERE cm_id=		#{value}
+   </delete>
+   <update id="delete">
+   		UPDATE EpCommunication SET cm_status='Deleted'
+   		WHERE cm_id=		#{value}
+   </update>
+	<update id="undelete">
+		UPDATE EpCommunication SET cm_status='New'
+		WHERE cm_id=		#{value}
+	</update>
+   <update id="updateLink" parameterType="CommunicationEmail">
+   		UPDATE EpCommunication 
+   		SET cm_tp_id=#{tripId,jdbcType=INTEGER},
+	   <if test="departmentId != null">
+		   cm_dp_id = #{departmentId,jdbcType=INTEGER},
+	   </if>
+   		<if test="readStatus != null">
+   			cm_read = #{readStatus,jdbcType=INTEGER},
+   		</if>
+   		<if test="processedStatus != null">    
+   		    cm_status = #{processedStatus,jdbcType=INTEGER},
+   		</if>    
+   			cm_acomp=#{currentCompany,jdbcType=VARCHAR},
+			cm_acust =#{currentCustomer,jdbcType=VARCHAR},
+			cm_auid =#{updatedBy,jdbcType=VARCHAR},
+			cm_astamp = NOW() <!--UTC_TIMESTAMP() -->
+   		WHERE  cm_id=	#{id,jdbcType=BIGINT}
+   </update>
+	
+   <update id="updateReadStatus" parameterType="map">
+   		UPDATE EpCommunication 
+   		SET cm_read = #{readStatus,jdbcType=VARCHAR}
+   		WHERE  cm_id=	#{id,jdbcType=BIGINT}
+   </update>
+	<update id="updateLabel" parameterType="map">
+   		UPDATE EpCommunication 
+   		SET cm_label=#{label,jdbcType=VARCHAR}
+   		WHERE  cm_id=	#{id,jdbcType=BIGINT}
+   </update>   
+	<update id="updateProcessStatus" parameterType="map">
+		UPDATE EpCommunication
+		SET cm_status = #{processedStatus,jdbcType=VARCHAR}
+		WHERE  cm_id=	#{id,jdbcType=BIGINT}
+	</update>
+</mapper>

@@ -1,0 +1,96 @@
+<form class="form-horizontal" role="form" method="POST" name="freightEditForm" ng-submit="ok(freightEditForm.$valid)">
+    <div class="modal-header">Add Item</div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="hidden col-sm-10 control-label text-right">{{tripID}}</label>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Desc Goods</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" ng-model="f.item" id="item">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Est. Pieces</label>
+                    <div class="col-sm-4">
+                        <input type="number" class="form-control" ng-model="f.estimatedPieces" id="estimatedPieces" max="9999999999" min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Est. Value</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-4"><input type="number" class="form-control" ng-model="f.estimatedCost"
+                                                         id="estimatedCost" step="0.01" max="99999999" min="0"
+                            >
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="input-group-btn dropdown" dropdown>
+                                    <select class="form-control" name="ddlCurrency" id="ddlCurrency"
+                                            ng-options="Option.id as Option.name for Option in currencyOption"
+                                            ng-model="f.estimatedCurrency">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Dims (LxWxH)</label>
+                    <div class="col-sm-9">
+                        <div class="row">
+                            <div class="col-sm-2"><input type="number" name="foo" class="form-control" max="99999" min="0"
+                                                         ng-model="f.estimatedDimension1" id="f.estimatedDimension1">
+                            </div>
+                            <div class="col-sm-1 text-center"><p class="form-control-static">X</p></div>
+                            <div class="col-sm-2"><input type="number" name="foo2" class="form-control" max="99999" min="0"
+                                                         ng-model="f.estimatedDimension2" id="f.estimatedDimension2">
+                            </div>
+                            <div class="col-sm-1 text-center"><p class="form-control-static">X</p></div>
+                            <div class="col-sm-2"><input type="number" name="foo3" class="form-control" max="99999" min="0"
+                                                         ng-model="f.estimatedDimension3" id="f.estimatedDimension3">
+                            </div>
+                            <div class="col-sm-2">
+                                <p class="form-control-static">{{f.lengthUOM}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Est.Weight</label>
+                    <div class="col-sm-3">
+                        <input type="number" class="form-control" ng-model="f.estimatedWeight"
+                               step="0.01" max="999999" min="0"
+                        >
+                    </div>
+
+                    <label class="col-sm-3 control-label text-left">Chargeable Weight</label>
+                    <div class="col-sm-2 text-left">
+                        <p class="form-control-static">{{getChargeWt()}}</p>
+                    </div>
+                    <div class="col-sm-1">
+                        <p class="form-control-static">{{f.estimatedUOM}}</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-3 control-label text-right">Long Description</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" rows="6" ng-model="f.description" id="description"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><strong>Save</strong></button>
+        <button type="button" class="btn btn-danger" ng-click="cancel()"><strong>Cancel</strong></button>
+    </div>
+</form>

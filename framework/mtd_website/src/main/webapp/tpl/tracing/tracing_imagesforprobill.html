@@ -1,0 +1,41 @@
+<div ng-controller="ImagesForProbillCtrl">
+	<div class="bg-light lter b-b wrapper-md hidden-print">
+		<h1 class="m-n font-thin h3">Images for Probill #
+			{{formattedProbillNumber}}</h1>
+	</div>
+	<div ng-repeat="group in imageGroup">
+		<div class="bg-light lter b-b wrapper-md hidden-print">
+			<h3 class="m-n font-bold h4">{{group[0].imageTableHead}}</h3>
+		</div>
+		<div class="table-responsive">
+			<table st-table="group" class="table table-striped">
+				<thead>
+					<tr>
+						<th style="width: 300px;" st-sort="id">{{group[0].imageTableHead}}</th>
+						<th st-sort="formattedScanDate">Scan Date</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in group">
+						<td><a class="text-u-l" ng-click="seeImage(row.realFilename)">
+								{{row.id}} </a></td>
+						<td>{{row.formattedScanDate}}</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="2"  class="text-left">
+							<button ng-if="group.length > 1" type="button" class="btn btn-default" ng-click="viewAllImages(group,probillNo)">View all {{group[0].imageTableHead}}</button>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+			
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			
+		</div>
+	</div>
+	<div class="col-lg-12">
+		<button type="button" class="btn btn-default" ng-click="backOriginal()">Back</button>
+	</div>
+</div>

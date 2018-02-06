@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.TripEventMapper" >
+	<sql id="SELECT_TRIP_EVENT">
+			ev_id AS id,
+			ev_tp_id as tripId,
+			ev_ct_id as eventTemplateId,
+            ev_type AS type,
+            ev_name AS name,
+            ev_category_sequence AS categorySequence,
+            ev_category AS category,
+            ev_sequence AS sequence,
+            ev_code AS code,
+            ev_item AS item,
+            ev_desc AS description,
+            ev_est_date as estimatedDate,
+            ev_act_date as actualDate,
+        	ev_linked_entity as linkedEntity,
+        	ev_linked_entity_contact as linkedEntityContact,
+        	ev_customer_notify as customerNotify,
+        	ev_class as eventClass,
+        	ev_marked_complete as markedComplete,
+        	ev_acomp as currentCompany,
+			ev_acust as currentCustomer,
+			ev_auid as updatedBy,
+            <!--DATE_ADD(ev_astamp, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) as updateTime-->
+            ev_astamp as updateTime
+</sql>
+<select id="selectTripEvents" resultType="TripEvent" parameterType="map">
+    SELECT
+        <include refid="SELECT_TRIP_EVENT"/>
+        ,IFNULL(tripType.cd_${language},tripType.cd_english) as tripType
+        ,IFNULL(classType.cd_${language},classType.cd_english) as eventClassDesc
+        ,em_name as linkedEntityName
+        ,el_bus_phone1 as linkedEntityCell
+        ,el_address1 as linkedEntityAddress1
+        ,CONCAT(EpEntity.et_fname, ' ', EpEntity.et_lname) as contactName
+    FROM EpEvent
+        INNER JOIN EpTrip ON ev_tp_id=tp_id
+        INNER JOIN EpDivision dep ON EpTrip.tp_dp_id=dep.dp_id
+        LEFT JOIN EpCode tripType ON tp_type= tripType.cd_key and tripType.cd_name='Trip Type'
+        LEFT JOIN EpEntityLocation ON ev_linked_entity=EpEntityLocation.el_id
+        LEFT JOIN EpEntity ON ev_linked_entity_contact=EpEntity.et_id
+        LEFT JOIN EpEntityMaster ON el_em_id=em_id
+        LEFT JOIN EpCode classType ON ev_class= classType.cd_key and classType.cd_name='Event Class'
+    WHERE ev_tp_id=#{tripId,jdbcType=INTEGER}
+    order by ev_category_sequence, ev_sequence, ev_item
+</select>
+<select id="selectTripEventById" resultType="TripEvent" parameterType="Integer">
+     SELECT
+        <include refid="SELECT_TRIP_EVENT"/>
+    FROM EpEvent
+        INNER JOIN EpTrip ON ev_tp_id=tp_id
+        INNER JOIN EpDivision dep ON EpTrip.tp_dp_id=dep.dp_id
+    WHERE ev_id=#{value,jdbcType=INTEGER}
+</select>
+<select id="selectLastCompleteTripEvent" resultType="TripEvent" parameterType="Integer">
+    SELECT
+    <include refid="SELECT_TRIP_EVENT"/>
+    FROM EpEvent
+    INNER JOIN EpTrip ON ev_tp_id=tp_id
+    INNER JOIN EpDivision dep ON EpTrip.tp_dp_id=dep.dp_id
+    WHERE ev_tp_id=#{value,jdbcType=INTEGER}
+    AND ev_act_date is NOT null
+    ORDER BY ev_category_sequence DESC, ev_sequence DESC
+    LIMIT 1
+</select>
+ <select id="selectNextTripEvent" resultType="TripEvent" parameterType="map">
+     SELECT
+        <include refid="SELECT_TRIP_EVENT"/>
+    FROM EpEvent
+         INNER JOIN EpTrip ON ev_tp_id=tp_id
+         INNER JOIN EpDivision dep ON EpTrip.tp_dp_id=dep.dp_id
+    WHERE ev_tp_id = #{tripId,jdbcType=INTEGER}
+        AND ev_act_date is null
+        AND ((ev_category_sequence = #{categorySequence,jdbcType=INTEGER} AND ev_sequence > #{sequence,jdbcType=INTEGER})
+          OR ev_category_sequence > #{categorySequence,jdbcType=INTEGER})
+    ORDER BY ev_category_sequence, ev_sequence
+    LIMIT 1
+</select>
+<select id="selectEventWithActualDate" resultType="TripEvent" parameterType="map">
+     SELECT
+        <include refid="SELECT_TRIP_EVENT"/>
+        ,IFNULL(cd_${language}, cd_english) as tripType
+        ,linkedEntity.linkedEntityName as linkedEntityName
+        ,linkedEntity.linkedEntityCell as linkedEntityCell
+        ,linkedEntity.linkedEntityAddress1 as linkedEntityAddress1
+        ,linkedEntity.linkedEntityType as linkedEntityType
+    FROM EpEvent
+        INNER JOIN EpTrip ON ev_tp_id = tp_id
+        INNER JOIN EpDivision dep ON EpTrip.tp_dp_id=dep.dp_id
+        LEFT JOIN EpCode ON tp_type= cd_key and cd_name = 'Trip Type'
+        LEFT JOIN EpEntity ON ev_linked_entity_contact = et_id
+        LEFT JOIN EpEntityLocation ON ev_linked_entity = el_id
+        LEFT JOIN EpEntityMaster ON em_id = el_em_id
+        LEFT JOIN (SELECT ev_tp_id AS le_tp_id,
+                        IFNULL(CONCAT(et_fname, ' ' , et_lname), '') as linkedEntityName
+                        ,IFNULL(et_phone_mobile, '') as linkedEntityCell
+                        ,el_address1 as linkedEntityAddress1
+                        ,em_type as linkedEntityType
+                    FROM EpEvent
+                        INNER JOIN EpTrip ON ev_tp_id = tp_id
+                        LEFT JOIN EpCode ON tp_type= cd_key and cd_name = 'Trip Type'
+                        LEFT JOIN EpEntity ON ev_linked_entity_contact = et_id
+                        LEFT JOIN EpEntityLocation ON ev_linked_entity = el_id
+                        LEFT JOIN EpEntityMaster ON em_id = el_em_id
+                    WHERE ev_tp_id=#{tripId,jdbcType=INTEGER}
+                    AND ev_act_date is not null
+                    ORDER BY ev_act_date DESC, ev_category_sequence desc, ev_sequence desc, ev_item
+                    LIMIT 1) linkedEntity ON linkedEntity.le_tp_id = ev_tp_id
+    WHERE ev_tp_id=#{tripId,jdbcType=INTEGER}
+        AND ev_customer_notify=#{customerNotify,jdbcType=VARCHAR}
+        AND ev_act_date is not null
+    order by ev_category_sequence desc, ev_sequence desc, ev_item
+</select>
+
+<insert id="insertTripEvent" parameterType="TripEvent">
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+        SELECT LAST_INSERT_ID()
+    </selectKey>
+    INSERT INTO EpEvent(
+        ev_tp_id ,
+        ev_ct_id ,
+        ev_type,
+        ev_name,
+        ev_category_sequence,
+        ev_category,
+        ev_sequence,
+        ev_code,
+        ev_item,
+        ev_desc,
+        ev_est_date,
+        ev_act_date,
+        ev_class,
+        ev_marked_complete,
+        ev_linked_entity,
+        ev_linked_entity_contact,
+        ev_customer_notify,
+        ev_acomp,
+        ev_acust,
+        ev_auid,
+        ev_astamp
+    ) VALUES (
+        #{tripId,jdbcType=INTEGER},
+        #{eventTemplateId,jdbcType=INTEGER},
+        #{type,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR},
+        #{categorySequence,jdbcType=INTEGER},
+        #{category,jdbcType=VARCHAR},
+        #{sequence,jdbcType=INTEGER},
+        #{code,jdbcType=VARCHAR},
+        #{item,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{estimatedDate,jdbcType=TIMESTAMP},
+        #{actualDate,jdbcType=TIMESTAMP},
+        #{eventClass,jdbcType=VARCHAR},
+        0,
+        #{linkedEntity,jdbcType=INTEGER},
+        #{linkedEntityContact,jdbcType=INTEGER},
+        #{customerNotify,jdbcType=VARCHAR},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <update id="updateTripEvent" parameterType="TripEvent">
+        UPDATE EpEvent SET            
+            ev_type=#{type,jdbcType=VARCHAR},
+            ev_name =#{name,jdbcType=VARCHAR},
+            ev_category_sequence =#{categorySequence,jdbcType=INTEGER},
+            ev_category =#{category,jdbcType=VARCHAR},
+            ev_sequence =#{sequence,jdbcType=INTEGER},
+            ev_code =#{code,jdbcType=VARCHAR},
+            ev_class =#{eventClass,jdbcType=VARCHAR},
+            ev_item =#{item,jdbcType=VARCHAR},
+            ev_desc =#{description,jdbcType=VARCHAR},
+            ev_est_date =#{estimatedDate,jdbcType=TIMESTAMP},
+            ev_act_date =#{actualDate,jdbcType=TIMESTAMP},
+            ev_linked_entity = #{linkedEntity,jdbcType=INTEGER},
+            ev_linked_entity_contact = #{linkedEntityContact,jdbcType=INTEGER},
+            ev_customer_notify = #{customerNotify,jdbcType=VARCHAR},
+            ev_acomp = #{currentCompany,jdbcType=VARCHAR},
+            ev_acust = #{currentCustomer,jdbcType=VARCHAR},
+            ev_auid = #{updatedBy,jdbcType=VARCHAR},
+            ev_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE ev_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateTripEventCategorySequence" parameterType="TripEvent">
+        UPDATE EpEvent
+        SET ev_category_sequence = #{categorySequence,jdbcType=INTEGER},
+            ev_sequence = #{sequence,jdbcType=INTEGER},
+            ev_acomp = #{currentCompany,jdbcType=VARCHAR},
+            ev_acust = #{currentCustomer,jdbcType=VARCHAR},
+            ev_auid = #{updatedBy,jdbcType=VARCHAR},
+            ev_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE ev_id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateTripEventSequence" parameterType="TripEvent">
+        UPDATE EpEvent
+        SET ev_sequence = #{sequence,jdbcType=INTEGER},
+            ev_acomp = #{currentCompany,jdbcType=VARCHAR},
+            ev_acust = #{currentCustomer,jdbcType=VARCHAR},
+            ev_auid = #{updatedBy,jdbcType=VARCHAR},
+            ev_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE ev_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <select id="getTripEventCategorySequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT min(ev_category_sequence)
+        FROM EpEvent
+        WHERE ev_name = #{name,jdbcType=VARCHAR}
+        AND ev_category = #{category,jdbcType=VARCHAR}
+        AND ev_tp_id = #{tripId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getLastTripEventCategorySequenceByName" resultType="Integer" parameterType="map">
+        SELECT max(ev_category_sequence)
+        FROM EpEvent
+        WHERE ev_name = #{name,jdbcType=VARCHAR}
+        AND ev_id != #{id,jdbcType=INTEGER}
+        AND ev_tp_id = #{tripId,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getTripEventSequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT max(ev_sequence)
+        FROM EpEvent
+        WHERE ev_name = #{name,jdbcType=VARCHAR}
+        AND ev_category = #{category,jdbcType=VARCHAR}
+        AND ev_tp_id = #{tripId,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteTripEvent" parameterType="Integer">
+        DELETE FROM EpEvent WHERE ev_id = #{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteTripEventsByTrip" parameterType="Integer">
+        DELETE FROM EpEvent WHERE ev_tp_id = #{value,jdbcType=INTEGER}
+    </delete>
+    <select id="hasCostDataByEventIds" resultType="Integer" parameterType="string" >
+        SELECT count(*) as CostCount
+        FROM EpCost C
+        WHERE #{eventIds,jdbcType=VARCHAR} like CONCAT('%,',C.ct_ev_id,',%')
+    </select>
+
+    <insert id="insertTripsWithTemplate" parameterType="Trip">
+ 		insert into EpEvent( 
+ 			ev_tp_id,
+			ev_ct_id,
+            ev_type,
+            ev_name ,
+            ev_category_sequence,
+            ev_category,
+            ev_sequence,
+            ev_code,
+            ev_item,
+            ev_desc,
+            ev_linked_entity,
+            ev_linked_entity_contact,
+            ev_customer_notify,
+            ev_class,
+            ev_marked_complete,
+	        ev_acomp,
+	        ev_acust,
+	        ev_auid,
+	        ev_astamp)
+		select #{id,jdbcType=INTEGER}	,
+			te_id,
+			te_type,
+			te_name,
+            te_category_sequence,
+            te_category,
+            te_sequence,
+			te_code,
+			te_item,
+            te_desc,
+            te_linked_entity,
+            te_linked_entity_contact,
+            te_customer_notify,
+            te_class,
+            0,
+            #{currentCompany,jdbcType=VARCHAR},
+			#{currentCustomer,jdbcType=VARCHAR},
+			#{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+		from EpEventTemplate
+		where te_status='Active'   
+		<if test="eventTemplatesTobeImported != null">
+			AND te_id in 
+			<foreach collection="eventTemplatesTobeImported" item="templateId" index="index"
+            	open="(" close=")" separator=",">
+            #{templateId,jdbcType=INTEGER}
+        	</foreach>
+		</if>  
+    </insert>
+
+    <insert id="insertTripEventCostWithTemplate" parameterType="Integer">
+        INSERT INTO EpCost(
+            ct_tp_id,
+            ct_ev_id,
+            ct_est_date,
+            ct_est_cost,
+            ct_est_currency,
+            ct_charge_code,
+            ct_charge_desc,
+            ct_description,
+            ct_visible,
+            ct_linked_entity,
+            ct_linked_entity_contact,
+            ct_acomp,
+            ct_acust,
+            ct_auid,
+            ct_astamp)
+        select e.ev_tp_id,
+            e.ev_id,
+            etc.ec_date,
+            etc.ec_cost,
+            etc.ec_currency,
+            etc.ec_charge_code,
+            etc.ec_charge_desc,
+            etc.ec_description,
+            etc.ec_visible,
+            etc.ec_linked_entity,
+            etc.ec_linked_entity_contact,
+            e.ev_acomp,
+            e.ev_acust,
+            e.ev_auid,
+            e.ev_astamp
+        from EpEvent e,
+            EpEventTemplateCost etc
+        where e.ev_tp_id = #{value,jdbcType=INTEGER}
+        and e.ev_ct_id = etc.ec_te_id
+    </insert>
+
+    <insert id="insertTripEventNotifyWithTemplate" parameterType="Integer">
+            insert into EpEventNotify(
+              ey_ev_id,
+              ey_name,
+              ey_email,
+              ey_acomp,
+              ey_acust,
+              ey_auid,
+              ey_astamp)
+            select e.ev_id,
+                etn.en_name,
+                etn.en_email,
+                e.ev_acomp,
+                e.ev_acust,
+                e.ev_auid,
+                e.ev_astamp
+            from EpEvent e,
+              EpEventTemplateNotify etn
+            where e.ev_tp_id = #{value,jdbcType=INTEGER}
+            and e.ev_ct_id = etn.en_te_id
+    </insert>
+	<insert id="insertEventNotify" parameterType="TripEventNotify">
+            insert into EpEventNotify(
+              ey_ev_id,
+              ey_name,
+              ey_email,
+              ey_acomp,
+              ey_acust,
+              ey_auid,
+              ey_astamp)
+			VALUES (
+				 #{eventId,jdbcType=INTEGER},
+				 #{name,jdbcType=VARCHAR},
+				 #{email,jdbcType=VARCHAR},
+				 #{currentCompany,jdbcType=VARCHAR},
+				 #{currentCustomer,jdbcType=VARCHAR},
+				 #{updatedBy,jdbcType=VARCHAR},
+				 NOW() <!--UTC_TIMESTAMP() -->
+			)
+    </insert>
+    <update id="updateEventNotify" parameterType="TripEventNotify">
+            UPDATE EpEventNotify SET
+              
+              ey_name=#{name,jdbcType=VARCHAR},
+              ey_email= #{email,jdbcType=VARCHAR},
+              ey_acomp=#{currentCompany,jdbcType=VARCHAR},
+              ey_acust=#{currentCustomer,jdbcType=VARCHAR},
+              ey_auid=#{updatedBy,jdbcType=VARCHAR},
+              ey_astamp= NOW() <!--UTC_TIMESTAMP() -->
+			WHERE ey_id=#{id,jdbcType=INTEGER}
+    </update>
+    <delete id="deleteEventNotify" parameterType="integer">
+            DELETE FROM  EpEventNotify 
+			WHERE ey_id=#{value,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteEventNotifiesWithEventId" parameterType="integer">
+        DELETE FROM  EpEventNotify
+        WHERE ey_ev_id=#{value,jdbcType=INTEGER}
+    </delete>
+	<delete id="deleteEventNotifiesWithTripId" parameterType="map">
+		DELETE FROM EpEventNotify
+		WHERE ey_ev_id IN 
+		(
+			SELECT ev_id FROM EpEvent WHERE ev_tp_id=#{tripId,jdbcType=INTEGER}
+		)
+		<if test="exculedEvent != null">
+			AND ey_ev_id != #{exculedEvent,jdbcType=INTEGER}
+		</if>
+	</delete>
+
+    <select id="selectEventNotifies" resultType="TripEventNotify" parameterType="Integer">
+        SELECT
+	        ey_id as id,
+	        ey_ev_id as eventId,
+	        ey_name as name,
+	        ey_email as email,
+        	ey_acomp as currentCompany,
+			ey_acust as currentCustomer,
+			ey_auid as updatedBy,
+			ey_astamp as updateTime
+        FROM EpEventNotify
+        WHERE ey_ev_id=#{value,jdbcType=INTEGER}
+    </select>
+    <update id="updateEventCompleteInfo" parameterType="TripEvent">
+      UPDATE EpEvent SET
+            ev_marked_complete = #{markedComplete,jdbcType=INTEGER},
+            ev_est_date = CASE WHEN #{markedComplete,jdbcType=INTEGER} = 1 THEN (CASE WHEN ev_est_date IS NULL THEN NOW() ELSE ev_est_date END) ELSE NULL END,
+            ev_act_date =  CASE WHEN #{markedComplete,jdbcType=INTEGER} = 1 THEN (CASE WHEN ev_act_date IS NULL THEN NOW() ELSE ev_act_date END) ELSE NULL END,
+            ev_acomp = #{currentCompany,jdbcType=VARCHAR},
+            ev_acust = #{currentCustomer,jdbcType=VARCHAR},
+            ev_auid = #{updatedBy,jdbcType=VARCHAR},
+            ev_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE ev_id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

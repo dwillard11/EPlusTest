@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.InvoiceMapper" >
+	<sql id="SELECT_INVOICE">
+			iv_id 			as id,
+			iv_invoiceno    as refNum,
+			iv_tp_id 		as tripId,
+			iv_date 		as invoiceDate,
+			iv_invoice_from as invoiceFrom,
+			iv_invoice_to 	as invoiceTo,
+			iv_miles		as miles,
+			iv_rate			as rate,
+			iv_exchange_rate as exchangeRate,
+			iv_billing_currency as billingCurrency,
+			iv_netprofit as netProfit,
+			iv_invoice_subtotal as invoiceSubtotal,
+			iv_billing_amount as totalAmount,
+			iv_acomp AS currentCompany,
+			iv_acust AS currentCustomer,
+			iv_auid AS updatedBy,
+			iv_astamp AS updateTime
+	</sql>
+	<sql id="SELECT_INVOICE_DETAIL">
+			id_id as id,
+			id_iv_id as invoiceId,
+			id_sequence as sequence,
+			id_item as item,
+			id_charge_code as chargeCode,
+			IFNULL(code.cd_${language},code.cd_english) as chargeDesp,
+			id_amount as amount,
+			id_tax_code as taxCode,
+			id_tax_code_value as taxCodeValue,
+			id_acomp AS currentCompany,
+			id_acust AS currentCustomer,
+			id_auid AS updatedBy,
+			id_astamp AS updateTime
+	</sql>	
+	
+    <select id="selectInvoiceByTrip" resultType="Invoice" parameterType="Integer">
+        SELECT 
+			<include refid="SELECT_INVOICE"/>
+        FROM EpInvoice
+        WHERE iv_tp_id=#{value,jdbcType=INTEGER}
+        ORDER BY iv_id
+    </select>
+    <select id="selectInvoiceById" resultType="Invoice" parameterType="Integer">
+        SELECT 
+			<include refid="SELECT_INVOICE"/>
+        FROM EpInvoice
+        WHERE iv_id=#{value,jdbcType=INTEGER}
+    </select>
+    <select id="selectInvoices" resultType="Invoice" parameterType="map">
+        SELECT
+			iv_id AS id,
+			iv_invoiceno    as refNum,
+			iv_tp_id AS tripId,
+			iv_date AS invoiceDate,
+			iv_invoice_from AS invoiceFrom,
+			iv_invoice_to AS invoiceTo,
+			iv_miles AS miles,
+			iv_rate AS rate,
+			
+			iv_billing_currency AS billingCurrency,
+			IFNULL(IFNULL(qType.cd_${language}, qType.cd_english), tp.tp_type) AS serviceType,
+			CONCAT(mShipper.em_name, ', ', pShipper.el_city) as shipper,
+			CONCAT(mInvoiceTo.em_name, ', ', pInvoiceTo.el_city) as billedClient,
+			iv_billing_amount AS totalAmount,
+			doc.dc_id as documentId
+		FROM
+			EpInvoice ei
+		INNER JOIN EpTrip tp ON tp.tp_id = ei.iv_tp_id
+		LEFT JOIN EpCode qType ON qType.cd_key = tp.tp_type		AND qType.cd_name = 'Trip Type'
+		INNER JOIN EpDivision dp ON dp.dp_id = tp.tp_dp_id
+		LEFT JOIN EpEntityLocation pShipper ON pShipper.el_id = tp.tp_shipper
+		LEFT JOIN EpEntityMaster mShipper ON mShipper.em_id = pShipper.el_em_id
+		LEFT JOIN EpEntityLocation pInvoiceTo ON pInvoiceTo.el_id = tp.tp_billed_client
+		LEFT JOIN EpEntityMaster mInvoiceTo ON mInvoiceTo.em_id = pInvoiceTo.el_em_id
+		LEFT JOIN EpDocument doc ON ei.iv_tp_id = doc.dc_tp_id and doc.dc_original_name = concat(ei.iv_invoiceno,'.pdf')
+		WHERE 1=1
+		<if test=" departmentIdList != null">
+			and tp.tp_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+                    index="index" open="(" close=")" separator=",">
+                    #{depId, jdbcType=INTEGER}
+        	</foreach>
+		</if>
+		<if test=" departmentId != null">
+			AND tp.tp_dp_id=#{departmentId,jdbcType=INTEGER}
+		</if>
+		<if test=" dateFrom != null">
+			AND ei.iv_date &gt;=#{dateFrom,jdbcType=DATE}
+		</if>
+		<if test=" dateTo != null">
+			AND ei.iv_date &lt;=#{dateTo,jdbcType=DATE}
+		</if>
+		<if test="tripId != null">
+			AND iv_tp_id = #{tripId,jdbcType=INTEGER}
+		</if>
+		ORDER BY iv_invoiceno DESC
+    </select>
+    <insert id="insertInvoice" parameterType="Invoice">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpInvoice(
+			iv_tp_id 		,
+			iv_invoiceno,
+			iv_date 		,
+			iv_invoice_from ,
+			iv_invoice_to 	,
+			iv_miles		,
+			iv_rate			,
+			iv_exchange_rate ,
+			iv_billing_currency ,
+           	iv_billing_amount,
+           	iv_invoice_subtotal,
+           	iv_netprofit,
+           	iv_netprofit_currency,
+            iv_acomp ,
+			iv_acust ,
+			iv_auid ,
+			iv_astamp 
+	    ) VALUES (
+
+	    	#{tripId,jdbcType=INTEGER},
+	    	#{refNum,jdbcType=VARCHAR},
+	    	#{invoiceDate,jdbcType=DATE},
+	    	#{invoiceFrom,jdbcType=VARCHAR},
+	    	#{invoiceTo,jdbcType=VARCHAR},
+	    	#{miles,jdbcType=NUMERIC},
+	    	#{rate,jdbcType=NUMERIC},
+	    	#{exchangeRate,jdbcType=NUMERIC},
+	    	#{billingCurrency,jdbcType=VARCHAR},
+	    	#{totalAmount,jdbcType=NUMERIC},
+	    	#{invoiceSubtotal,jdbcType=NUMERIC},
+	    	#{netProfit,jdbcType=NUMERIC},
+	    	#{netProfitCurrency,jdbcType=VARCHAR},
+	        #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+			NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+	<update id="updateInvoice" parameterType="Invoice">
+		UPDATE EpInvoice SET
+			iv_date 		=#{invoiceDate,jdbcType=DATE},
+			iv_invoice_from =#{invoiceFrom,jdbcType=VARCHAR},
+			iv_invoice_to 	=#{invoiceTo,jdbcType=VARCHAR},
+			iv_miles		=#{miles,jdbcType=NUMERIC},
+			iv_rate			=#{rate,jdbcType=NUMERIC},
+		<if test="exchangeRate != null">
+			iv_exchange_rate = #{exchangeRate,jdbcType=NUMERIC},
+		</if>	
+			iv_billing_currency =#{billingCurrency,jdbcType=VARCHAR},
+			iv_billing_amount=#{totalAmount,jdbcType=NUMERIC},
+			iv_invoice_subtotal=#{invoiceSubtotal,jdbcType=NUMERIC},
+			iv_netprofit =#{netProfit,jdbcType=NUMERIC},
+			iv_netprofit_currency=#{netProfitCurrency,jdbcType=VARCHAR},
+			iv_acomp =#{currentCompany,jdbcType=VARCHAR},
+			iv_acust =#{currentCustomer,jdbcType=VARCHAR},
+			iv_auid = #{updatedBy,jdbcType=VARCHAR},
+			iv_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE 
+			iv_id=#{id,jdbcType=INTEGER}	
+	</update>   
+
+	<delete id="deleteInvoice" parameterType="int">
+		DELETE FROM EpInvoice 
+		WHERE 
+			iv_id=#{value,jdbcType=INTEGER}	
+	</delete>   
+	<select id="selectInvoiceDetails" resultType="InvoiceDetail" parameterType="map">
+        SELECT 
+			<include refid="SELECT_INVOICE_DETAIL"/>
+		FROM EpInvoiceDetail eid
+			LEFT JOIN EpCode code ON code.cd_name='Charge Code' and code.cd_key=eid.id_charge_code
+        WHERE id_iv_id=#{id,jdbcType=INTEGER}
+        ORDER BY id_sequence
+    </select>	
+    <insert id="insertInvoiceDetail" parameterType="InvoiceDetail">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpInvoiceDetail(
+			id_iv_id,
+			id_sequence,
+			id_item ,
+			id_charge_code ,
+			id_amount,
+			id_tax_code ,
+			id_tax_code_value ,
+			id_tax_amount,
+			id_acomp,
+			id_acust,
+			id_auid,
+			id_astamp
+	    ) VALUES (
+
+	    	#{invoiceId,jdbcType=INTEGER},
+	    	#{sequence,jdbcType=INTEGER},
+	    	#{item,jdbcType=VARCHAR},
+	    	#{chargeCode,jdbcType=VARCHAR},
+	    	#{amount,jdbcType=NUMERIC},
+	    	#{taxCode,jdbcType=VARCHAR},
+	    	#{taxCodeValue,jdbcType=NUMERIC},
+	    	#{taxAmount,jdbcType=NUMERIC},
+	        #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+			NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <delete id="deleteAllInvoiceDetails" parameterType="int">
+		DELETE FROM EpInvoiceDetail 
+		WHERE 
+			id_iv_id=#{value,jdbcType=INTEGER}	
+	</delete>   
+</mapper>

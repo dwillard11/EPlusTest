@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.SecureMenuMapper" >
+  <resultMap id="RESULTMAP_MENU_PROFILE" type="SecureMenu" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="url" property="url" jdbcType="VARCHAR" />
+    <result column="sortNum" property="sortNum" jdbcType="NUMERIC" />
+    <result column="parentMenuId" property="parentMenuId" jdbcType="VARCHAR" />
+    <result column="remarks" property="remarks" jdbcType="VARCHAR" />
+    <result column="icon" property="icon" jdbcType="VARCHAR" />
+    <result column="active" property="active" jdbcType="VARCHAR" />
+  </resultMap>
+
+	<!--get top menus -->
+  	<select id="selectTopMenus" resultMap="RESULTMAP_MENU_PROFILE" parameterType="HashMap" >
+  	SELECT tmmid AS id, tmvnam AS NAME, tmseq as sortNum FROM PMTTMNU
+	WHERE 1 = 1 
+	<if test=" company != null">
+        and tmcomp = #{company}
+    </if>	
+	<if test=" groupName != null">
+        and TMGRP = #{groupName}
+    </if>	
+    and tmmtyp = 'M'
+    AND active='Y'
+	ORDER BY tmseq
+  	</select>  
+
+	<!--get side menus -->
+  	<select id="selectSideMenus" resultMap="RESULTMAP_MENU_PROFILE" parameterType="HashMap" >
+  	SELECT tsmid as parentMenuId, tssmid AS id, tsvnam AS NAME, tssseq as sortNum, url, icon, active FROM PMTSMNU
+	WHERE 1 = 1 
+	<if test=" parentMenuId != null">
+        and tsmid=#{parentMenuId}
+    </if>	
+	<if test=" type != null">
+        and tsmtyp=#{type}
+    </if>    
+    AND active='Y'
+	ORDER BY tssseq asc, TSCSEQ asc
+  	</select>  
+  
+	<!--get first level side menus -->
+  	<select id="selectFirstLevelSideMenus" resultMap="RESULTMAP_MENU_PROFILE" parameterType="HashMap" >
+  	SELECT tsmid as parentMenuId, tssmid AS id, tsvnam AS NAME, tssseq as sortNum, url, icon, active FROM PMTSMNU
+	WHERE 1 = 1 
+	<if test=" parentMenuId != null">
+        and tsmid=#{parentMenuId}
+    </if>	
+    and tsmtyp='N'
+    AND active='Y'
+	ORDER BY tssseq
+  	</select>  
+  
+	<!--get second level side menus -->
+  	<select id="selectSecondLevelSideMenus" resultMap="RESULTMAP_MENU_PROFILE" parameterType="HashMap" >
+  	SELECT tsmid as parentMenuId, tssmid AS id, tsvnam AS NAME, TSCSEQ as sortNum, url, icon, active FROM PMTSMNU
+	WHERE 1 = 1 
+	<if test=" parentMenuId != null">
+        and tssmid=#{parentMenuId}
+    </if>	
+	<if test=" sortNum != null">
+        and tssseq=#{sortNum}
+    </if>    
+    and tsmtyp='L'
+    AND active='Y'
+	ORDER BY TSCSEQ
+  	</select>    
+  
+</mapper>

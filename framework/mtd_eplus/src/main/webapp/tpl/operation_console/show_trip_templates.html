@@ -1,0 +1,55 @@
+<div class="modal-header">Select Template</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <label class="col-sm-2 control-label"></label>
+                <div class="col-sm-8">
+                    <div class="table-responsive" style="height: 550px">
+                        <table st-table="displayedCollection" st-safe-src="templatesList"
+                               class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th class="hidden" st-sort="id">ID</th>
+                                <th st-sort="templateName">Template Name</th>
+                            </tr>
+                            </thead>
+                            <tbody ng-show="!isLoading">
+                            <tr ng-repeat="role in displayedCollection">
+                                <td><input type="checkbox" ng-model="role.hasChecked"></td>
+                                <td class="hidden">{{role.id}}</a></td>
+                                <td>{{ role.templateName}}</td>
+                            </tr>
+                            </tbody>
+                            <tbody ng-show="isLoading">
+                            <tr>
+                                <td colspan="3" class="text-center"><i
+                                        class="fa fa-spin fa-refresh"></i></td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="2" class="text-left">
+                                    <div>
+                                        <small class="text-muted inline m-t-sm m-b-sm">Total item(s):
+                                            {{collectionLength}}
+                                        </small>
+                                    </div>
+                                </td>
+                                <td colspan="1" class="text-center">
+
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" ng-click="cancel()" class="btn btn-default">Cancel</button>
+    <button type="button" ng-click="newTripFromTemplates()" class="btn btn-primary">Import</button>
+</div>

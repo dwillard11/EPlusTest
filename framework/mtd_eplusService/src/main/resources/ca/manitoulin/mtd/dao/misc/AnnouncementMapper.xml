@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.AnnouncementMapper">
+	<select id="selectAnnouncements" resultType="Announcement" parameterType="SecureUser">
+		select ANO.AODESC as title,
+		ANO.AOEDTE AS dateBegin,
+		ANO.AOMSG AS content
+		from PMTANO ANO LEFT JOIN PMTANOCUST ANOC ON ANO.AOREF = ANOC.AOREF
+		<!--where ANO.AOEDTE &lt; UTC_TIMESTAMP() AND ANO.AOXDTE &gt; UTC_TIMESTAMP()-->
+		where ANO.AOEDTE &lt; NOW() AND ANO.AOXDTE &gt; NOW()
+		<if test="type != 'ADMIN'">
+			AND ((ANO.AOCUST = '[ALL]' OR ANO.AOCUST=#{customer})
+			OR (ANO.AOCOMP=#{company} 
+			AND (ANOC.AOCOMP IS NULL OR ANOC.AOCOMP=#{company}) 
+			AND (ANOC.AOCUST IS NULL OR ANOC.AOCUST=#{customer})))
+		</if>
+		AND ANO.AOLANG=#{referLanguage}
+		ORDER BY ANO.AOEDTE DESC
+	</select>
+</mapper>

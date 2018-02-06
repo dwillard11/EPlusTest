@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.customer.CourierVisaMapper">
+	<sql id="SELECT_COURIERVISA">
+			cr_id as id,
+        	cr_et_id as contactId,
+        	cr_country as country,
+			PS.ep_country AS countryName,
+			cr_visano as visaNo,
+			cr_name as name,
+			cr_nationality as nationality,
+			cr_passport_no as passportNo,
+			cr_valid_from as validFrom,
+			cr_valid_to as validTo,
+			cr_sector as sector,
+			cr_note as note,
+			cr_acomp as currentCompany,
+			cr_acust as currentCustomer,
+			cr_auid as updatedBy,
+			cr_astamp as updateTime
+	</sql>
+    <select id="selectCourierVisaByContactId" resultType="CourierVisa" parameterType="integer">
+        SELECT DISTINCT
+        	<include refid="SELECT_COURIERVISA" />
+ 		FROM EpCourierVisa cr LEFT JOIN EpProvinceState PS on PS.ep_country_code = cr.cr_country
+ 		WHERE cr_et_id=#{value,jdbcType=INTEGER}
+ 		ORDER BY cr_visano
+    </select>
+    <select id="selectCourierVisaById" resultType="CourierVisa" parameterType="integer">
+        SELECT 
+        	<include refid="SELECT_COURIERVISA" />
+ 		FROM EpCourierVisa cr LEFT JOIN EpProvinceState PS on PS.ep_country_code = cr.cr_country
+ 		WHERE cr_id=#{value,jdbcType=INTEGER}
+    </select>
+    <update id="updateCourierVisa" parameterType="CourierVisa">
+    	UPDATE EpCourierVisa SET
+    		cr_country = #{country,jdbcType=VARCHAR},
+    		cr_visano = #{visaNo,jdbcType=VARCHAR},
+    		cr_name = #{name,jdbcType=VARCHAR},
+    		cr_nationality = #{nationality,jdbcType=VARCHAR},
+    		cr_passport_no = #{passportNo,jdbcType=VARCHAR},
+			cr_valid_from=#{validFrom, jdbcType=TIMESTAMP},
+			cr_valid_to=#{validTo, jdbcType=TIMESTAMP},
+    		cr_sector = #{sector,jdbcType=VARCHAR},
+    		cr_note = #{note,jdbcType=VARCHAR},
+			cr_acomp = #{currentCompany,jdbcType=VARCHAR},
+			cr_acust = #{currentCustomer,jdbcType=VARCHAR},
+			cr_auid = #{updatedBy,jdbcType=VARCHAR},
+			cr_astamp = NOW()
+			<!--UTC_TIMESTAMP() -->
+    	WHERE fr_id=#{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insertCourierVisa" parameterType="CourierVisa">
+    	INSERT INTO EpCourierVisa(
+				cr_et_id,
+				cr_country,
+				cr_visano,
+				cr_name,
+				cr_nationality,
+				cr_passport_no,
+				cr_valid_from,
+				cr_valid_to,
+				cr_sector,
+				cr_note,
+				cr_acomp,
+				cr_acust,
+				cr_auid,
+				cr_astamp)
+		VALUES (
+				#{contactId,jdbcType=INTEGER},
+				#{country,jdbcType=VARCHAR},
+				#{visaNo,jdbcType=VARCHAR},
+				#{name,jdbcType=VARCHAR},
+				#{nationality,jdbcType=VARCHAR},
+				#{passportNo,jdbcType=VARCHAR},
+				#{validFrom, jdbcType=TIMESTAMP},
+				#{validTo, jdbcType=TIMESTAMP},
+				#{sector,jdbcType=VARCHAR},
+				#{note,jdbcType=VARCHAR},
+				#{currentCompany,jdbcType=VARCHAR},
+				#{currentCustomer,jdbcType=VARCHAR},
+				#{updatedBy,jdbcType=VARCHAR},
+				NOW()
+				<!--UTC_TIMESTAMP() -->
+		)	
+    	<selectKey resultType="int" order="AFTER" keyProperty="id">
+    		SELECT LAST_INSERT_ID()
+    	</selectKey>
+    </insert>
+    <delete id="deleteCourierVisa" parameterType="integer">
+    	DELETE FROM EpCourierVisa
+    	WHERE cr_id=#{value,jdbcType=INTEGER}
+    </delete>
+	<delete id="deleteCourierVisaByContactId" parameterType="integer">
+    	DELETE FROM EpCourierVisa
+    	WHERE cr_et_id=#{value,jdbcType=INTEGER}
+    </delete>
+</mapper>

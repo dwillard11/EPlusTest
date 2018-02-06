@@ -1,0 +1,662 @@
+<div class="wrapper-md" ng-controller="pickupdetailsctrl">
+    <div class="bg-light lter b-b wrapper-md">
+        <div class="row">
+            <div class="col-sm-6 col-xs-12">
+                <h1 class="m-n font-thin h3">Pickup / Delivery Order Builder</h1>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form name="pickupform" class="form-horizontal">
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Trip #</label>
+                        <div class="col-sm-6">
+                            <p class="form-control-static">{{trip.tripRefNo}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Trip Type</label>
+                        <div class="col-sm-6">
+                            <p class="form-control-static">{{trip.typeDesp}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Pickup Date</label>
+                        <div class="col-sm-6">
+                            <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                                <input type="text" class="form-control"
+                                       datepicker-popup="yyyy-MM-dd"
+                                       ng-model="trip.pickupDate" id="pickupDate"
+                                       is-open="opened" datepicker-options="dateOptions"
+                                       ng-required="false" close-text="Close"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Delivery date</label>
+                        <div class="col-sm-6">
+                            <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                                <input type="text" class="form-control"
+                                       datepicker-popup="yyyy-MM-dd"
+                                       ng-model="trip.deliveryDate" id="deliveryDate"
+                                       is-open="opened" datepicker-options="dateOptions"
+                                       ng-required="false" close-text="Close"/>
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+                                        <i class="glyphicon glyphicon-calendar"></i>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">Agent</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" method="post">
+                                <div class="hidden form-group">
+                                    <div class="col-sm-11">
+                                        <input class="form-control" type="text" id="agentLocationEntityID"
+                                               ng-model="agent.id" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Search</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+
+                                            <ui-select ng-model="agent.selected" theme="bootstrap"
+                                                       ng-change="selectLocation(agent.selected,'agent')">
+                                                <ui-select-match
+                                                        placeholder="Select or search a client in the list...">
+                                                    {{$select.selected.genericInfo}}
+                                                </ui-select-match>
+                                                <ui-select-choices group-by="'customerName'"
+                                                                   repeat="item in clients "
+                                                                   refresh="searchLocation($select.search)"
+                                                                   refresh-delay="400">
+                                                    <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'agent');"
+
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Name</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <input class="form-control" type="text" id="agentLocationEntityName"
+                                                   ng-model="agent.customerName" disabled />
+                                            <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(agent)" ng-disabled="!agent || !agent.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Address</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="agent.address1" id="agentAddress"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Postal</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" ng-model="agent.postalCode" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">City</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text" id="agentCity"
+                                               ng-model="agent.city"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Province</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text" id="agentProvince"
+                                               ng-model="agent.stateProvince"
+                                               disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Country</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text" id="agentCountry"
+                                               ng-model="agent.country"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Phone #</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="agent.busPhone1" id="agentPhoneNum"
+                                               disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Notes</label>
+                                    <div class="col-sm-9">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="agent.notes"
+                                                          disabled></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">Consignee</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form">
+                                <div class="hidden form-group">
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="consignee.id" id="locationEntityID"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Search</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+
+
+                                            <ui-select ng-model="consignee.selected" theme="bootstrap"
+                                                       ng-change="selectLocation(consignee.selected,'consignee')">
+                                                <ui-select-match
+                                                        placeholder="Select or search a client in the list...">
+                                                    {{$select.selected.genericInfo}}
+                                                </ui-select-match>
+                                                <ui-select-choices group-by="'customerName'"
+                                                                   repeat="item in clients "
+                                                                   refresh="searchLocation($select.search)"
+                                                                   refresh-delay="400">
+                                                    <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'consignee');"
+
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Name</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <input class="form-control" type="text" id="locationEntityName"
+                                                   ng-model="consignee.customerName" disabled />
+                                            <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(consignee)" ng-disabled="!consignee || !consignee.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                             </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Address</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="consignee.address1" id="address"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Postal</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" ng-model="consignee.postalCode" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">City</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text" ng-model="consignee.city"
+                                               id="city"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Province</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="consignee.stateProvince" id="province"
+                                               disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Country</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="consignee.country" id="country"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Phone #</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="consignee.busPhone1" id="phoneNum"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Notes</label>
+                                    <div class="col-sm-9">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="consignee.notes"
+                                                          disabled></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">Shipper</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" method="post">
+                                <div class="hidden form-group">
+                                    <div class="col-sm-11">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.id" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Search</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <ui-select ng-model="shipper.selected" theme="bootstrap"
+
+                                                       ng-change="selectLocation(shipper.selected,'shipper')">
+                                                <ui-select-match
+                                                        placeholder="Select or search a shipper in the list...">
+                                                    {{$select.selected.genericInfo}}
+                                                </ui-select-match>
+                                                <ui-select-choices group-by="'customerName'"
+                                                                   repeat="item in clients "
+                                                                   refresh="searchLocation($select.search)"
+                                                                   refresh-delay="400">
+                                                    <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'shipper');"
+
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Name</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <input class="form-control" type="text"
+                                                   ng-model="shipper.customerName" disabled />
+                                            <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(shipper)" ng-disabled="!shipper || !shipper.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                             </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Address</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.address1"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Postal</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" ng-model="shipper.postalCode" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">City</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.city"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Province</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.stateProvince"
+                                               disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Country</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.country"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Phone #</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="shipper.busPhone1"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Notes</label>
+                                    <div class="col-sm-9">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="shipper.notes"
+                                                          disabled></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">Broker</div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" role="form">
+                                <div class="hidden form-group">
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="broker.id"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Search</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <ui-select ng-model="broker.selected" theme="bootstrap"
+
+                                                       ng-change="selectLocation(broker.selected,'broker')">
+                                                <ui-select-match
+                                                        placeholder="Select or search a broker in the list...">
+                                                    {{$select.selected.genericInfo}}
+                                                </ui-select-match>
+                                                    <ui-select-choices group-by="'customerName'"
+                                                                       repeat="item in brokers "
+                                                                       refresh="searchBroker($select.search)"
+                                                                       refresh-delay="400">
+                                                    <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                            <span class="input-group-btn">
+                                                              <button ng-click="selectLocation({},'broker');"
+
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </button>
+                                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Name</label>
+                                    <div class="col-sm-9">
+                                        <div class="input-group">
+                                            <input class="form-control" type="text"
+                                                   ng-model="broker.customerName" disabled />
+                                            <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(broker)" ng-disabled="!broker || !broker.id">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Address</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text"
+                                               ng-model="broker.address1"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Postal</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" ng-model="broker.postalCode" disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">City</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text" ng-model="broker.city"
+
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Province</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="broker.stateProvince"
+                                               disabled>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Country</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="broker.country"
+                                               disabled>
+                                    </div>
+
+                                    <div class="col-sm-1"></div>
+
+                                    <label class="col-sm-2 control-label text-right">Phone #</label>
+                                    <div class="col-sm-3">
+                                        <input class="form-control" type="text"
+                                               ng-model="broker.busPhone1"
+                                               disabled>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label text-right">Notes</label>
+                                    <div class="col-sm-9">
+                                                <textarea class="form-control" rows="6"
+                                                          ng-model="broker.notes"
+                                                          disabled></textarea>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <form name="pickupform2" class="form-horizontal">
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Pickup at</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" ng-model="temp.pickupAt" value="{{temp.pickupAt}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12"></div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Delivery to</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" ng-model="temp.deliveryTo"
+                                   value="{{temp.deliveryTo}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12"></div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="col-sm-6 control-label text-left">PCS</label>
+                        <div class="col-sm-6">
+                            <p class="form-control-static">{{trip.totalPieces}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label text-left">WT({{trip.systemOfMeasure=="M"?"KG":"LBS"}})</label>
+                        <div class="col-sm-8">
+                            <p class="form-control-static">{{trip.totalWeight}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-group">
+                        <label class="col-sm-4 control-label text-left">Charged WT({{trip.systemOfMeasure=="M"?"KG":"LBS"}})</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" ng-model="trip.chargedWeight"
+                                   value="{{trip.chargedWeight}}">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12"></div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Dims</label>
+                        <div class="col-sm-10">
+                            <p class="form-control-static">{{trip.dims}}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12"></div>
+                <div class="col-lg-12">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label text-left">Special Instructions</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" ng-model="trip.pickupInstruction"
+                                   value="{{trip.pickupInstruction}}">
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="line b-b line-lg pull-in"></div>
+            <div class="pull-left col-lg-12">
+                <div class="table-responsive">
+                    <div class="panel-heading font-bold">Cost Items</div>
+                    <table st-table="displayedCollection" st-safe-src="trip.costs"
+                           class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" ng-click="selectAllItems()" ng-model="check"></th>
+                            <th class="hidden" st-sort="id">ID</th>
+                            <th st-sort="chargeDesc">Item</th>
+                            <th st-sort="description">Description</th>
+                            <th st-sort="actCost">Cost</th>
+                            <th st-sort="actCurrency">Currency</th>
+                        </tr>
+                        </thead>
+                        <tbody ng-show="!isLoading">
+                        <tr ng-repeat="tripCost in displayedCollection">
+                            <td><input type="checkbox" ng-model="tripCost.selected"></td>
+                            <td class="hidden">{{tripCost.id}}</a></td>
+                            <td>{{ tripCost.chargeDesc}}</td>
+                            <td>{{ tripCost.description}}</td>
+                            <td>{{ tripCost.actCost | currency:'':2}}</td>
+                            <td>{{ tripCost.actCurrency}}</td>
+                        </tr>
+                        </tbody>
+                        <tbody ng-show="isLoading">
+                        <tr>
+                            <td colspan="5" class="text-center"><i
+                                    class="fa fa-spin fa-refresh"></i></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="col-lg-12">
+                    <div class="btn-group  pull-right m-t-xs">
+                        <button class="btn btn-danger " type="button"
+                                ng-click="back()">Cancel
+                        </button>
+                    </div>
+                    <div class="btn-group  pull-right m-t-xs">
+                        <button class="btn btn-success " type="button" ng-click="savePickup('save')">Save
+                        </button>
+                    </div>
+                    <div class="hidden btn-group  pull-right m-t-xs">
+                        <button class="btn btn-default " type="button" ng-click="savePickup('preview')">
+                            Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

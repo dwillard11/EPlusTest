@@ -1,0 +1,207 @@
+<div class="bg-light lter b-b wrapper-md">
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <h1 class="inline m-n font-thin h3 text-black">Division Summary</h1>
+            <div class="inline btn-group" dropdown>
+                <button type="button" class="btn btn-default">Milton</button>
+                <button type="button" class="btn btn-default dropdown-toggle" dropdown-toggle>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href>Beijing</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-6 text-right hidden-xs">
+            <button type="button" class="btn btn-default pull-right m-t-n-xs"><i class="fa fa-refresh"></i></button>
+        </div>
+    </div>
+</div>
+<div class="wrapper-md">
+    <div class="panel panel-default">
+        <div class="panel-heading"><span class="h4">Shipments</span></div>
+        <div class="table-responsive">
+            <table class="table table-striped b-t b-light">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Qty</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><i class="fa fa-long-arrow-up text-danger"></i></td>
+                    <td>
+                        <a href class="text-info">Critical Shipments</a>
+                    </td>
+                    <td>4</td>
+                    <td>5,000</td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-long-arrow-up text-danger"></i></td>
+                    <td>
+                        <a href class="text-info">Open Shipments</a>
+                    </td>
+                    <td>16</td>
+                    <td>89,000</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href class="text-info">Awaiting Pickup</a>
+                    </td>
+                    <td>5</td>
+                    <td>12,000</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href class="text-info">(D)Awaiting Pickup</a>
+                    </td>
+                    <td>1</td>
+                    <td>2,500</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="h4">Quotes</span>
+
+        </div>
+        <div class="row wrapper">
+            <div class="col-sm-4 m-b-xs">
+            </div>
+            <div class="col-sm-4">
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group pull-right" ng-controller="DatepickerDemoCtrl">
+                    <label class="col-sm-2 control-label">Date</label>
+                    <div class="col-sm-10">
+                        <input ui-jq="daterangepicker" ui-options="{
+                                format: 'YYYY-MM-DD',
+                                startDate: '2013-01-01',
+                                endDate: '2013-12-31'
+                            }" class="form-control w-md" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped b-t b-light">
+                <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Qty</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <i class="fa fa-check text-success"></i>
+                    </td>
+                    <td>
+                        <a href class="text-info">Open Quotes</a>
+                    </td>
+                    <td>4</td>
+                    <td>5,000</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href class="text-info">Cancelled Quotes</a>
+                    </td>
+                    <td>16</td>
+                    <td>89,000</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href class="text-info">Approved Quotes</a>
+                    </td>
+                    <td>5</td>
+                    <td>12,000</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading"><span class="h4"><i class="fa fa-users text-info"></i> Staff Online</span></div>
+                <div class="table-responsive">
+                    <table class="table table-striped b-t b-light">
+                        <thead>
+                        <tr>
+                            <th></th>
+                            <th>Qty</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Shipment</a>
+                            </td>
+                            <td>2</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Quoting</a>
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Reporting</a>
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Administration</a>
+                            </td>
+                            <td>1</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-heading"><span class="h4"><i class="icon icon-envelope"></i> Message Queue</div>
+                <div class="table-responsive">
+                    <table class="table table-striped b-t b-light">
+                        <thead>
+                        <tr>
+                            <th>
+                            </th>
+                            <th>Qty</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Inbox</a>
+                            </td>
+                            <td>4</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <a href class="text-info">Processed</a>
+                            </td>
+                            <td>89</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

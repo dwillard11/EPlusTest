@@ -1,0 +1,49 @@
+<!DOCTYPE html><html><meta charset="UTF-8"><body><h3>Event Notification for $!{Trip.typeDesp}</h3><table width="100%" border="0"><tr><td width="15%">Trip #:</td><td>$!{Trip.tripRefNo}</td>
+<td width="15%">Authorization #:</td><td>$!{Trip.authorizationNo}</td></tr><tr><td>Shipper:</td><td>$!{Trip.shipperName}<BR/>$!{Trip.shipperCity}&nbsp;$!{Trip.shipperState}&nbsp;$!{Trip.shipperCountry}
+</td>
+<td>Consignee:</td>
+<td>$!{Trip.consigneeName}<BR/>
+$!{Trip.consigneeCity}&nbsp;$!{Trip.consigneeState}&nbsp;$!{Trip.consigneeCountry}</td>
+</tr>
+</table><h4>Freight Items</h4><table width="100%" border="1">
+<tr>
+<th>Pieces</th>
+<th>Weight</th>
+<th>Dims</th>
+<th>Description</th>
+</tr>
+#foreach($Freight in $Trip.freights)
+<tr>
+<td>$!{Freight.actualPieces}</td>
+<td>$!{Freight.actualWeight} $!{Freight.actualUOM} </td>
+<td>$!{Freight.actualDimension}</td>
+<td>$!{Freight.item}</td>
+</tr>
+#end
+</table>
+<h4>Events</h4>
+<table width="100%" border="1">
+<tr>
+<th width="25%">Date Time</th>
+<th>Event</th>
+</tr>
+#foreach($Event in $EventList)
+<tr>
+<td>$!{Event.actualDateStr}</td>
+<td>$!{Event.item}
+#if($Event.code == "POD" || $Event.code == "VEHLC" || $Event.code == "FB")
+&nbsp; $!{Event.description}
+#end
+</td>
+</tr>
+#end
+</table>
+#if($showDutiesAndTaxes)
+<p><b>Duties and Taxes:</b>$!{Trip.dutiesTax}</p>
+#end
+<p><b>Ready Time/Date:</b>$!{Trip.readyTimeStr}</p>
+#if($showCouriter)
+<p><b>Courier Name:</b>$!{CourierName}</p><p><b>Mobile Phone:</b>$!{MobilePhone}</p>
+#end
+</body>
+</html>

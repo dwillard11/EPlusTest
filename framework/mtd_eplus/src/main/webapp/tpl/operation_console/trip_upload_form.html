@@ -1,0 +1,40 @@
+<form class="form-horizontal" role="form" method="POST" name="uploadDocForm" ng-submit="ok(uploadDocForm.$valid)">
+    <div class="modal-header">Upload</div>
+
+    <div class="modal-body">
+        <div id="myAlert" ng-show="showalert" class="alert alert-warning">
+            {{errormsg}}
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <label class="hidden col-sm-10 control-label text-right">{{d.tripid}}</label>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label text-right">Doc Type</label>
+                    <div class="col-sm-4">
+                        <div class="input-group-btn dropdown" dropdown>
+                            <select class="form-control"
+                                    ng-options="Option.id as Option.name for Option in fileTypeOption"
+                                    ng-model="d.fileType">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label text-right"></label>
+                    <div class="col-sm-4">
+                        <input id="fileinput" type="file" file-model="myFile"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><strong>Save</strong></button>
+        <button type="button" class="btn btn-danger" ng-click="cancel()"><strong>Cancel</strong></button>
+    </div>
+</form>

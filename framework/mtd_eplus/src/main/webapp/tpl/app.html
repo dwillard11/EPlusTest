@@ -1,0 +1,35 @@
+<toaster-container toaster-options="{'limit':1,'position-class': 'toast-top-center'}"
+                   class="text-capitalize"></toaster-container>
+
+<!-- navbar -->
+  <div data-ng-include=" 'tpl/blocks/header.html' " class="app-header navbar">
+  </div>
+  <!-- / navbar -->
+
+  <!-- menu -->
+  <div data-ng-include=" 'tpl/blocks/aside.html' " class="app-aside hidden-xs {{app.settings.asideColor}}">
+  </div>
+  <!-- / menu -->
+
+  <!-- content -->
+  <div class="app-content">
+    <div id="sideBar">
+      <i class="fa fa-caret-left" ng-click="sideBar()"></i>
+    </div>
+    <div class="app-content-body fade-in-up" ui-view></div>
+  </div>
+  <!-- /content -->
+
+  <!-- footer -->
+  <div class="app-footer wrapper b-t bg-light">
+    <span class="pull-right">{{app.version}} <a href ui-scroll-to="app" class="m-l-sm text-muted"><i class="fa fa-long-arrow-up"></i></a></span>
+   &nbsp;&nbsp;&nbsp; &copy; 2017 Copyright.
+  </div>
+  <!-- / footer -->
+
+  <div data-ng-include=" 'tpl/blocks/settings.html' " class="hidden settings panel panel-default">
+  </div>
+
+<script type="text/ng-template" id="pagination.html">
+  <div ng-include="'tpl/blocks/pagination.html'"></div>
+</script>

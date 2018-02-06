@@ -1,0 +1,164 @@
+<div class="modal-header">
+    Send Email
+    <button type="button" class="btn btn-sm btn-primary pull-right text-right m-t-n-xs"
+            ng-click="ok(newMail.$valid,'send')">
+        <strong>Send</strong></button>
+    <button type="button" class="btn btn-sm btn-default pull-right text-right m-t-n-xs"
+            ng-click="cancel()">
+        <strong>Cancel</strong></button>
+    <button type="button" class="btn btn-sm btn-primary pull-right text-right m-t-n-xs"
+            ng-click="ok(newMail.$valid,'save')">
+        <strong>Save as Draft</strong></button>
+</div>
+<div class="wrapper">
+    <form name="newMail" class="form-horizontal m-t-lg" ng-submit="ok(newMail.$valid)">
+        <div class="form-group" ng-show="tag == 'edit'">
+            <label class="col-lg-1 control-label">Created By:</label>
+
+            <div class="col-lg-5">
+                <p class="form-control-static">{{mail.updatedBy}}</p>
+            </div>
+            <label class="col-lg-1 control-label">Date Created:</label>
+
+            <div class="col-lg-5">
+                <p class="form-control-static">{{mail.created}}</p>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">To:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailTo"
+                       ng-blur="formatEmailAddress(mail.mailTo,'mailto')">
+            </div>
+            <label class="col-lg-12 control-label"></label>
+            <label class="col-lg-1 control-label"></label>
+            <div class="col-lg-11">
+                <div class="input-group">
+                    <ui-select ng-model="addressEntity.mailTo" theme="bootstrap">
+                        <ui-select-match placeholder="Select or search a contact in the list...">
+                            {{$select.selected.emailShowInfo}}
+                        </ui-select-match>
+                        <ui-select-choices group-by="'group'"
+                                           repeat="item in contacts | filter: $select.search"
+                                           refresh="searchContact($select.search)"
+                                           refresh-delay="400">
+                            <span ng-bind-html="item.emailGenericInfo | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                    <span class="input-group-btn">
+                         <button class="btn btn-default" type="button"
+                                 ng-click="appendEmail('mailto',addressEntity.mailTo.email)">Add</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">CC:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailCc"
+                       ng-blur="formatEmailAddress(mail.mailCc,'mailcc')">
+            </div>
+            <label class="col-lg-12 control-label"></label>
+            <label class="col-lg-1 control-label"></label>
+            <div class="col-lg-11">
+                <div class="input-group">
+                    <ui-select ng-model="addressEntity.mailCc" theme="bootstrap">
+                        <ui-select-match placeholder="Select or search a contact in the list...">
+                            {{$select.selected.emailShowInfo }}
+                        </ui-select-match>
+                        <ui-select-choices group-by="'group'"
+                                           repeat="item in contacts | filter: $select.search"
+                                           refresh="searchContact($select.search)"
+                                           refresh-delay="400">
+                            <span ng-bind-html="item.emailGenericInfo | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                    <span class="input-group-btn">
+                         <button class="btn btn-default" type="button"
+                                 ng-click="appendEmail('mailcc',addressEntity.mailCc.email)">Add</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">BCC:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailBcc"
+                       ng-blur="formatEmailAddress(mail.mailBcc,'mailbcc')">
+            </div>
+            <label class="col-lg-12 control-label"></label>
+            <label class="col-lg-1 control-label"></label>
+            <div class="col-lg-11">
+                <div class="input-group">
+                    <ui-select ng-model="addressEntity.mailBcc" theme="bootstrap">
+                        <ui-select-match placeholder="Select or search a contact in the list...">
+                            {{$select.selected.emailShowInfo }}
+                        </ui-select-match>
+                        <ui-select-choices group-by="'group'"
+                                           repeat="item in contacts | filter: $select.search"
+                                           refresh="searchContact($select.search)"
+                                           refresh-delay="400">
+                            <span ng-bind-html="item.emailGenericInfo | highlight: $select.search"></span>
+                        </ui-select-choices>
+                    </ui-select>
+                    <span class="input-group-btn">
+                         <button class="btn btn-default" type="button"
+                                 ng-click="appendEmail('mailbcc',addressEntity.mailBcc.email)">Add</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">Subject:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.subject">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">Attachment:</label>
+            <div class="col-lg-5">
+                <div ng-repeat="attach in mail.attachments" class="inline">
+                    <a class="text-u-l" ng-click="downloadFile(attach.id)">{{attach.originalFileName}}</a><a
+                        class="text-u-l"
+                        ng-click="deleteFile(attach.id,$index)">&nbsp;&nbsp;<strong>[x]</strong></a>&nbsp;
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <script type="text/ng-template" id="tripRefDoc.html">
+                    <div ng-include="'tpl/operation_console/show_trip_docs.html'"></div>
+                </script>
+                <input id="fileinput" type="file" file-model="myFile"/>
+                <br/>
+                <div class="row inline">
+                    <button type="button" class="btn btn-sm btn-default pull-right text-right m-t-n-xs"
+                            ng-click="uploadAttachment()">upload
+                    </button>
+                    <button type="button" class="btn btn-sm btn-default pull-right text-right m-t-n-xs"
+                            ng-click="showRefDoc(mail.tripId, 'NoEmail')">Select Uploaded
+                    </button>
+                </div>
+            </div>
+        </div>
+        <br>
+
+
+        <div class="form-group">
+            <div class="col-lg-12">
+                <textarea id="container" class="content ueditor" style="height: 600px" ng-model="mail.content" config="ueditorConfig"></textarea>
+            </div>
+
+            <div class="col-lg-10  pull-right">
+                <button type="button" class="btn btn-sm btn-primary pull-right text-right m-t-n-xs"
+                        ng-click="ok(newMail.$valid,'send')">
+                    <strong>Send</strong></button>
+                <button type="button" class="btn btn-sm btn-default pull-right text-right m-t-n-xs"
+                        ng-click="cancel()">
+                    <strong>Cancel</strong></button>
+                <button type="button" class="btn btn-sm btn-primary pull-right text-right m-t-n-xs"
+                        ng-click="ok(newMail.$valid,'save')">
+                    <strong>Save as Draft</strong></button>
+            </div>
+
+        </div>
+    </form>
+</div>

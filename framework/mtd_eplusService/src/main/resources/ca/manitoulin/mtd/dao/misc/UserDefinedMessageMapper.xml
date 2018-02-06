@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.UserDefinedMessageMapper" >
+  
+
+  <sql id="SQL_PMLANG" >
+    pm_id as id,
+    pm_messageEn as content,    
+    pm_messageFr as translatedContent,
+    pm_messageKey as uniqueKey
+  </sql>
+
+  <select id="selectMessageByKey" parameterType="string" resultType="UserDefinedMessage" >
+    SELECT 
+    <include refid="SQL_PMLANG" />
+    FROM EpPromptMessage
+    WHERE pm_messageKey = #{value,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertMessage" parameterType="UserDefinedMessage"  >
+    INSERT INTO EpPromptMessage(pm_messageEn, pm_messageFr, pm_messageKey)
+    VALUES (
+    #{content,jdbcType=VARCHAR},
+     #{translatedContent,jdbcType=VARCHAR},
+     #{uniqueKey,jdbcType=VARCHAR}
+    
+    )
+  </insert>
+ 
+</mapper>

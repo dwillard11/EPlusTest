@@ -1,0 +1,865 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.TripMapper">
+	<select id="getDivisionCodeByTripId" resultType="String" parameterType="Integer">
+		SELECT DISTINCT dep.dp_shortname as departmentShortName
+		FROM EpTrip tp INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_id = #{tripId,jdbcType=INTEGER}
+	</select>
+
+	<select id="selectTripList" resultType="Trip" parameterType="map">
+		SELECT DISTINCT tp.tp_id as id,
+		tp.tp_dp_id as departmentId,
+		dep.dp_shortname as departmentShortName,
+		tp.tp_reference as refId,
+		tp.tp_status as status,
+		IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+		IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+		CONCAT(mClient.em_name, ', ', pClient.el_city) as clientName,
+		CASE WHEN IFNULL(tp.tp_consignee,0) = 0 THEN tp_drop_consignee ELSE CONCAT(mCong.em_name, ', ', pCong.el_city) END AS consigneeName,
+		CASE WHEN IFNULL(tp.tp_shipper,0) = 0 THEN tp_drop_shiper ELSE CONCAT(mShipper.em_name, ', ', pShipper.el_city) END AS shipperName,
+		pShipper.el_country as orig,
+		pCong.el_country as dest,
+		pShipper.el_country as shipperCountry,
+		tp.tp_critical_time as criticalTime,
+		<!--case when tp.tp_critical_time is null or dep.dp_default_timezone is NULL then tp.tp_critical_time
+		else DATE_ADD(tp.tp_critical_time,INTERVAL - dep.dp_default_timezone HOUR) end-->
+		tp.tp_critical_time as criticalUTCTime,
+		tp.tp_next_eventname as nextEventName,
+		tp.tp_next_eventdate as nextEventDate,
+		tp.tp_critical_note as note,
+		tp.tp_is_template as isTemplate,
+		notes.numberOfNotes,
+		IFNULL(comm.numberOfUnreadEmail,0) AS numberOfUnreadEmail,
+		tp.tp_type as type,
+		eventCode,
+		eventDesc,
+		chargeCode,
+		chargeDesc
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+		LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+		LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+		LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+		LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+		LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+		LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+		LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		LEFT JOIN (SELECT en_tp_id, count(1) as numberOfNotes FROM EpNote Group by en_tp_id) notes ON tp.tp_id=notes.en_tp_id
+		LEFT JOIN (SELECT cm_tp_id, count(1) as numberOfUnreadEmail
+					FROM EpCommunication
+					WHERE IFNULL(cm_read, 'U') = 'U'
+						and cm_type = 'In'
+						and IFNULL(cm_status, '') != 'Deleted'
+						-- AND IFNULL(cm_status,'UnProcessed') != 'UnProcessed'
+					GROUP BY cm_tp_id) comm ON comm.cm_tp_id=tp.tp_id
+		LEFT OUTER JOIN (SELECT distinct EV.ev_tp_id,
+									EV.ev_code AS eventCode,
+									CASE WHEN IFNULL(EV.ev_desc, '') = '' THEN C.cd_english ELSE EV.ev_desc END as eventDesc
+							FROM EpEvent EV LEFT OUTER JOIN EpCode C ON EV.ev_code = C.cd_key and C.cd_name= 'Event Code'
+							WHERE  EV.ev_code IS NOT NULL
+								AND ('${awb}' != '' OR '${eventDesc}' != '')
+								AND ('${awb}' = '' OR EV.ev_code = '${awb}')
+								AND ('${eventDesc}' = ''
+									OR EV.ev_desc LIKE '%${eventDesc}%'
+									OR C.cd_english LIKE '%${eventDesc}%')) A ON tp.tp_id = A.ev_tp_id
+		LEFT OUTER JOIN (SELECT distinct ec.ct_tp_id,
+							ec.ct_charge_code AS chargeCode,
+							CASE WHEN IFNULL(ec.ct_description, '') = '' THEN C.cd_english ELSE ec.ct_description END as chargeDesc
+						FROM EpCost ec LEFT OUTER JOIN EpCode C ON ec.ct_charge_code  = C.cd_key and C.cd_name= 'Charge Code'
+						WHERE ec.ct_charge_code IS NOT NULL
+							AND ('${chargeCode}' != '' OR '${chargeDesc}' != '')
+							AND ('${chargeCode}' = '' OR ec.ct_charge_code = '${chargeCode}')
+							AND ('${chargeDesc}' = '' OR ec.ct_charge_desc LIKE '%${chargeDesc}%'
+								OR ec.ct_description LIKE '%${chargeDesc}%'
+								OR C.cd_english LIKE '%${chargeDesc}%')) B ON tp.tp_id = B.ct_tp_id
+		WHERE 1 = 1
+		<if test=" departmentIdList != null">
+			and tp.tp_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+					 index="index" open="(" close=")" separator=",">
+				#{depId, jdbcType=INTEGER}
+			</foreach>
+		</if>
+		<if test="departmentId != null and departmentId != 0">
+			and tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		</if>
+
+		<if test="'OPEN' eq tripStatus">
+			and tp.tp_status  IN ('QA','NEW','WQ','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH')
+		</if>
+		<if test="'CLOSE' eq tripStatus">
+			and tp.tp_status IN ('CLO','ARC')
+		</if>
+		<if test="'DEL' eq tripStatus">
+			and tp.tp_status IN ('DEL')
+		</if>
+		<if test="'ALL' eq tripStatus">
+			and tp.tp_status IN ('QA','NEW','WQ','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH','DEL','CLO','ARC')
+		</if>
+		<if test="awb != null and awb != ''">
+			and  EXISTS (
+					SELECT 1 FROM EpEvent EV
+					WHERE EV.ev_tp_id=tp.tp_id
+					AND EV.ev_code = '${awb}')
+		</if>
+		<if test="eventDesc != null and eventDesc != ''">
+			and (
+				EXISTS (
+					SELECT 1 FROM EpCost ec
+					WHERE ec.ct_tp_id=tp.tp_id
+						AND ct_description LIKE '%${eventDesc}%')
+			or
+				EXISTS (
+					SELECT 1 FROM EpEvent EV LEFT OUTER JOIN EpCode C ON EV.ev_code = C.cd_key and C.cd_name= 'Event Code'
+					WHERE EV.ev_tp_id=tp.tp_id
+					AND (EV.ev_desc LIKE '%${eventDesc}%'
+						OR C.cd_english LIKE '%${eventDesc}%'))
+			)
+		</if>
+		<if test="chargeCode != null and chargeCode != ''">
+			and (
+				EXISTS (
+					SELECT 1 FROM EpCost ec
+					WHERE ec.ct_tp_id=tp.tp_id
+					AND ct_charge_code = '${chargeCode}')
+			)
+		</if>
+		<if test="chargeDesc != null and chargeDesc != ''">
+			and
+			EXISTS (
+			SELECT 1
+			FROM EpCost ec LEFT OUTER JOIN EpCode C on ec.ct_charge_code = C.cd_key and C.cd_name= 'Charge Code'
+			WHERE ec.ct_tp_id = tp.tp_id
+				AND (ct_charge_desc LIKE '%${chargeDesc}%'
+					OR ct_description LIKE '%${chargeDesc}%'
+					OR C.cd_english LIKE '%${chargeDesc}%'))
+		</if>
+		<if test="searchKey != null and searchKey != ''">
+			and (
+			CONCAT(dep.dp_shortname,'-',tp.tp_reference) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR statusCode.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR pClient.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR pCong.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR pShipper.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR qType.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mClient.em_name, ', ', pClient.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mCong.em_name, ', ', pCong.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mShipper.em_name, ', ', pShipper.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			<!--
+			OR (('${awb}' != '' OR '${eventDesc}' != '')
+			AND EXISTS (
+			SELECT 1
+			FROM EpEvent EV LEFT OUTER JOIN EpCode C ON EV.ev_code = C.cd_key and C.cd_name= 'Event Code'
+			WHERE EV.ev_code IS NOT NULL
+			AND ('${awb}' != '' OR '${eventDesc}' != '')
+			AND ('${awb}' = '' OR EV.ev_code = '${awb}')
+			AND ('${eventDesc}' = ''
+			OR EV.ev_desc LIKE '%${eventDesc}%'
+			OR C.cd_english LIKE '%${eventDesc}%')
+			AND (EV.ev_code LIKE '%${searchKey}%'
+			OR CASE WHEN IFNULL(EV.ev_desc, '') = '' THEN C.cd_english ELSE EV.ev_desc END LIKE '%${searchKey}%')
+			)
+			)
+			-->
+                        OR (('${chargeCode}' != '' OR '${chargeDesc}' != '')
+                        AND EXISTS (
+                        SELECT 1
+                        FROM EpCost ec LEFT OUTER JOIN EpCode C ON ec.ct_charge_code = C.cd_key and C.cd_name= 'Charge Code'
+                        WHERE ec.ct_charge_code IS NOT NULL
+                        AND ('${chargeCode}' != '' OR '${chargeDesc}' != '')
+                        AND ('${chargeCode}' = '' OR ec.ct_charge_code = '${chargeCode}')
+                        AND ('${chargeDesc}' = ''
+							OR ec.ct_charge_desc LIKE '%${chargeDesc}%'
+                        	OR ec.ct_description LIKE '%${chargeDesc}%'
+                        	OR C.cd_english LIKE '%${chargeDesc}%')
+                        AND (ec.ct_charge_code LIKE '%${searchKey}%'
+                        	OR CASE WHEN IFNULL(ec.ct_description, '') = '' THEN C.cd_english ELSE ec.ct_description END LIKE '%${searchKey}%')
+                        )
+                        )
+
+			)
+		</if>
+		<if test="startDate != null and startDate != ''">
+			<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR)  >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>
+order by <![CDATA[
+        IF(tp.tp_critical_time is null, 4, IF(tp.tp_critical_time <= NOW(), 1, IF(tp.tp_critical_time <= DATE_ADD(NOW(), INTERVAL 2 HOUR), 2, 3))),
+        ]]>
+tp.tp_critical_time ASC,
+length(tp_reference) DESC,
+tp.tp_reference DESC
+</select>
+
+<select id="selectTrips" resultType="Trip" parameterType="map">
+SELECT tp.tp_id as id,
+    tp.tp_dp_id as departmentId,
+    dep.dp_shortname as departmentShortName,
+    tp.tp_reference as refId,
+    tp.tp_status as status,
+    IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+    IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+    CONCAT(mClient.em_name, ', ', pClient.el_city) as clientName,
+	CASE WHEN IFNULL(tp.tp_consignee,0) = 0 THEN tp_drop_consignee ELSE CONCAT(mCong.em_name, ', ', pCong.el_city) END AS consigneeName,
+	CASE WHEN IFNULL(tp.tp_shipper,0) = 0 THEN tp_drop_shiper ELSE CONCAT(mShipper.em_name, ', ', pShipper.el_city) END AS shipperName,
+
+    pShipper.el_country as orig,
+    pCong.el_country as dest,
+    pShipper.el_country as shipperCountry,
+    tp.tp_critical_time as criticalTime,
+    <!--case when tp.tp_critical_time is null or dep.dp_default_timezone is NULL then tp.tp_critical_time
+        else DATE_ADD(tp.tp_critical_time,INTERVAL - dep.dp_default_timezone HOUR) end-->
+			tp.tp_critical_time as criticalUTCTime,
+			tp.tp_next_eventname as nextEventName,
+			tp.tp_next_eventdate as nextEventDate,
+			tp.tp_critical_note as note,
+			tp.tp_is_template as isTemplate,
+			notes.numberOfNotes,
+			IFNULL(comm.numberOfUnreadEmail,0) AS numberOfUnreadEmail,
+			tp.tp_type as type
+    FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+        LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+        LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+        LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+        LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+        LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+        LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+        LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+        INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+        LEFT JOIN (SELECT en_tp_id, count(1) as numberOfNotes FROM EpNote Group by en_tp_id) notes ON tp.tp_id=notes.en_tp_id
+        LEFT JOIN (SELECT cm_tp_id, count(1) as numberOfUnreadEmail
+					FROM EpCommunication
+					WHERE IFNULL(cm_read, 'U') = 'U'
+						and cm_type = 'In'
+						and IFNULL(cm_status, '') != 'Deleted'
+						-- AND IFNULL(cm_status,'UnProcessed') != 'UnProcessed'
+					GROUP BY cm_tp_id) comm ON comm.cm_tp_id=tp.tp_id
+    WHERE 1 = 1
+    <if test=" departmentIdList != null">
+        and tp.tp_dp_id in
+        <foreach collection="departmentIdList" item="depId"
+                index="index" open="(" close=")" separator=",">
+                #{depId, jdbcType=INTEGER}
+        </foreach>
+    </if>
+    <if test="departmentId != null and departmentId != 0">
+        and tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+    </if>
+
+    <if test="'OPEN' eq tripStatus">
+        and tp.tp_status  IN ('QA','NEW','WQ','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH')
+    </if>
+    <if test="'CLOSE' eq tripStatus">
+        and tp.tp_status IN ('CLO','ARC')
+    </if>
+    <if test="'DEL' eq tripStatus">
+        and tp.tp_status IN ('DEL')
+    </if>
+    <if test="'ALL' eq tripStatus">
+        and tp.tp_status IN ('QA','NEW','WQ','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH','DEL','CLO','ARC')
+    </if>
+    <if test="awb != null and awb != ''">
+        and (
+                EXISTS (
+                    SELECT 1 FROM EpCost ec
+                    WHERE ec.ct_tp_id=tp.tp_id
+                        AND ct_description LIKE '%${awb}%')
+            or
+                EXISTS (
+                SELECT 1 FROM EpEvent EV
+                LEFT OUTER JOIN EpCode C ON EV.ev_code = C.cd_key
+                WHERE EV.ev_tp_id=tp.tp_id
+                    AND (EV.ev_code LIKE '%${awb}%'
+                        OR EV.ev_desc LIKE '%${awb}%'
+                        OR C.cd_english LIKE '%${awb}%'))
+        )
+    </if>
+    <if test="chargeCode != null and chargeCode != ''">
+        and (
+        EXISTS (
+        SELECT 1 FROM EpCost ec
+        WHERE ec.ct_tp_id=tp.tp_id
+        AND ct_charge_code = '${chargeCode}')
+        )
+    </if>
+    <if test="searchKey != null and searchKey != ''">
+        and (
+            tp.tp_reference like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR statusCode.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR pClient.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR pCong.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR pShipper.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR qType.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR CONCAT(mClient.em_name, ', ', pClient.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR CONCAT(mCong.em_name, ', ', pCong.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR CONCAT(mShipper.em_name, ', ', pShipper.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+            OR EXISTS (
+                    SELECT 1 FROM EpCost ec
+                    WHERE ec.ct_tp_id=tp.tp_id
+                    AND ct_description LIKE CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%'))
+            OR
+                EXISTS (
+                    SELECT 1 FROM EpEvent EV
+                        LEFT OUTER JOIN EpCode C ON EV.ev_code = C.cd_key
+                    WHERE EV.ev_tp_id=tp.tp_id
+                        AND (EV.ev_code LIKE CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+                        OR EV.ev_desc LIKE CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+                        OR C.cd_english LIKE CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')))
+        )
+    </if>
+    <if test="startDate != null and startDate != ''">
+        <!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR)  >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>
+		order by <![CDATA[
+				IF(tp.tp_critical_time is null, 4, IF(tp.tp_critical_time <= NOW(), 1, IF(tp.tp_critical_time <= DATE_ADD(NOW(), interval 2 HOUR), 2, 3))),
+				]]>
+			tp.tp_critical_time ASC,
+			length(tp_reference) DESC,
+			tp.tp_reference DESC
+    </select>
+    <select id="selectQuotes" resultType="Trip" parameterType="map">
+        SELECT tp.tp_id as id,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			tp.tp_reference as refId,
+			IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+			IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+        	tp.tp_client as clientId,
+        	tp.tp_consignee as consigneeId,
+			CONCAT(mClient.em_name, ', ', pClient.el_city) as clientName,
+			CASE WHEN IFNULL(tp.tp_consignee,0) = 0 THEN tp_drop_consignee ELSE CONCAT(mCong.em_name, ', ', pCong.el_city) END AS consigneeName,
+			CASE WHEN IFNULL(tp.tp_shipper,0) = 0 THEN tp_drop_shiper ELSE CONCAT(mShipper.em_name, ', ', pShipper.el_city)  END AS shipperName,
+			pClient.el_country as orig,
+			pCong.el_country as dest,
+			pShipper.el_country as shipperCountry,
+			tp.tp_quote_version as version,
+			tp.tp_quote_expireby as expireDate,
+			IFNULL(comm.numberOfUnreadEmail,0) AS numberOfUnreadEmail
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+			LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+			LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+			LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+			LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+			LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+			LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+			LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+		    INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		    LEFT JOIN (SELECT cm_tp_id, count(1) as numberOfUnreadEmail
+						FROM EpCommunication
+						WHERE IFNULL(cm_read, 'U') = 'U'
+							and cm_type = 'In'
+							and IFNULL(cm_status, '') != 'Deleted'
+							-- AND IFNULL(cm_status,'UnProcessed') != 'UnProcessed'
+						GROUP BY cm_tp_id) comm ON comm.cm_tp_id=tp.tp_id
+		WHERE 1 = 1
+        and tp.tp_status IN ('QUO','QC','DRAFT','QA')
+		<if test=" departmentIdList != null">
+			and tp.tp_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+                    index="index" open="(" close=")" separator=",">
+                    #{depId, jdbcType=INTEGER}
+        	</foreach>
+		</if>
+		<if test="departmentId != null and departmentId != 0">
+            and tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+        </if>
+        <if test="'QUO' eq statusCode">
+            and tp.tp_status in 'QUO'
+        </if>
+        <if test="'OPEN' eq statusCode">
+            and tp.tp_status IN ('QUO','DRAFT')
+        </if>
+        <if test="'CANCEL' eq statusCode">
+            and tp.tp_status = 'QC'
+        </if>
+        <if test="'APPROVED' eq statusCode">
+            and tp.tp_status = 'QA'
+        </if>
+        <if test="searchKey != null and searchKey != ''">
+			and (tp.tp_reference like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR statusCode.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR pClient.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR pCong.el_country like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR qType.cd_english like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mClient.em_name, ', ', pClient.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mCong.em_name, ', ', pCong.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%')
+			OR CONCAT(mShipper.em_name, ', ', pShipper.el_city) like CONCAT('%',#{searchKey, jdbcType=VARCHAR},'%'))
+        </if>
+        <if test="startDate != null and startDate != ''">
+			<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+        <if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>
+		order by length(tp.tp_reference) DESC, tp.tp_reference DESC
+    </select>
+	<insert id="insertTrip" parameterType="Trip">
+		INSERT INTO EpTrip(
+			tp_dp_id,
+			tp_reference,
+			tp_type,
+			tp_status,
+        	tp_drop_shiper,
+        	tp_drop_consignee,
+			tp_last_user,
+			tp_last_update,			
+			tp_creator,
+			tp_create_date,
+			tp_critical_time,
+			tp_client,
+			tp_shipper,
+			tp_consignee,
+			tp_quote_version,
+			tp_quote_date,
+			tp_system_of_measure,
+			tp_is_template,
+			tp_acomp,
+			tp_acust,
+			tp_auid,
+			tp_astamp
+		)VALUES(
+			#{departmentId,jdbcType=INTEGER},
+			#{refId,jdbcType=VARCHAR},
+			#{type,jdbcType=VARCHAR},
+			#{status,jdbcType=VARCHAR},
+        	#{dropShipperName,jdbcType=VARCHAR},
+        	#{dropCosigneeName,jdbcType=VARCHAR},
+			#{updatedBy,jdbcType=VARCHAR},
+			NOW(), <!--UTC_TIMESTAMP(), -->
+			#{updatedBy,jdbcType=VARCHAR},
+			NOW(), <!--UTC_TIMESTAMP(), -->
+			NOW(), <!--UTC_TIMESTAMP(), -->
+			#{clientId,jdbcType=INTEGER},
+			#{shipperId,jdbcType=INTEGER},
+			#{consigneeId,jdbcType=INTEGER},
+			#{version,jdbcType=INTEGER},
+			NOW(), <!--UTC_TIMESTAMP(), -->
+			'I',
+			0,
+			#{currentCompany,jdbcType=VARCHAR},
+			#{currentCustomer,jdbcType=VARCHAR},
+			#{updatedBy,jdbcType=VARCHAR},
+			NOW() <!--UTC_TIMESTAMP() -->
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+    		SELECT LAST_INSERT_ID()
+    	</selectKey>
+	</insert>
+	<update id="updateTripReference" parameterType="map">
+		UPDATE EpTrip SET tp_reference = #{ref,jdbcType=VARCHAR}
+		WHERE tp_id=#{tripId,jdbcType=INTEGER}
+	</update>
+	<update id="updateTripNextEvent" parameterType="map">
+		UPDATE EpTrip 
+		SET tp_next_eventname = #{nextEventName,jdbcType=VARCHAR},
+			tp_next_eventdate = #{nextEventDate,jdbcType=TIMESTAMP}
+		
+		WHERE tp_id=#{tripId,jdbcType=INTEGER}
+	</update>	
+	<update id="updateQuote" parameterType="Trip">
+		UPDATE EpTrip SET
+			<if test="departmentId != null">
+				tp_dp_id = #{departmentId,jdbcType=INTEGER},
+			</if>
+			tp_type = #{type,jdbcType=VARCHAR},
+			tp_status = #{status,jdbcType=VARCHAR},
+			tp_quote_expireby=#{expireDate, jdbcType=TIMESTAMP},
+			tp_authorizedby = #{authorizedBy,jdbcType=VARCHAR},
+			tp_authorization_no = #{authorizationNo,jdbcType=VARCHAR},
+			tp_last_user = #{updatedBy,jdbcType=VARCHAR},
+			tp_last_update = NOW(), <!--UTC_TIMESTAMP(), -->
+			tp_client = #{clientId,jdbcType=INTEGER},
+        	tp_shipper = #{shipperId,jdbcType=INTEGER},
+			tp_consignee = #{consigneeId,jdbcType=INTEGER},
+			tp_drop_shiper = #{dropShipperName,jdbcType=VARCHAR},
+			tp_drop_consignee = #{dropCosigneeName,jdbcType=VARCHAR},
+			tp_billed_client = #{billedClientId,jdbcType=VARCHAR},
+			-- tp_quote_version = tp_quote_version + 1,
+			tp_quote_date = NOW(), <!--UTC_TIMESTAMP(), -->
+			tp_quote_total = #{quoteTotal,jdbcType=NUMERIC},
+			<if test="systemOfMeasure != null">
+				tp_system_of_measure=#{systemOfMeasure,jdbcType=VARCHAR},
+			</if>
+			tp_acomp = #{currentCompany,jdbcType=VARCHAR},
+			tp_acust = #{currentCustomer,jdbcType=VARCHAR},
+			tp_auid = #{updatedBy,jdbcType=VARCHAR},
+			tp_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE 
+			tp_id=#{id,jdbcType=INTEGER}	
+	</update>
+	<update id="updatePOD" parameterType="Trip">
+		UPDATE EpTrip SET
+			tp_pod_time =#{ podTime,jdbcType=TIMESTAMP},
+			tp_pod_name =#{ podName,jdbcType=VARCHAR}
+		WHERE 
+			tp_id=#{id,jdbcType=INTEGER}	
+	</update>	
+	<update id="updateTrip" parameterType="Trip">
+		UPDATE EpTrip SET
+			<if test="departmentId != null">
+		tp_dp_id = #{departmentId,jdbcType=INTEGER},
+			
+		</if>
+		<if test="type != null">
+			tp_type 			= #{type,jdbcType=DATE},
+		</if>
+			tp_status 			= #{status,jdbcType=VARCHAR},
+			tp_authorizedby 	= #{authorizedBy,jdbcType=VARCHAR},
+			tp_authorization_no = #{authorizationNo,jdbcType=VARCHAR},
+			tp_client 			= #{clientId,jdbcType=INTEGER},
+			tp_consignee 		= #{consigneeId,jdbcType=INTEGER},
+			tp_consignee_2 		= #{consigneeId2,jdbcType=INTEGER},
+			tp_consignee_3 		= #{consigneeId3,jdbcType=INTEGER},
+			tp_shipper			= #{shipperId,jdbcType=INTEGER},
+			tp_shipper_2		= #{shipperId2,jdbcType=INTEGER},
+			tp_shipper_3		= #{shipperId3,jdbcType=INTEGER},
+			tp_broker			= #{brokerId,jdbcType=INTEGER},
+			tp_broker_2			= #{brokerId2,jdbcType=INTEGER},
+			tp_billed_client	= #{billedClientId,jdbcType=INTEGER},
+			tp_drop_shiper		= #{dropShipperName,jdbcType=VARCHAR},
+			tp_drop_consignee		= #{dropCosigneeName,jdbcType=VARCHAR},
+			tp_critical_time	= #{criticalTime,jdbcType=TIMESTAMP},
+			tp_critical_note	= #{note,jdbcType=VARCHAR},
+			<if test="pickupDate != null">
+			tp_pickup_date 			= #{pickupDate,jdbcType=DATE},
+			</if>
+			<if test="deliveryDate != null">
+			tp_delivery_date 		= #{deliveryDate,jdbcType=DATE},
+			</if>
+			<if test="readyTime != null">
+				tp_ready_time 			= #{readyTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="podTime != null">
+			tp_pod_time 			= #{podTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="billCurrency != null">
+			tp_amt_bill_currency = #{billCurrency,jdbcType=VARCHAR},
+			</if>
+			tp_last_user 		= #{updatedBy,jdbcType=VARCHAR},
+			tp_last_update 		= NOW(), <!--UTC_TIMESTAMP(), -->
+			<if test="systemOfMeasure != null">
+				tp_system_of_measure= #{systemOfMeasure,jdbcType=VARCHAR},
+			</if>
+			tp_acomp 			= #{currentCompany,jdbcType=VARCHAR},
+			tp_acust 			= #{currentCustomer,jdbcType=VARCHAR},
+			tp_auid 			= #{updatedBy,jdbcType=VARCHAR},
+			tp_astamp 			= NOW() <!--UTC_TIMESTAMP() -->
+		WHERE 
+			tp_id=#{id,jdbcType=INTEGER}	
+	</update>
+	
+	<update id="updatePickup" parameterType="Trip">
+		UPDATE EpTrip SET
+			tp_shipped_as			= #{agentId,jdbcType=INTEGER},
+			tp_consignee 			= #{consigneeId,jdbcType=INTEGER},
+			tp_shipper				= #{shipperId,jdbcType=INTEGER},
+			tp_broker				= #{brokerId,jdbcType=INTEGER},
+			tp_pickup_date 			= #{pickupDate,jdbcType=DATE},
+			tp_delivery_date 		= #{deliveryDate,jdbcType=DATE},
+			tp_port 				= #{port,jdbcType=VARCHAR},
+			tp_charge_wt 			= #{chargedWeight,jdbcType=NUMERIC},
+			tp_call_time 			= #{callTime,jdbcType=TIMESTAMP},
+			<if test="readyTime != null">
+				tp_ready_time 			= #{readyTime,jdbcType=TIMESTAMP},
+			</if>
+			tp_close_time 			= #{closeTime,jdbcType=TIMESTAMP},
+			tp_dispatch_time 		= #{dispathTime,jdbcType=TIMESTAMP},
+			tp_pickup_time 			= #{pickupTime,jdbcType=DATE},
+			tp_pod_time 			= #{podTime,jdbcType=TIMESTAMP},
+			tp_pod_name 			= #{podName,jdbcType=VARCHAR},
+			tp_pickup_instructions 	= #{pickupInstruction,jdbcType=VARCHAR},
+			tp_acomp 			= #{currentCompany,jdbcType=VARCHAR},
+			tp_acust 			= #{currentCustomer,jdbcType=VARCHAR},
+			tp_auid 			= #{updatedBy,jdbcType=VARCHAR},
+			tp_astamp 			= NOW() <!--UTC_TIMESTAMP() -->
+		WHERE 
+			tp_id=#{id,jdbcType=INTEGER}	
+	</update>
+
+	<select id="selectQuoteByID" resultType="Trip" parameterType="map">
+		SELECT tp.tp_id as id,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			tp.tp_authorizedby 	as authorizedBy,
+			tp.tp_authorization_no as authorizationNo,
+			tp.tp_reference as refId,
+			statusCode.cd_key as status,
+			IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+			qType.cd_key as type,
+			IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+			tp.tp_client as clientId,
+        	tp.tp_consignee as consigneeId,
+        	tp.tp_consignee_2 as consigneeId2,
+        	tp.tp_consignee_3 as consigneeId3,
+        	tp.tp_shipper as shipperId,
+        	tp.tp_shipper_2 as shipperId2,
+        	tp.tp_shipper_3 as shipperId3,
+			mClient.em_quick_name as clientName,
+			mCong.em_quick_name as consigneeName,
+			mShipper.em_quick_name as shipperName,
+			tp.tp_broker as brokerId,
+			tp.tp_broker_2 as brokerId2,
+			tp.tp_billed_client	as billedClientId,
+        	tp.tp_drop_consignee as dropCosigneeName,
+        	tp.tp_drop_shiper as dropShipperName,
+			pClient.el_country as orig,
+			pCong.el_country as dest,
+			pShipper.el_address1 as shipperAddress1,
+			pCong.el_address1 as consigneeAddress1,
+			pShipper.el_city as shipperCity,
+			pShipper.el_state_prov as shipperState,
+			pShipper.el_country as shipperCountry,
+			pCong.el_city as consigneeCity,
+			pCong.el_state_prov as consigneeState,
+			pCong.el_country as consigneeCountry,			
+			tp.tp_quote_version as version,
+			tp.tp_quote_expireby as expireDate,
+			
+			tp_shipped_as as agentId,
+			tp_pickup_date as pickupDate,
+			tp_delivery_date as deliveryDate,
+			tp_port as port,
+			tp_charge_wt as chargedWeight,
+			tp_call_time as callTime,
+			tp_ready_time as readyTime,
+			tp_close_time as closeTime,
+			tp_dispatch_time as dispathTime,
+			tp_pickup_time as pickupTime,
+			tp_pod_time as podTime,
+			tp_pod_name as podName,
+			tp_pickup_instructions as pickupInstruction,
+			<!--DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) as createTime,-->
+			tp.tp_create_date as createTime,
+			tp_quote_total as quoteTotal,
+			tp_quote_flight_schedule as flightSchedule,
+			case when IFNULL(tp_quote_duties_tax,'') != '' then tp_quote_duties_tax
+				else CONCAT('Passengers must declare commercial goods and must be compliant with countries  rules and regulations ', char(13),
+						'If courier required to pay taxes on arrival a service fee will apply + all outlay charges') end as dutiesTax,
+			case when tp_quote_destination_city is null or tp_quote_destination_city = '' then
+					case when pCong.el_city is null or pCong.el_city = '' then tp.tp_drop_consignee else pCong.el_city end
+				else tp_quote_destination_city end as destinationCity,
+			case when tp_quote_pickup_city is null or tp_quote_pickup_city = '' then
+					case when pShipper.el_city is null or pShipper.el_city = '' then tp.tp_drop_shiper else pShipper.el_city end
+				else tp_quote_pickup_city end as pickupCity,
+			tp.tp_critical_time as criticalTime,
+			tp.tp_next_eventname as nextEventName,
+			tp.tp_next_eventdate as nextEventDate,
+			tp.tp_critical_note as note,
+			tp_lockstatus as lockStatus,
+			tp_lockuser as lockedBy,
+			tp_locktime as locktime,
+			tp_is_template as isTemplate,
+			tp_template_name as templateName,
+			tp_te_id as eventTemplateId,
+			tp_system_of_measure as systemOfMeasure,
+			tp_amt_to_bill as  amountInvoiced,
+			tp_amt_bill_currency as billCurrency,
+			tp_billing_currency as quoteCurrency,
+			tp.tp_acomp AS currentCompany,
+			tp.tp_acust AS currentCustomer,
+			tp.tp_auid AS updatedBy,
+			<!--DATE_ADD(tp.tp_astamp, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) AS updateTime,-->
+			tp.tp_astamp AS updateTime,
+				<!--UTC_TIMESTAMP() as currentUTCTime,-->
+				NOW() as currentUTCTime
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+			LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+			LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+			LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+			LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+			LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+			LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+			LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+			INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_id = #{tripId,jdbcType=INTEGER}
+	</select>
+
+	<update id="updateQuotePdfData" parameterType="Trip">
+		UPDATE EpTrip SET
+		tp_ready_time 				= #{readyTime,jdbcType=TIMESTAMP},
+		tp_quote_expireby			= #{expireDate, jdbcType=TIMESTAMP},
+		tp_quote_pickup_city		= #{pickupCity,jdbcType=VARCHAR},
+		tp_quote_destination_city	= #{destinationCity,jdbcType=VARCHAR},
+		tp_quote_total 				= #{quoteTotal,jdbcType=NUMERIC},
+		tp_billing_currency 		= #{quoteCurrency,jdbcType=VARCHAR},
+		tp_quote_duties_tax			= #{dutiesTax,jdbcType=VARCHAR},
+		tp_quote_flight_schedule	= #{flightSchedule,jdbcType=VARCHAR},
+		tp_quote_version 			= tp_quote_version + 1,
+
+		tp_acomp 					= #{currentCompany,jdbcType=VARCHAR},
+		tp_acust 					= #{currentCustomer,jdbcType=VARCHAR},
+		tp_auid 					= #{updatedBy,jdbcType=VARCHAR},
+		tp_astamp 					= NOW() <!--UTC_TIMESTAMP() -->
+		WHERE
+		tp_id=#{id,jdbcType=INTEGER}
+	</update>
+	
+	<update id="updateBOL" parameterType="Trip">
+		UPDATE EpTrip SET
+		tp_authorization_no = #{authorizationNo,jdbcType=VARCHAR},
+
+		tp_acomp 					= #{currentCompany,jdbcType=VARCHAR},
+		tp_acust 					= #{currentCustomer,jdbcType=VARCHAR},
+		tp_auid 					= #{updatedBy,jdbcType=VARCHAR},
+		tp_astamp 					= NOW() <!--UTC_TIMESTAMP() -->
+		WHERE
+		tp_id=#{id,jdbcType=INTEGER}
+	</update>
+	<update id="updateTripLockStatus" parameterType="Trip">
+		UPDATE EpTrip SET
+			tp_lockstatus=#{lockStatus,jdbcType=VARCHAR},
+			tp_lockuser=#{lockedBy,jdbcType=VARCHAR},
+			<!--tp_locktime= case when #{lockStatus,jdbcType=VARCHAR} = "Y" then UTC_TIMESTAMP() else null end,-->
+			tp_locktime= case when #{lockStatus,jdbcType=VARCHAR} = "Y" then NOW() else null end
+		WHERE
+			tp_id=#{id,jdbcType=INTEGER}
+	</update>
+	<update id="deleteTripLockStatusByUUID" parameterType="String">
+		UPDATE EpTrip SET
+			tp_lockstatus=NULL,
+			tp_lockuser=NULL,
+			tp_locktime=NULL
+		WHERE
+			tp_lockuser=#{value,jdbcType=VARCHAR}
+	</update>
+	<update id="deleteTripLockStatusByID" parameterType="Integer">
+		UPDATE EpTrip SET
+		tp_lockstatus=NULL,
+		tp_lockuser=NULL,
+		tp_locktime=NULL
+		WHERE
+		tp_id=#{tripId,jdbcType=INTEGER}
+	</update>
+	<select id="selectLockedTripAndQuotes" resultType="Trip" parameterType="map">
+		SELECT tp.tp_id as id,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			CONCAT(dep.dp_shortname, case when tp.tp_status  IN ('QUO','QC','DRAFT') then '-Q-' else '-' end, tp.tp_reference)  as refId,
+			IFNULL(statusCode.cd_${language}, statusCode.cd_english) as statusDesp,
+			IFNULL(qType.cd_${language}, qType.cd_english) as typeDesp,
+			CONCAT(mClient.em_name, ', ', pClient.el_city) as clientName,
+			CASE WHEN IFNULL(tp.tp_consignee,0) = 0 THEN tp_drop_consignee ELSE CONCAT(mCong.em_name, ', ', pCong.el_city) END AS consigneeName,
+			CASE WHEN IFNULL(tp.tp_shipper,0) = 0 THEN tp_drop_shiper ELSE CONCAT(mShipper.em_name, ', ', pShipper.el_city) END AS shipperName,
+			pClient.el_country as orig,
+			pCong.el_country as dest,
+			tp.tp_lockuser as lockedBy,
+			tp.tp_locktime as locktime
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+		LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+		LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+		LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+		LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+		LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+		LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+		LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		LEFT JOIN (SELECT en_tp_id, count(1) as numberOfNotes FROM EpNote Group by en_tp_id) notes ON tp.tp_id=notes.en_tp_id
+		WHERE 1 = 1
+		and tp.tp_status  IN ('QUO','QC','WQ','DRAFT','QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH')
+		and tp.tp_lockstatus = 'Y'
+		<if test=" departmentIdList != null">
+			and tp.tp_dp_id in
+			<foreach collection="departmentIdList" item="depId"
+					 index="index" open="(" close=")" separator=",">
+				#{depId, jdbcType=INTEGER}
+			</foreach>
+		</if>
+		order by length(tp_reference) DESC, tp.tp_reference DESC
+	</select>
+	<select id="findTripByRefNumber" parameterType="String" resultType="java.lang.Integer">
+		SELECT count(*) as recordCount
+		FROM EpTrip tp INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_reference=#{value, jdbcType=VARCHAR}
+			or CONCAT(dep.dp_shortname,'-',tp.tp_reference) = #{value, jdbcType=VARCHAR}
+			or CONCAT(dep.dp_shortname,'-Q-',tp.tp_reference) = #{value, jdbcType=VARCHAR}
+	</select>
+	<select id="selectTripByRefNumber" resultType="Trip">
+		SELECT tp.tp_id as id,
+			tp.tp_dp_id as departmentId,
+			tp.tp_authorizedby 	as authorizedBy,
+			tp.tp_authorization_no as authorizationNo,
+			tp.tp_reference as refId
+		FROM EpTrip tp INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_reference=#{value, jdbcType=VARCHAR}
+			or CONCAT(dep.dp_shortname,'-',tp.tp_reference) = #{value, jdbcType=VARCHAR}
+			or CONCAT(dep.dp_shortname,'-Q-',tp.tp_reference) = #{value, jdbcType=VARCHAR}
+	</select>
+    <select id="selectTemplateName" parameterType="String" resultType="java.lang.Integer">
+        SELECT EXISTS(SELECT 1 FROM EpTrip WHERE tp_template_name=#{templateName}) as recordCount
+    </select>
+    <update id="updateTripTemplateName" parameterType="map">
+      UPDATE EpTrip
+      SET
+      	tp_is_template=1,
+       	<if test="eventTemplateId != null ">
+             tp_te_id = #{eventTemplateId,jdbcType=INTEGER},
+        </if>
+      	tp_template_name=#{templateName,jdbcType=VARCHAR}
+      WHERE tp_id=#{tripId,jdbcType=INTEGER}
+    </update>
+    <update id="deleteTemplateEvent" parameterType="integer">
+    	UPDATE EpTrip
+    	SET tp_te_id = NULL
+    	WHERE tp_te_id = #{value}
+    </update>
+	<update id="deleteTemplateEventByCategory" parameterType="map">
+		UPDATE EpTrip
+		SET tp_te_id = NULL
+		WHERE tp_te_id in (select te_id from EpEventTemplate
+			WHERE te_type =  #{tripType,jdbcType=VARCHAR}
+			  AND te_name =  #{name,jdbcType=VARCHAR})
+	</update>
+	<select id="selectTripTemplates" resultType="Trip" parameterType="map">
+        SELECT
+        DISTINCT t.tp_template_name as templateName,
+        t.tp_id as id
+        from EpTrip t
+        where t.tp_is_template = 1
+        and t.tp_template_name is not null
+        <if test="departmentId != null and departmentId != 0">
+            and t.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+        </if>
+		order by t.tp_template_name
+	</select>
+	<update id="updateTripUOM" parameterType="Trip">
+      UPDATE EpTrip
+      SET
+      tp_system_of_measure= #{systemOfMeasure,jdbcType=VARCHAR}
+      WHERE tp_id=#{id,jdbcType=INTEGER}
+    </update>
+ 	<update id="updateBillingInfo" parameterType="Trip">
+      UPDATE EpTrip
+      SET
+	      tp_amt_to_bill= #{amountInvoiced,jdbcType=VARCHAR},
+	      tp_amt_bill_currency = #{billCurrency,jdbcType=VARCHAR}
+      WHERE tp_id=#{id,jdbcType=INTEGER}
+    </update>
+	<update id="updateTripDivision" parameterType="Trip">
+		UPDATE EpTrip
+		SET tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		WHERE tp_id=#{id,jdbcType=INTEGER}
+	</update>
+	<select id="getTripEventSubject" resultType="String" parameterType="map">
+		SELECT CASE WHEN IFNULL(tp_event_subject, '') = '' THEN CONCAT('[',dep.dp_shortname,'-',tp.tp_reference, '] Event Notification for ',IFNULL(qType.cd_${language}, qType.cd_english)) ELSE tp_event_subject END as eventSubject
+		FROM EpTrip tp INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+						LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+		WHERE tp_id = #{tripId,jdbcType=INTEGER}
+	</select>
+	<update id="updateTripEventSubject" parameterType="map">
+		UPDATE EpTrip
+		SET tp_event_subject = #{eventSubject,jdbcType=VARCHAR}
+		WHERE tp_id = #{tripId,jdbcType=INTEGER}
+	</update>
+</mapper>

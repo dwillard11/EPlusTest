@@ -1,0 +1,783 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.customer.CustomerMapper">
+	<sql id="SELECT_ENTITY">
+			EM.em_id as id,
+        	EM.em_type as type,
+			IFNULL(EC.cd_${language},EC.cd_english) as typeDesc,
+        	EM.em_name as name,
+        	EM.em_status as status,
+			EM.em_quick_name as quickName,
+            EM.em_acomp AS currentCompany,
+            EM.em_acust AS currentCustomer,
+            EM.em_auid AS updatedBy,
+            EM.em_astamp AS updateTime
+	</sql>
+
+    <select id="retrieveCustomerByType" resultType="Customer"  parameterType="map">
+        SELECT DISTINCT
+        	<include refid="SELECT_ENTITY" />
+ 		FROM EpEntityMaster EM LEFT OUTER JOIN EpCode EC ON EM.em_type = EC.cd_key AND EC.cd_name = 'Entity Type'
+			LEFT OUTER JOIN EpEntityLocation EL on EM.em_id = EL.el_em_id
+		WHERE 1 = 1
+		<if test="customerType != null and customerType != '' and 'ALL' != customerType" >
+			and EM.em_type = #{customerType,jdbcType=VARCHAR}
+		</if>
+		<if test="qucikName != null and qucikName != '' ">
+			and (EM.em_name like '%${qucikName}%' OR EM.em_quick_name like '%${qucikName}%')
+		</if>
+		<if test="locationKeyword != null and locationKeyword != '' ">
+			and (EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_city like '%${locationKeyword}%'
+			OR EL.el_bus_phone1 like '%${locationKeyword}%'
+			OR EL.el_bus_phone2 like '%${locationKeyword}%')
+		</if>
+		<if test="(firstName != null and firstName != '') or (lastName != null and lastName != '') ">
+			and EXISTS(
+			select 1 from EpEntity ee
+			where ee.et_el_id = EL.el_id
+			<if test="firstName != null and firstName != '' ">
+				and ee.et_fname like '%${firstName}%'
+			</if>
+			<if test="lastName != null and lastName != '' ">
+				and ee.et_lname like '%${lastName}%'
+			</if>
+			)
+		</if>
+ 		ORDER BY EM.em_name
+		limit 100
+    </select>
+
+    <select id="retrieveCustomerProfileById" resultType="Customer" parameterType="map">
+        SELECT 
+        	<include refid="SELECT_ENTITY" />
+ 		FROM EpEntityMaster EM LEFT OUTER JOIN EpCode EC ON EM.em_type = EC.cd_key AND EC.cd_name = 'Entity Type'
+ 		WHERE EM.em_id=#{id,jdbcType=INTEGER}
+    </select>
+
+    <update id="updateCustomer" parameterType="Customer">
+    	UPDATE EpEntityMaster
+    	SET
+    		em_type = #{type,jdbcType=VARCHAR},
+			em_name = #{name,jdbcType=VARCHAR},
+			em_quick_name = #{quickName,jdbcType=VARCHAR},
+			em_status = #{status,jdbcType=VARCHAR},
+			em_acomp = #{currentCompany,jdbcType=VARCHAR},
+            em_acust = #{currentCustomer,jdbcType=VARCHAR},
+            em_auid = #{updatedBy,jdbcType=VARCHAR},
+            em_astamp = NOW()
+			<!--UTC_TIMESTAMP() -->
+    	WHERE em_id=#{id,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertCustomer" parameterType="Customer">
+    	INSERT INTO EpEntityMaster(
+			em_type,
+			em_name,
+			em_quick_name,
+			em_status,
+			em_acomp,
+			em_acust,
+			em_auid,
+			em_astamp)
+		VALUES (
+			#{type,jdbcType=VARCHAR},
+			#{name,jdbcType=VARCHAR},
+			#{quickName,jdbcType=VARCHAR},
+			#{status,jdbcType=VARCHAR},
+			#{currentCompany,jdbcType=VARCHAR},
+			#{currentCustomer,jdbcType=VARCHAR},
+			#{updatedBy,jdbcType=VARCHAR},
+			NOW() <!--UTC_TIMESTAMP() -->
+		)	
+    	<selectKey resultType="int" order="AFTER" keyProperty="id">
+    		SELECT LAST_INSERT_ID()
+    	</selectKey>
+    </insert>
+
+    <delete id="deleteCustomer" parameterType="integer">
+    	DELETE FROM EpEntityMaster
+    	WHERE em_id=#{id,jdbcType=INTEGER}
+    </delete>
+
+	<select id="loadCustomerTreeData" resultType="Customer" parameterType="map">
+		SELECT *
+		FROM (
+		SELECT em_id as id,
+			0 as parentId,
+			em_name as name,
+			'M' as nodeType,
+			0 as isOnline
+		FROM EpEntityMaster
+		WHERE em_id=#{id,jdbcType=INTEGER}
+
+		union
+
+		SELECT 1000000 + el_id as id,
+			el_em_id as parentId,
+			CONCAT(CASE WHEN IFNULL(el_city,'') != '' THEN CONCAT(el_city, ' - ') ELSE '' END, IFNULL(el_address1, IFNULL(el_address2,''))) as name,
+			'L' as nodeType,
+			0 as isOnline
+		FROM EpEntityLocation
+		WHERE el_em_id=#{id,jdbcType=INTEGER}
+			AND el_code like  #{keyword,jdbcType=VARCHAR}
+
+		union
+
+		SELECT 1000000000 + c.et_id as id,
+		1000000 + c.et_el_id as parentId,
+			CONCAT(IFNULL(c.et_lname,''),
+					CASE WHEN c.et_fname != '' AND c.et_lname != '' THEN ', ' ELSE '' END,
+					IFNULL(c.et_fname,''))  as name,
+			'C' as nodeType,
+			case when et_online_status = 'AVA' then 1 else 0 end as isOnline
+		FROM EpEntity c, EpEntityLocation l
+		WHERE c.et_el_id = l.el_id
+		and l.el_em_id=#{id,jdbcType=INTEGER}
+		and l.el_code like  #{keyword,jdbcType=VARCHAR}
+		<if test="showOnline == true">
+			AND et_online_status = 'AVA'
+		</if>
+		) tempList
+		ORDER BY case nodeType when 'M' then 1 when 'L' then 2 else 3 end,
+			name
+	</select>
+
+	<sql id="SELECT_LOCATION">
+		el_id as id,
+		el_em_id as customerId,
+		EM.em_name as customerName,
+		el_code as code,
+		el_quick_name as quickName,
+		el_status as status,
+		el_address1 as address1,
+		el_address2 as address2,
+		el_city as city,
+		el_postal_code as postalCode,
+		el_bus_phone1 as busPhone1,
+		el_bus_phone2 as busPhone2,
+		el_after_hours_phone as afterHoursPhone,
+		el_fax as fax,
+		el_email as email,
+		el_open_hours as openHours,
+		el_usage as locationUsage,
+		el_map_url as mapUrl,
+		el_billing_company as billingCompany,
+		el_broker_us as brokerUs,
+		el_broker_ca as brokerCa,
+		el_alt_broker_us as altBrokerUs,
+		el_alt_broker_ca as altBrokerCa,
+		el_broker_nat as brokerNat,
+		el_agent_id as agentId,
+		el_notes as notes,
+		el_known as known,
+		el_known_status_index as knownStatusIndex,
+		el_tsa as tsa,
+		el_tsa_airport as tsaAirport,
+		el_tsa_contact as tsaContact,
+		el_csa as csa,
+		el_acomp AS currentCompany,
+		el_acust AS currentCustomer,
+		el_auid AS updatedBy,
+		el_astamp AS updateTime
+	</sql>
+	<select id="selectCustomerLocationByEntityId" resultType="CustomerLocation" parameterType="integer">
+		SELECT
+			<include refid="SELECT_LOCATION" />
+			,el_state_prov as stateProvince
+			,el_country as country
+		FROM EpEntityLocation EL,
+			EpEntityMaster EM
+		WHERE EM.em_id = EL.el_em_id
+			AND EL.el_em_id=#{value,jdbcType=INTEGER}
+		ORDER BY EL.el_code
+	</select>
+	<select id="selectCustomerLocationById" resultType="CustomerLocation" parameterType="integer">
+		SELECT
+		<include refid="SELECT_LOCATION" />
+		,EL.el_state_prov as stateProvince
+		,EL.el_country as country
+		FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+		EpEntityMaster EM
+		WHERE EM.em_id = EL.el_em_id
+		AND el_id=#{value,jdbcType=INTEGER}
+	</select>
+	<select id="selectCustomerLocationByIdForTrip" resultType="CustomerLocation" parameterType="integer">
+		SELECT
+		<include refid="SELECT_LOCATION" />
+		,IFNULL(PS.ep_description, EL.el_state_prov) as stateProvince
+		,EL.el_country as country
+		FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+			EpEntityMaster EM
+		WHERE EM.em_id = EL.el_em_id
+			AND el_id=#{value,jdbcType=INTEGER}
+	</select>
+
+	<select id="retrieveCustomerLocationByFuzzySearch" resultType="CustomerLocation" parameterType="map">
+		SELECT EL.el_id as id,
+			EL.el_code as code,
+			EL.el_address1 as address1,
+			EL.el_address2 as address2,
+			EL.el_bus_phone1 as busPhone1,
+			EL.el_bus_phone2 as busPhone2,
+			EL.el_city as city,
+			-- EL.el_state_prov as stateProvince,
+			IFNULL(PS.ep_description, EL.el_state_prov) as stateProvince,
+			EL.el_postal_code as postalCode,
+			EL.el_country as country,
+			-- IFNULL(PS.ep_country, EL.el_country) as country,
+			EL.el_em_id as customerId,
+			EL.el_quick_name as quickName,
+			EM.em_name as customerName,
+			EL.el_notes as notes,
+			EL.el_fax as fax,
+			EL.el_email as email,
+			EL.el_id as keyId,
+			0 as contactId,
+			'' as contactName,
+			EL.el_billing_company as billingCompany
+		FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+			EpEntityMaster EM
+		where EM.em_id = EL.el_em_id
+		and (EL.el_status != 'Inactive' or EL.el_status is null)
+		and (EM.em_status != 'Inactive' or EM.em_status is null)
+		<if test="'ALL' != customerType">
+			and EM.em_type = #{customerType,jdbcType=VARCHAR}
+		</if>
+		<if test="qucikName != null and qucikName != '' ">
+			and (EM.em_name like '${qucikName}%' OR EM.em_quick_name like '${qucikName}%')
+		</if>
+		<if test="locationKeyword != null and locationKeyword != '' ">
+			and (EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_city like '%${locationKeyword}%'
+			OR EL.el_bus_phone1 like '%${locationKeyword}%'
+			OR EL.el_bus_phone2 like '%${locationKeyword}%')
+		</if>
+		<if test="(firstName != null and firstName != '') or (lastName != null and lastName != '') ">
+			and EXISTS(
+				select 1 from EpEntity ee
+				where ee.et_el_id = EL.el_id
+				<if test="firstName != null and firstName != '' ">
+					and ee.et_fname like '%${firstName}%'
+				</if>
+				<if test="lastName != null and lastName != '' ">
+					and ee.et_lname like '%${lastName}%'
+				</if>
+			)
+		</if>
+		order by EM.em_name,
+		el_quick_name,
+	  	CASE WHEN el_address1 IS NULL THEN el_address2 ELSE el_address2 END,
+		CASE WHEN busPhone1 IS NULL THEN busPhone2 ELSE busPhone1 END
+		limit 100
+	</select>
+
+	<select id="selectCustomerLocationByContactId" resultType="CustomerLocation" parameterType="integer">
+		SELECT EL.el_id as id,
+			EL.el_code as code,
+			EL.el_address1 as address1,
+			EL.el_address2 as address2,
+			EL.el_bus_phone1 as busPhone1,
+			EL.el_bus_phone2 as busPhone2,
+			EL.el_city as city,
+			-- EL.el_state_prov as stateProvince,
+			IFNULL(PS.ep_description, EL.el_state_prov) as stateProvince,
+			EL.el_postal_code as postalCode,
+			EL.el_country as country,
+			-- IFNULL(PS.ep_country, EL.el_country) as country,
+			EL.el_em_id as customerId,
+			EL.el_quick_name as quickName,
+			EM.em_name as customerName,
+			EL.el_notes as notes,
+			EL.el_fax as fax,
+			EL.el_email as email,
+			CONCAT(EL.el_id,'-',EE.et_id) as keyId,
+			EE.et_id as contactId,
+			CONCAT(IFNULL(EE.et_fname,''), ' ', IFNULL(EE.et_lname,'')) as contactName
+		FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+			EpEntityMaster EM,
+			EpEntity EE
+		WHERE EM.em_id = EL.el_em_id
+		  	AND EE.et_el_id = EL.el_id
+			AND EE.et_id=#{value,jdbcType=INTEGER}
+	</select>
+
+	<select id="retrieveCustomerContactByFuzzySearch" resultType="CustomerLocation" parameterType="map">
+		SELECT EL.el_id as id,
+			EL.el_code as code,
+			EL.el_address1 as address1,
+			EL.el_address2 as address2,
+			EL.el_bus_phone1 as busPhone1,
+			EL.el_bus_phone2 as busPhone2,
+			EL.el_city as city,
+			-- EL.el_state_prov as stateProvince,
+			IFNULL(PS.ep_description, EL.el_state_prov) as stateProvince,
+			EL.el_postal_code as postalCode,
+			EL.el_country as country,
+			-- IFNULL(PS.ep_country, EL.el_country) as country,
+			EL.el_em_id as customerId,
+			EL.el_quick_name as quickName,
+			EM.em_name as customerName,
+			EL.el_notes as notes,
+			EL.el_fax as fax,
+			EL.el_email as email,
+			CONCAT(EL.el_id,'-',EE.et_id) as keyId,
+			EE.et_id as contactId,
+			EL.el_billing_company as billingCompany,
+			CONCAT(IFNULL(EE.et_fname,''), ' ', IFNULL(EE.et_lname,''))  as contactName
+		FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+			EpEntityMaster EM,
+			EpEntity EE
+		WHERE EM.em_id = EL.el_em_id
+		  and EE.et_el_id = EL.el_id
+		and (EL.el_status != 'Inactive' or EL.el_status is null)
+		and (EM.em_status != 'Inactive' or EM.em_status is null)
+		<if test="'ALL' != customerType">
+			and EM.em_type = #{customerType,jdbcType=VARCHAR}
+		</if>
+		<if test="qucikName != null and qucikName != '' ">
+			and (EM.em_name like '${qucikName}%' OR EM.em_quick_name like '${qucikName}%')
+		</if>
+		<if test="locationKeyword != null and locationKeyword != '' ">
+			and (EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_address1 like '%${locationKeyword}%'
+			OR EL.el_city like '%${locationKeyword}%'
+			OR EL.el_bus_phone1 like '%${locationKeyword}%'
+			OR EL.el_bus_phone2 like '%${locationKeyword}%')
+		</if>
+		<if test="firstName != null and firstName != '' ">
+			and EE.et_fname like '%${firstName}%'
+		</if>
+		<if test="lastName != null and lastName != '' ">
+			and EE.et_lname like '%${lastName}%'
+		</if>
+		order by EM.em_name,
+			EL.el_quick_name,
+			CASE WHEN el_address1 IS NULL THEN el_address2 ELSE el_address2 END,
+			CASE WHEN busPhone1 IS NULL THEN busPhone2 ELSE busPhone1 END,
+			EE.et_fname,
+			EE.et_lname
+		limit 100
+	</select>
+
+    <select id="selectCustomerLocationByCustomerType" resultType="CustomerLocation" parameterType="String">
+        SELECT
+        <include refid="SELECT_LOCATION"/>
+		,IFNULL(PS.ep_description, EL.el_state_prov) as stateProvince
+		,EL.el_country as country
+        FROM EpEntityLocation EL LEFT JOIN EpProvinceState PS ON EL.el_country = PS.ep_country_code AND EL.el_state_prov = PS.ep_code,
+        	EpEntityMaster EM
+		WHERE EM.em_id = EL.el_em_id
+        AND EM.em_type = #{customerType,jdbcType=VARCHAR}
+        order by EM.em_name
+    </select>
+
+	<update id="updateCustomerLocation" parameterType="CustomerLocation">
+		UPDATE EpEntityLocation
+		SET
+		el_code = #{code,jdbcType=VARCHAR},
+		el_quick_name = #{quickName,jdbcType=VARCHAR},
+		el_status = #{status,jdbcType=VARCHAR},
+		el_address1 = #{address1,jdbcType=VARCHAR},
+		el_address2 = #{address2,jdbcType=VARCHAR},
+		el_city = #{city,jdbcType=VARCHAR},
+		el_state_prov = #{stateProvince,jdbcType=VARCHAR},
+		el_postal_code = #{postalCode,jdbcType=VARCHAR},
+		el_country = #{country,jdbcType=VARCHAR},
+		el_bus_phone1 = #{busPhone1,jdbcType=VARCHAR},
+		el_bus_phone2 = #{busPhone2,jdbcType=VARCHAR},
+		el_after_hours_phone = #{afterHoursPhone,jdbcType=VARCHAR},
+		el_fax = #{fax,jdbcType=VARCHAR},
+		el_email = #{email,jdbcType=VARCHAR},
+		el_open_hours = #{openHours,jdbcType=VARCHAR},
+		el_usage = #{locationUsage,jdbcType=INTEGER},
+		el_map_url = #{mapUrl,jdbcType=VARCHAR},
+		el_billing_company = #{billingCompany,jdbcType=INTEGER},
+		el_broker_us = #{brokerUs,jdbcType=INTEGER},
+		el_broker_ca = #{brokerCa,jdbcType=INTEGER},
+		el_alt_broker_us = #{altBrokerUs,jdbcType=INTEGER},
+		el_alt_broker_ca = #{altBrokerCa,jdbcType=INTEGER},
+		el_broker_nat = #{brokerNat,jdbcType=INTEGER},
+		el_agent_id = #{agentId,jdbcType=INTEGER},
+		el_notes = #{notes,jdbcType=VARCHAR},
+		el_known = #{known,jdbcType=VARCHAR},
+		el_known_status_index = #{knownStatusIndex,jdbcType=INTEGER},
+		el_tsa = #{tsa,jdbcType=VARCHAR},
+		el_tsa_airport = #{tsaAirport,jdbcType=VARCHAR},
+		el_tsa_contact = #{tsaContact,jdbcType=VARCHAR},
+		el_csa = #{csa,jdbcType=VARCHAR},
+		el_acomp = #{currentCompany,jdbcType=VARCHAR},
+		el_acust = #{currentCustomer,jdbcType=VARCHAR},
+		el_auid = #{updatedBy,jdbcType=VARCHAR},
+		el_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE el_id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateCustomerLocationInactiveByEntityId" parameterType="integer">
+		UPDATE EpEntityLocation
+		SET
+		el_status = 'Inactive',
+		el_acomp = #{currentCompany,jdbcType=VARCHAR},
+		el_acust = #{currentCustomer,jdbcType=VARCHAR},
+		el_auid = #{updatedBy,jdbcType=VARCHAR},
+		el_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE el_em_id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateCustomerContactInactiveByEntityId" parameterType="integer">
+		UPDATE EpEntity
+		SET
+		et_status = 'Inactive',
+		et_acomp = #{currentCompany,jdbcType=VARCHAR},
+		et_acust = #{currentCustomer,jdbcType=VARCHAR},
+		et_auid = #{updatedBy,jdbcType=VARCHAR},
+		et_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE et_el_id in (select el_id from EpEntityLocation EL where el_em_id=#{id,jdbcType=INTEGER})
+	</update>
+
+	<update id="updateCustomerContactInactiveByLocationId" parameterType="integer">
+		UPDATE EpEntity
+		SET
+		et_status = 'Inactive',
+		et_acomp = #{currentCompany,jdbcType=VARCHAR},
+		et_acust = #{currentCustomer,jdbcType=VARCHAR},
+		et_auid = #{updatedBy,jdbcType=VARCHAR},
+		et_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE et_el_id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<insert id="insertCustomerLocation" parameterType="CustomerLocation">
+		INSERT INTO EpEntityLocation(
+		el_em_id,
+		el_code,
+		el_quick_name,
+		el_status,
+		el_address1,
+		el_address2,
+		el_city,
+		el_state_prov,
+		el_postal_code,
+		el_country,
+		el_bus_phone1,
+		el_bus_phone2,
+		el_after_hours_phone,
+		el_fax,
+		el_email,
+		el_open_hours,
+		el_usage,
+		el_map_url,
+		el_billing_company,
+		el_broker_us,
+		el_broker_ca,
+		el_alt_broker_us,
+		el_alt_broker_ca,
+		el_broker_nat,
+		el_agent_id,
+		el_notes,
+		el_known,
+		el_known_status_index,
+		el_tsa,
+		el_tsa_airport,
+		el_tsa_contact,
+		el_csa,
+		el_acomp,
+		el_acust,
+		el_auid,
+		el_astamp)
+		VALUES (
+		#{customerId,jdbcType=INTEGER},
+		#{code,jdbcType=VARCHAR},
+		#{quickName,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR},
+		#{address1,jdbcType=VARCHAR},
+		#{address2,jdbcType=VARCHAR},
+		#{city,jdbcType=VARCHAR},
+		#{stateProvince,jdbcType=VARCHAR},
+		#{postalCode,jdbcType=VARCHAR},
+		#{country,jdbcType=VARCHAR},
+		#{busPhone1,jdbcType=VARCHAR},
+		#{busPhone2,jdbcType=VARCHAR},
+		#{afterHoursPhone,jdbcType=VARCHAR},
+		#{fax,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{openHours,jdbcType=VARCHAR},
+		#{locationUsage,jdbcType=INTEGER},
+		#{mapUrl,jdbcType=VARCHAR},
+		#{billingCompany,jdbcType=INTEGER},
+		#{brokerUs,jdbcType=INTEGER},
+		#{brokerCa,jdbcType=INTEGER},
+		#{altBrokerUs,jdbcType=INTEGER},
+		#{altBrokerCa,jdbcType=INTEGER},
+		#{brokerNat,jdbcType=INTEGER},
+		#{agentId,jdbcType=INTEGER},
+		#{notes,jdbcType=VARCHAR},
+		#{known,jdbcType=VARCHAR},
+		#{knownStatusIndex,jdbcType=INTEGER},
+		#{tsa,jdbcType=VARCHAR},
+		#{tsaAirport,jdbcType=VARCHAR},
+		#{tsaContact,jdbcType=VARCHAR},
+		#{csa,jdbcType=VARCHAR},
+		#{currentCompany,jdbcType=VARCHAR},
+		#{currentCustomer,jdbcType=VARCHAR},
+		#{updatedBy,jdbcType=VARCHAR},
+		NOW() <!--UTC_TIMESTAMP() -->
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteCustomerLocation" parameterType="integer">
+		DELETE FROM EpEntityLocation
+		WHERE el_id=#{value,jdbcType=INTEGER}
+	</delete>
+
+
+	<sql id="SELECT_CONTACT">
+		et_id as id,
+		et_el_id as locationId,
+		et_status as status,
+		et_type as contactType,
+		et_notes as notes,
+		et_fname as firstName,
+		et_lname as lastName,
+		et_address1 as address1,
+		et_address2 as address2,
+		et_city as city,
+		et_province as stateProvince,
+		et_country as country,
+		et_postal_code as postalCode,
+		et_phone_office as phoneOffice,
+		et_phone_mobile as phoneMobile,
+		et_phone_pager as phonePager,
+		et_phone_fax as phoneFax,
+		et_phone_home as phoneHome,
+		et_email as email,
+		et_map_url as mapUrl,
+		et_online_status as onlineStatus,
+		et_online_country as onlineCountry,
+		et_courier_airport as courierAirport,
+		et_courier_city as courierCity,
+		et_current_flight as currentFlight,
+		et_nexus as nexus,
+		et_companycreditcard as companyCreditCard,
+		et_tsapreclearance as tsaPreClearance,
+		et_globalentry as globalEntry,
+		et_acomp AS currentCompany,
+		et_acust AS currentCustomer,
+		et_auid AS updatedBy,
+		et_astamp AS updateTime
+	</sql>
+	<select id="selectCustomerContactByLocationId" resultType="CustomerContact" parameterType="integer">
+		SELECT
+		<include refid="SELECT_CONTACT" />
+		FROM EpEntity
+		WHERE el_em_id=#{value,jdbcType=INTEGER}
+		ORDER BY el_code
+	</select>
+    <select id="selectAllCustomerContact" resultType="CustomerContact" parameterType="map">
+        SELECT
+        <include refid="SELECT_CONTACT"/>
+        , em_name as companyName
+        , el_address1 as divisionAddress
+        , el_city as divisionCity
+		FROM EpEntity c, EpEntityLocation l, EpEntityMaster m
+		WHERE c.et_el_id = l.el_id
+			and l.el_em_id = m.em_id
+			and (l.el_status != 'Inactive' or l.el_status is null)
+			and (m.em_status != 'Inactive' or m.em_status is null)
+			and (c.et_status != 'Inactive' or c.et_status is null)
+		<if test="firstName!=null">
+			AND et_fname LIKE '%${firstName}%'
+		</if>
+		<if test="lastName!=null">
+			AND et_lname LIKE '%${lastName}%'
+		</if>
+		<if test="email!=null">
+			AND et_email LIKE '%${email}%'
+		</if>	
+		<if test="needEmail != null and needEmail == true">
+			AND et_email IS NOT NULL
+		</if>		
+		<if test="keyword != null">
+			AND (et_fname LIKE '%${keyword}%' OR et_lname LIKE '%${keyword}%' OR et_email LIKE '%${keyword}%' )
+		</if>
+		order by et_fname, et_lname
+		limit 100
+    </select>
+	<select id="selectCustomerContactById" resultType="CustomerContact" parameterType="integer">
+		SELECT
+		<include refid="SELECT_CONTACT" />
+		FROM EpEntity
+		WHERE et_id=#{value,jdbcType=INTEGER}
+	</select>
+	<update id="updateCustomerContact" parameterType="CustomerContact">
+		UPDATE EpEntity
+		SET
+		et_status = #{status,jdbcType=VARCHAR},
+		et_type = #{contactType,jdbcType=VARCHAR},
+		et_notes = #{notes,jdbcType=VARCHAR},
+		et_fname = #{firstName,jdbcType=VARCHAR},
+		et_lname = #{lastName,jdbcType=VARCHAR},
+		et_address1 = #{address1,jdbcType=VARCHAR},
+		et_address2 = #{address2,jdbcType=VARCHAR},
+		et_city = #{city,jdbcType=VARCHAR},
+		et_province = #{stateProvince,jdbcType=VARCHAR},
+		et_country = #{country,jdbcType=VARCHAR},
+		et_postal_code = #{postalCode,jdbcType=VARCHAR},
+		et_phone_office = #{phoneOffice,jdbcType=VARCHAR},
+		et_phone_mobile = #{phoneMobile,jdbcType=VARCHAR},
+		et_phone_pager = #{phonePager,jdbcType=VARCHAR},
+		et_phone_fax = #{phoneFax,jdbcType=VARCHAR},
+		et_phone_home = #{phoneHome,jdbcType=VARCHAR},
+		et_email = #{email,jdbcType=VARCHAR},
+		et_map_url = #{mapUrl,jdbcType=VARCHAR},
+		et_online_status = #{onlineStatus,jdbcType=VARCHAR},
+		et_online_country = #{onlineCountry,jdbcType=VARCHAR},
+		et_courier_airport = #{courierAirport,jdbcType=VARCHAR},
+		et_courier_city = #{courierCity,jdbcType=VARCHAR},
+		et_current_flight = #{currentFlight,jdbcType=VARCHAR},
+		et_nexus = #{nexus,jdbcType=VARCHAR},
+		et_companycreditcard = #{companyCreditCard,jdbcType=VARCHAR},
+		et_tsapreclearance = #{tsaPreClearance,jdbcType=VARCHAR},
+		et_globalentry = #{globalEntry,jdbcType=VARCHAR},
+		et_acomp = #{currentCompany,jdbcType=VARCHAR},
+		et_acust = #{currentCustomer,jdbcType=VARCHAR},
+		et_auid = #{updatedBy,jdbcType=VARCHAR},
+		et_astamp = NOW() <!--UTC_TIMESTAMP() -->
+		WHERE et_id=#{id,jdbcType=INTEGER}
+	</update>
+	<insert id="insertCustomerContact" parameterType="CustomerContact">
+		INSERT INTO EpEntity(
+		et_el_id,
+		et_status,
+		et_type,
+		et_notes,
+		et_fname,
+		et_lname,
+		et_address1,
+		et_address2,
+		et_city,
+		et_province,
+		et_country,
+		et_postal_code,
+		et_phone_office,
+		et_phone_mobile,
+		et_phone_pager,
+		et_phone_fax,
+		et_phone_home,
+		et_email,
+		et_map_url,
+		et_online_status,
+		et_online_country,
+		et_courier_airport,
+		et_courier_city,
+		et_current_flight,
+		et_nexus,
+		et_companycreditcard,
+		et_tsapreclearance,
+		et_globalentry,
+		et_acomp,
+		et_acust,
+		et_auid,
+		et_astamp)
+		VALUES (
+		#{locationId,jdbcType=INTEGER},
+		#{status,jdbcType=VARCHAR},
+		#{contactType,jdbcType=VARCHAR},
+		#{notes,jdbcType=VARCHAR},
+		#{firstName,jdbcType=VARCHAR},
+		#{lastName,jdbcType=VARCHAR},
+		#{address1,jdbcType=VARCHAR},
+		#{address2,jdbcType=VARCHAR},
+		#{city,jdbcType=VARCHAR},
+		#{stateProvince,jdbcType=VARCHAR},
+		#{country,jdbcType=VARCHAR},
+		#{postalCode,jdbcType=VARCHAR},
+		#{phoneOffice,jdbcType=VARCHAR},
+		#{phoneMobile,jdbcType=VARCHAR},
+		#{phonePager,jdbcType=VARCHAR},
+		#{phoneFax,jdbcType=VARCHAR},
+		#{phoneHome,jdbcType=VARCHAR},
+		#{email,jdbcType=VARCHAR},
+		#{mapUrl,jdbcType=VARCHAR},
+		#{onlineStatus,jdbcType=VARCHAR},
+		#{onlineCountry,jdbcType=VARCHAR},
+		#{courierAirport,jdbcType=VARCHAR},
+		#{courierCity,jdbcType=VARCHAR},
+		#{currentFlight,jdbcType=VARCHAR},
+		#{nexus,jdbcType=VARCHAR},
+		#{companyCreditCard,jdbcType=VARCHAR},
+		#{tsaPreClearance,jdbcType=VARCHAR},
+		#{globalEntry,jdbcType=VARCHAR},
+		#{currentCompany,jdbcType=VARCHAR},
+		#{currentCustomer,jdbcType=VARCHAR},
+		#{updatedBy,jdbcType=VARCHAR},
+		NOW() <!--UTC_TIMESTAMP() -->
+		)
+		<selectKey resultType="int" order="AFTER" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<delete id="deleteCustomerContact" parameterType="integer">
+		DELETE FROM EpEntity
+		WHERE et_id=#{id,jdbcType=INTEGER}
+	</delete>
+	<select id="selectCourierList" resultType="Courier" parameterType="map">
+		SELECT DISTINCT 1000000000 + et.et_id as id,
+			em.em_id as entityId,
+			em.em_name as company,
+			et.et_current_flight as airLineInfo,
+			CONCAT(et.et_fname,' ',et.et_lname) as contactName,
+			el.el_quick_name as locationName,
+			el.el_code as locationCode,
+			et.et_address1 as address,
+			et.et_city as city,
+			et.et_country as country,
+			el.el_notes as note,
+			et.et_online_status as onlineStatus,
+			c.cd_english as onlineStatusDesc,
+			IFNULL(PS.ep_country, et.et_online_country) as onlineCountry,
+			et.et_courier_airport as courierAirport,
+			et.et_courier_city as courierCity,
+			B.visaCountry
+		FROM EpEntityMaster em
+			join EpEntityLocation el on em.em_id = el.el_em_id
+			join EpEntity et on el.el_id = et.et_el_id
+			left join EpCode c on et_online_status = c.cd_key
+			left join EpProvinceState PS on PS.ep_country_code = et.et_online_country
+			LEFT JOIN (select cr_et_id,
+							group_concat(ep_country order by ep_country separator ", ") as visaCountry
+						from (
+							select distinct cr.cr_et_id, PS.ep_country
+							from EpCourierVisa cr INNER join EpProvinceState PS on PS.ep_country_code = cr.cr_country) A
+						group by cr_et_id) B ON et.et_id = B.cr_et_id
+		WHERE em.em_type = 'COURIER'
+		AND (et.et_status != 'Inactive' or et.et_status is null)
+		<if test="companyId != null and companyId != 0 ">
+			AND em.em_id =  #{companyId,jdbcType=INTEGER}
+		</if>
+		<if test="locationId != null and locationId != 0 ">
+			AND el.el_id =  #{locationId,jdbcType=VARCHAR}
+		</if>
+		<if test="status != null and status != '' ">
+			AND et.et_online_status =  #{status,jdbcType=VARCHAR}
+		</if>
+		<if test="country != null and country != '' ">
+			AND (left(#{country,jdbcType=VARCHAR},3) = ',0,' OR instr(#{country,jdbcType=VARCHAR},concat(',',et.et_online_country,',')) != 0)
+		</if>
+		<if test="airport != null and airport != '' ">
+			and (et.et_courier_airport like '%${airport}%' OR et.et_courier_airport like '%${airport}%')
+		</if>
+		<if test="city != null and city != '' ">
+			and (et.et_courier_city like '%${city}%' OR et.et_courier_city like '%${city}%')
+		</if>
+		ORDER BY em_name,
+				et_fname,
+				et_lname
+	</select>
+
+</mapper>

@@ -1,0 +1,29 @@
+<!-- list -->
+<ul class="nav">
+
+	<li ui-sref-active="active" class="hidden">
+		<a ui-sref="app.dashboard-v1" class="auto"> 
+			<i class="glyphicon glyphicon-stats icon text-primary-dker"></i>
+			<span class="font-bold" translate="aside.nav.DASHBOARD">Dashboard</span>
+		</a>
+	</li>
+
+	<li class="active" ng-repeat="firstLevelSideMenu in firstLevelSideMenus | filter:{active: 'Y'}">
+		<a class="auto">
+			<span class="pull-right text-muted"> 
+				<i class="fa fa-fw fa-angle-right text"></i> 
+				<i class="fa fa-fw fa-angle-down text-active"></i>
+			</span> 
+			<i class="glyphicon {{firstLevelSideMenu.icon}} icon text-info-lter"></i> 
+			<span class="font-bold">{{firstLevelSideMenu.name | translate }}</span>
+		</a>
+		<ul class="nav nav-sub dk">
+			<li ui-sref-active="active" ng-repeat="secondLevelSideMenu in secondLevelSideMenus | filter:{sortNum: firstLevelSideMenu.sortNum} | filter:{active: 'Y'}">
+				<a ui-sref="{{secondLevelSideMenu.url}}">
+					<span>{{secondLevelSideMenu.name | translate}}</span>
+				</a>
+			</li>
+		</ul>
+	</li>
+
+<!-- / list -->

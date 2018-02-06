@@ -1,0 +1,208 @@
+<div  ng-controller="Departsummaryctrl">
+    <style>
+        .col-sm-1,.col-sm-2,.col-sm-3,.col-sm-4,.col-sm-5,.col-sm-6,.col-sm-7,.col-sm-8,.col-sm-9,.col-sm-10{ padding-right: 5px; padding-left: 10px}
+        .control-label{ margin-top: 5px;}
+    </style>
+    <!-- main -->
+    <div>
+        <!-- main header -->
+        <div class="bg-light lter b-b wrapper-md" style="padding:8px 15px 10px 15px;">
+            <div class="row">
+                <div class="col-sm-6 col-xs-12">
+                    <h1 class="m-n font-thin h3" translate="Division Summary">Division Summary</h1>
+                </div>
+                <div class="col-sm-6 text-right hidden-xs">
+                    <button type="button" class="btn btn-default pull-right" ng-click="getData()"><i class="fa fa-refresh"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="row wrapper">
+                <div class="col-sm-3">
+                    <label for="mySelect" class="col-sm-4 control-label" translate="Division">Division:</label>
+                    <div class="col-sm-8">
+                        <select ng-model="searchParam.departmentId" name="mySelect" id="mySelect"
+                                ng-options="Option.id as Option.name for Option in departmentOptions" class="form-control"></select>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label for="pointInTime" class="col-sm-5 control-label">Point In Time:</label>
+                    <div class="col-sm-7">
+                        <select ng-model="selectedPointInTime" id="pointInTime" class="form-control">
+                            <option value=""></option>
+                            <option value="1">Today</option>
+                            <option value="2">Yesterday</option>
+                            <option value="3">This week</option>
+                            <option value="4">Last week</option>
+                            <option value="5">This month</option>
+                            <option value="6">Last month</option>
+                            <option value="7">This year</option>
+                            <option value="8">This year to date</option>
+                            <option value="9">Last year</option>
+                            <option value="10">Last year to date</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtStartDate" class="col-sm-3 control-label">Start:</label>
+                    <div class="col-sm-9">
+                        <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                            <input type="text" class="form-control"
+                                   datepicker-popup="yyyy-MM-dd" id="txtStartDate" ng-model="searchParam.startDate"
+                                   is-open="opened" datepicker-options="dateOptions"
+                                   ng-required="false" close-text="Close" /> <span
+                                class="input-group-btn">
+									<button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <label for="txtEndDate" class="col-sm-3 control-label">End:</label>
+                    <div class="col-sm-9">
+                        <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                            <input type="text" class="form-control"
+                                   datepicker-popup="yyyy-MM-dd" id="txtEndDate" ng-model="searchParam.endDate"
+                                   is-open="opened" datepicker-options="dateOptions"
+                                   ng-required="false" close-text="Close" /> <span
+                                class="input-group-btn">
+									<button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- / main header -->
+        <div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="panel panel-default" id="ShipmentsBox">
+                        <div class="panel-heading h4">
+                            <div class="row">
+                                <div class="col-sm-6" translate="Shipments">
+                                    <i class="fa fa-users text-info"></i>
+                                    Shipments</div>
+                                <div class="col-sm-6 text-right">
+                                    <i class="fa" ng-class="CriticalShipment"></i> &nbsp;
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body tableTr" style="min-height:175px;">
+                            <table class="table table-striped m-b-none">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center" width="80px">Qty</th>
+                                    <th class="text-center" width="180px">Value</th>
+                                </tr>
+                                </thead>
+                                <tbody style="height:175px;">
+                                <tr ng-repeat="row in ShipmentList">
+                                    <td><a ng-click="showDetails(row.type,'trip')" class="text-info">{{ row.name}}</a></td>
+                                    <td class="text-center" width="80px">{{ row.qty}}</td>
+                                    <td class="text-right" width="180px">{{ row.value}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading h4" translate="Quotes"><i class="fa fa-users text-info"></i> Quotes
+                        </div>
+                        <div class="panel-body" style="min-height:175px;">
+                            <table class="table table-striped m-b-none">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center" width="80px">Qty</th>
+                                    <th class="text-center" width="180px">Value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="row in QuoteList">
+                                    <td><a ng-click="showDetails(row.type,'quote')" class="text-info">{{ row.name}}</a></td>
+                                    <td class="text-center" width="80px">{{ row.qty}}</td>
+                                    <td class="text-right" width="180px">{{ row.value}}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading h4"> <i class="fa fa-users text-info"></i> Staff Online </div>
+                        <div class="panel-body tableTr" style="min-height:250px;">
+                            <table class="table table-striped m-b-none">
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th style="width:160px; padding-right:50px;" class="text-center">Qty</th>
+                                </tr>
+                                </thead>
+                                <tbody ng-show="!isLoading" style="height:175px;">
+                                <tr ng-repeat="row in onlineList">
+                                    <td>{{ row.name}}</td>
+                                    <td class="text-center" width="160px">{{ row.onlineUserCount}}</td>
+                                </tr>
+                                </tbody>
+                                <tbody ng-show="isLoading">
+                                <tr>
+                                    <td colspan="2" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading h4"> <i class="fa fa-users text-info"></i> Message Queue </div>
+                        <div class="panel-body" style="min-height:250px;">
+                            <table class="table table-striped m-b-none">
+                                <colgroup>
+                                    <col>
+                                    <col width="160px">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th class="text-center">Qty</th>
+                                </tr>
+                                </thead>
+                                <tbody ng-show="!isLoading">
+                                <tr ng-repeat="row in MessageList">
+                                    <td>{{ row.name}}</td>
+                                    <td class="text-center">{{ row.qty}}</td>
+                                </tr>
+                                </tbody>
+                                <tbody ng-show="isLoading">
+                                <tr>
+                                    <td colspan="2" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <!-- / main -->
+</div>

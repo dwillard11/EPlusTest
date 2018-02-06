@@ -1,0 +1,306 @@
+<div ng-controller="operationcenterctrl">
+    <div class="bg-light lter b-b wrapper-md">
+        <h1 class="m-n font-thin h3" translate="Operations Center-Active Trips and Quotes">Operations Center-Active Trips and Quotes</h1>
+    </div>
+    <div class="wrapper-md">
+        <div class="panel panel-default" style="margin-bottom: 5px;">
+            <div class="wrapper">
+                <div class="row ">
+                    <label class="col-sm-1 control-label" translate="Division">Division</label>
+                    <div class="col-sm-11">
+                        <label class="checkbox-inline" ng-repeat="dept in departmentOptions">
+                            <input type="checkbox" id="{{dept.id}}" name="{{dept.name}}"
+                                   ng-checked="isSelectedDept(dept.id)" ng-click="updateSelectDept($event,dept.id)">
+                            {{dept.name}}
+                        </label>
+                    </div>
+                </div>
+
+                <div class="row ">
+
+                        <div class="col-sm-3 m-b-xs">
+                            <div class="input-group  pull-right m-t-xs">
+                                <input type="text" class="input form-control"
+                                       ng-model="advsearchfilter">
+                                <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="advsearch2()"
+                                                    translate="Search">Search</button>
+                                        </span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3 m-b-xs">
+                            <div class="input-group pull-right m-t-xs">
+                                <label class="col-sm-3 control-label m-t-xs" translate="Showing">Showing</label>
+                                <div class="col-sm-9">
+                                    <select ng-model="selectedCategory" name="mySelect2" id="mySelect2"
+                                            style="width: 200px !important; min-width: 100px; max-width: 200px;"
+                                            ng-options="y.id as y.name for y in categories" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 m-b-xs">
+                            <div class="row">
+                                <div class="col-sm-2 btn-group dropdown pull-right m-t-xs">
+                                    <button class="btn btn-default" data-toggle="dropdown" translate="Export">
+                                        Export
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a ng-click="exportpdf(rowCollectionPage,'trip')">PDF</a></li>
+                                        <li><a ng-csv="exportcsv(rowCollectionPage,'trip')"
+                                               filename="{{csvfilename}}">CSV</a></li>
+                                    </ul>
+                                </div>
+                                <div class="pull-right m-t-xs">
+                                    <button class="btn btn-success " type="button"
+                                            ng-click="handleTrip('', 'add','trip',selectedDepartmentOption.id)"
+                                            translate="New Trip">
+                                        <i class="fa fa-plus"></i>
+                                        New Trip
+                                    </button>
+                                    <script type="text/ng-template" id="showTripTemplates.html">
+                                        <div ng-include="'tpl/operation_console/show_trip_templates.html'"></div>
+                                    </script>
+                                    <button class="btn btn-success " type="button"
+                                            ng-click="showTripTemplates(selectedDepartmentOption.id)"
+                                            translate="New Trip From Template">
+                                        <i class="fa fa-plus"></i>
+                                        New Trip From Template
+                                    </button>
+                                </div>
+                                <div class="col-sm-3 pull-right  m-t-xs">
+                                    <select ng-model="selectedDepartmentOption" name="mySelect" id="mySelect"
+                                            ng-options="y.name for y in departmentOptions" class="form-control"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                    <script type="text/ng-template" id="addTripTemplate.html">
+                        <div ng-include="'tpl/operation_console/add_trip_template.html'"></div>
+                    </script>
+                    <script type="text/ng-template" id="changeTripDivision.html">
+                        <div ng-include="'tpl/operation_console/trip_change_division.html'"></div>
+                    </script>
+                </div>
+            </div>
+
+            <div class="table-responsive actionstyle">
+                    <table search-trip-model="advsearchfilter" st-table="displayedCollection"
+                           st-safe-src="rowCollectionPage"
+                           class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th st-sort="id" class="hidden">ID</th>
+                            <th st-sort="tripRefNo" translate="Trip#">Trip#</th>
+                            <th st-sort="shipperName" translate="Shipper">Shipper</th>
+                            <th st-sort="consigneeName" translate="Consignee">Consignee</th>
+                            <th st-sort="statusDesp" translate="Status">Status</th>
+                            <th st-sort="orig" translate="Orig">Orig</th>
+                            <th st-sort="dest" translate="Dest">Dest</th>
+                            <th st-sort="criticalTime" translate="Critical Time">Critical Time</th>
+                            <th st-sort="nextEventName" translate="Next Event">Next Event</th>
+                            <th st-sort="nextEventDate" translate="Next Event Date">Next Evt Date</th>
+                            <th st-sort="note" translate="Note">Note</th>
+                            <th st-sort="numberOfUnreadEmail"><i class="glyphicon glyphicon-envelope icon"></i></th>
+                            <th style="width: 60px; text-align: center" translate="Action">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody ng-show="!isLoading">
+                        <tr ng-repeat="row in displayedCollection">
+                            <td class="hidden"><a class="text-u-l">{{row.id}}</a></td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.tripRefNo}}</td>
+                            <td style="width:210px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.shipperName }}</td>
+                            <td style="width:210px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.consigneeName }}</td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.statusDesp}}</td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.orig}}</td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.dest }}</td>
+                            <td ng-class="timeStatus(row.status, row.criticalUTCTime, row.shipperCountry, row.dest)">
+                                <a href class="text-info" tooltip="{{row.note}}" ng-click="handleTrip(row.id, 'focusnote', 'trip',row.departmentId)"  tooltip-placement="top">
+                                    {{ row.criticalTime | date:'yyyy-MM-dd HH:mm'}}
+                                </a></td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">
+                                <a href class="text-info"  ng-click="handleTrip(row.id, 'event','trip',row.departmentId)">{{row.nextEventName}}</a>
+                            </td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.nextEventDate | date:'yyyy-MM-dd HH:mm'}}</td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">
+                                <a href class="text-info" ng-show="row.numberOfNotes>0" ng-click="handleTrip(row.id, 'readnote', 'trip')">View</a>
+                            </td>
+                            <td ng-class="recordStatus(row.shipperCountry, row.dest)">
+                                <a href ng-click="handleTrip(row.id, 'commcenter', 'trip')" style="color: red;">{{row.numberOfUnreadEmail}}</a>
+                            </td>
+                            <td style="white-space: nowrap" ng-class="recordStatus(row.shipperCountry, row.dest)">
+                                <div class="btn-group dropdown">
+                                    <button class="btn btn-default" data-toggle="dropdown">Action <span class="caret"></span></button>
+                                    <ul class="dropdown-menu  pull-right" style="overflow:auto;position:absolute;top:0px;">
+                                        <li><a ng-click="handleTrip(row.id, 'edit','trip',row.departmentId)">Edit Trip</a></li>
+                                        <li><a ng-click="changeTripDivision('Trip',row.id,row.departmentId)" >Change Division</a></li>
+                                        <li><a ng-click="handleTrip(row.id, 'read','trip')" >ReadOnly</a></li>
+                                        <li><a ng-click="showPickup(row.id, 'edit','pickup')" >Edit Pu/Del</a></li>
+                                        <li><a ng-click="showBOL(row.id, 'edit','bol')" >Edit BOL</a></li>
+                                        <li><a ng-show="row.isTemplate != 1"ng-click="addTripTemplate(row.id,row.type)" >Save Template</a></li>
+                                        <li><a ng-click="printTripPDF(row.id)" >Print Trip PDF</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tbody ng-show="isLoading">
+                        <tr>
+                            <td colspan="14" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2" class="text-left">
+                                <div>
+                                    <small class="text-muted inline m-t-sm m-b-sm">Total item(s):
+                                        {{conllectionLength}}
+                                    </small>
+                                </div>
+                            </td>
+                            <td colspan="5" class="text-center">
+                                <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                </div>
+        </div>
+
+        <div class="panel panel-default" style="margin-bottom: 5px;">
+            <div class="wrapper">
+                <div class="row ">
+                    <div class="col-sm-3 m-b-xs">
+                        <div class="input-group  pull-right m-t-xs">
+                            <input type="text" class="input form-control"
+                                   ng-model="query">
+                            <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button" ng-click="advsearch()" translate="Search">Search</button>
+                                        </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3 m-b-xs">
+                        <div class="btn-group pull-right m-t-xs">
+                            <button class="btn btn-default" type="button" ng-click="getRatesEgencia()"
+                                    translate="Get Rates Egencia">
+                                <i class="fa fa-plus"></i> Get Rates Egencia
+                            </button>
+                            <button class="btn btn-default" type="button" ng-click="getRatesOAG()"
+                                    translate="Get Rates OAG">
+                                <i class="fa fa-plus"></i> Get Rates OAG
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 m-b-xs">
+                        <div class="row">
+                            <div class="col-sm-2 btn-group dropdown pull-right m-t-xs">
+                                <button class="btn btn-default" data-toggle="dropdown" translate="Export">
+                                    Export
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a ng-click="exportpdf(rowCollectionPage2,'quote')">PDF</a></li>
+                                    <li><a ng-csv="exportcsv(rowCollectionPage2,'quote')"
+                                           filename="{{csvfilename}}">CSV</a></li>
+                                </ul>
+                            </div>
+                            <div class="pull-right m-t-xs">
+                                <button class="btn btn-success " type="button"
+                                        ng-click="handleQuote('', 'add','quote',selectedDepartmentOption.id)"
+                                        translate="New Quote">
+                                    <i class="fa fa-plus"></i> New Quote
+                                </button>
+                            </div>
+                            <div class="col-sm-3 pull-right  m-t-xs">
+                                <select ng-model="selectedDepartmentOption" name="mySelect3" id="mySelect3"
+                                        ng-options="y.name for y in departmentOptions" class="form-control"></select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+
+                <table search-quote-model="query" st-table="displayedCollection2" st-safe-src="rowCollectionPage2"
+                       class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th st-sort="quoteRefNo" translate="Quote #">Quote #</th>
+                        <th st-sort="clientName" translate="Client">Client</th>
+                        <th st-sort="shipperName" translate="Shipper">Shipper</th>
+                        <th st-sort="consigneeName" translate="Consignee">Consignee</th>
+                        <th st-sort="version" translate="Version">Version</th>
+                        <th st-sort="expireDate" translate="Expires">Expires</th>
+                        <th st-sort="orig" translate="Orig">Orig</th>
+                        <th st-sort="dest" translate="Dest">Dest</th>
+                        <th st-sort="typeDesp" translate="Type">Type</th>
+                        <th st-sort="commCenter"><i class="glyphicon glyphicon-envelope icon"></i></th>
+                        <th style="width: 60px; text-align: center" translate="Action">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody ng-show="!isLoading2">
+                    <tr ng-repeat="row2 in displayedCollection2">
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.quoteRefNo}}</td>
+                        <td style="width:210px" ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.clientName}}</td>
+                        <td style="width:210px" ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.shipperName }}</td>
+                        <td style="width:210px" ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.consigneeName }}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">Version {{ row2.version}}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.expireDate | date:'yyyy-MM-dd HH:mm'}}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.orig }}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.dest }}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">{{ row2.typeDesp }}</td>
+                        <td ng-class="recordStatus(row2.shipperCountry, row2.dest)">
+                            <a href ng-click="handleQuote(row2.id, 'commcenter', 'quote',row2.departmentId)" style="color: red;">{{row2.numberOfUnreadEmail}}</a>
+                        </td>
+                        <td style="white-space: nowrap" ng-class="recordStatus(row2.shipperCountry, row2.dest)">
+                            <div class="buttons">
+                                <button class="btn btn-sm btn-info"
+                                        ng-click="handleQuote(row2.id, 'edit','quote',row2.departmentId)"
+                                        tooltip-placement="bottom" tooltip="Edit Quote">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info"
+                                        ng-click="changeTripDivision('Quote',row2.id,row2.departmentId)"
+                                        tooltip-placement="bottom" tooltip="Change Division">
+                                    <i class="fa fa-archive"></i>
+                                </button>
+                                <button class="btn btn-sm btn-info"
+                                        ng-click="btnQuotePDF(row2.id)"
+                                        tooltip-placement="bottom" tooltip="Quote PDF">
+                                    <i class="fa fa-anchor"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger"
+                                        ng-click="handleTrip(row2.id, 'fromQuote','trip')"
+                                        tooltip-placement="bottom" tooltip="Edit Trip">
+                                    <i class="fa fa-plane"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tbody ng-show="isLoading2">
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <i class="fa fa-spin fa-refresh"></i>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2" class="text-left">
+                            <div>
+                                <small class="text-muted inline m-t-sm m-b-sm">
+                                    Total item(s):{{conllectionLength2}}
+                                </small>
+                            </div>
+                        </td>
+                        <td colspan="5" class="text-center">
+                            <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

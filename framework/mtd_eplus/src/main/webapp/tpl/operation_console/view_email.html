@@ -1,0 +1,89 @@
+<div class="modal-header">
+    View Email
+    <button class="btn btn-warning pull-right" ng-click="print()" type="button">
+        Print
+    </button>
+    <button class="btn btn-info pull-right" ng-click="sendEmail(mail,'replyAll')" type="button" ng-if="canReply == 'Y'">
+        Reply to all
+    </button>
+    <button class="btn btn-info pull-right" ng-click="sendEmail(mail,'reply')" type="button" ng-if="canReply == 'Y'">
+        Reply
+    </button>
+    <button class="btn btn-danger pull-right" ng-click="ok()">Close</button>
+</div>
+<div class="wrapper">
+    <form name="newMail" class="form-horizontal m-t-lg">
+        <div class="form-group">
+            <label class="col-lg-1 control-label">From:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailFrom" ng-readonly=true>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-1 control-label">To:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailTo" ng-readonly=true>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-1 control-label">CC:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailCc" ng-readonly=true>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-1 control-label">BCC:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.mailBcc" ng-readonly=true>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-lg-1 control-label">Subject:</label>
+            <div class="col-lg-11">
+                <input type="text" class="form-control" ng-model="mail.subject" ng-readonly=true>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">Label:</label>
+            <div class="col-lg-11">
+                <select class="form-control" ng-change="markLabel(mail.id, mail.label)"
+                        ng-options="Option.id as Option.name for Option in searchLabelOptions"
+                        ng-model="mail.label" ng-disabled="true"></select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-lg-1 control-label">Attachment:</label>
+            <div class="col-lg-11">
+                <div ng-repeat="attach in mail.attachments" class="inline">
+                    <a class="text-u-l" ng-click="downloadFile(attach.id)">{{attach.originalFileName}}</a>&nbsp;
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-1 control-label">Body</label>
+            <div class="col-sm-11" contenteditable="false" id="ueditorBody">
+                <textarea id="containerview" class="content ueditor" style="height: 600px" ng-model="mail.content" config="ueditorConfig" contenteditable="false"></textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-lg-8  pull-right">
+                <button class="btn btn-warning pull-right" ng-click="print()" type="button">
+                    Print
+                </button>
+                <button class="btn btn-info pull-right" ng-click="sendEmail(mail,'replyAll')" type="button"
+                        ng-if="canReply == 'Y'">
+                    Reply to all
+                </button>
+                <button class="btn btn-info pull-right" ng-click="sendEmail(mail,'reply')" type="button"
+                        ng-if="canReply == 'Y'">
+                    Reply
+                </button>
+                <button class="btn btn-danger pull-right" ng-click="ok()">Close</button>
+            </div>
+        </div>
+    </form>
+</div>

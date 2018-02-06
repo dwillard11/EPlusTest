@@ -1,0 +1,117 @@
+/* This is for the login page. */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: #F1F2F4;
+}
+
+#loginContent {
+    width: 90%;
+    height: 100%;
+    min-height: 100%;
+    display: table;
+    overflow: hidden;
+    margin: auto;
+}
+
+    #loginContent #loginleft,
+    #loginContent #loginright {
+        display: table-cell;
+        position: relative;
+        text-align: center;
+    }
+
+    #loginContent #loginright {
+        width: 600px;
+        background: url("../img/loginbg.jpg") no-repeat scroll 0 center transparent;
+    }
+
+    #loginContent .loginform {
+        max-width: 450px;
+        height: 100%;
+        text-align: left;
+        margin: auto;
+        padding-bottom: 50px;
+    }
+
+    #loginContent h1 {
+	background-image: url(../img/manitoulin_logo.svg);
+        background-repeat: no-repeat;
+        background-position: center 0;
+	padding-top: 160px;
+        margin-bottom: 25px;
+        font-size: 26px;
+        color: #E2153C;
+    }
+
+    #loginContent .form-validation {
+        margin: 0px auto;
+        padding: 20px 20px 5px 20px;
+        border-radius: 4px;
+        border: 1px solid #D8DDE6;
+        color: #16325c;
+        background-color: #FFF;
+    }
+
+    #loginContent label {
+        color: #54698d;
+        margin: 0 0 8px 0;
+        line-height: inherit;
+        font-weight: normal;
+    }
+
+    #loginContent .form-control {
+        border: 1px solid #D8DDE6;
+        border-radius: 4px;
+        height: 40px;
+    }
+
+    #loginContent .btn {
+        background-color: #E2153C;
+        color: #FFF;
+    }
+
+    #loginContent .tip {
+        padding: 10px 0 0 15px;
+        color: #6F6F6F;
+    }
+
+    #loginContent .footer {
+        position: absolute;
+        width: 100%;
+        bottom: 10px;
+    }
+
+
+
+@media screen and (max-width:1200px) {
+    #loginContent #loginright {
+        display: none;
+    }
+}
+
+
+@media only screen and (max-height: 1200px) {
+    .loginform {
+        padding-top: 180px;
+    }
+}
+
+@media only screen and (max-height: 1000px) {
+    .loginform {
+        padding-top: 140px;
+    }
+}
+
+@media only screen and (max-height: 900px) {
+    .loginform {
+        padding-top: 100px;
+    }
+}
+
+@media only screen and (max-height: 736px) {
+    .loginform {
+        padding-top: 60px;
+    }
+}

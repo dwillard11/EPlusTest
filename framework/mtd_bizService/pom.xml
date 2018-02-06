@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+		<groupId>ca.manitoulin.mtd</groupId>
+		<artifactId>mtd_deps</artifactId>
+		<version>1.0.1-SNAPSHOT</version>
+		<relativePath>../mtd_deps</relativePath>
+  </parent>
+  <artifactId>mtd_bizService</artifactId>
+	<version>${framework.version}</version>
+	<description>business tier connect to DB2</description>
+	<packaging>jar</packaging>
+	<dependencies>
+		<dependency>
+			<groupId>ca.manitoulin.mtd</groupId>
+			<artifactId>mtd_support</artifactId>
+			<version>${framework.version}</version>
+		</dependency>	
+		<dependency>
+			<groupId>ca.manitoulin.mtd</groupId>
+			<artifactId>mtd_wsClient</artifactId>
+			<version>${framework.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sf.jt400</groupId>
+			<artifactId>jt400</artifactId>
+		</dependency>	
+
+	</dependencies>
+</project>

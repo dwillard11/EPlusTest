@@ -1,0 +1,100 @@
+<div class="bg-light lter b-b wrapper-md">
+	<h1 class="m-n font-thin h3">ProBills by Delivery Date (Format: YYYY-MM-DD)</h1>
+</div>
+<div class="wrapper-md" ng-controller="DeliveryDateResultsCtrl">
+	<div class="panel panel-default">
+		<div class="panel-heading">{{beginDate}} - {{endDate}}</div>
+		<div class="row wrapper">
+			<div class="col-sm-4 m-b-xs">
+				<div class="input-group  pull-right m-t-xs">
+					<input type="text" class="input form-control" placeholder="Search" ng-model="query"> 
+					<span class="input-group-btn">
+						<button class="btn btn-default" type="button" ng-click="advsearch()">Search</button>
+					</span>
+				</div>
+			</div>
+			<div class="col-sm-5"></div>
+			<div class="col-sm-3">
+				<div class="btn-group dropdown pull-right m-t-xs">
+					<button class="btn btn-default" data-toggle="dropdown">
+						<i class="icon-settings"></i>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="changerowstyle('RC.Comfortable')">Comfortable</a></li>
+						<li><a ng-click="changerowstyle('RC.Cozy')">Cozy</a></li>
+						<li><a ng-click="changerowstyle('RC.Compact')">Compact</a></li>
+					</ul>
+				</div>
+				<div class="btn-group dropdown pull-right m-t-xs">
+					<button class="btn btn-default" data-toggle="dropdown">
+						Export...
+						<span class="caret">
+						</span>
+					</button>
+					<ul class="dropdown-menu">
+						<li><a ng-click="exportpdf('currentPage')">Current Page PDF</a></li>
+						<li><a ng-click="exportpdf('all')">All PDF</a></li>
+						<li><a ng-csv="exportcsv('currentPage')" filename="{{csvfilename}}">Current Page CSV</a></li>
+						<li><a ng-csv="exportcsv('all')" filename="{{csvfilename}}">All CSV</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<table search-watch-model="query" st-table="displayedCollection" st-safe-src="rowCollectionPage"
+				class="table table-striped">
+				<thead>
+					<tr>
+						<th st-sort="formattedProbillNumber">Probill</th>
+						<th st-sort="formattedDeliveryDate">Delivery Date</th>
+						<th st-sort="formattedDeliveryTime">Delivery Time</th>
+						<th st-sort="shipper">Shipper</th>
+						<th st-sort="shipperCity">City</th>
+						<th st-sort="consignee">Consignee</th>
+						<th st-sort="consigneeCity">City</th>
+						<th st-sort="formattedPickupDate">Pickup Date</th>
+						<th st-sort="receivedBy">Received By</th>
+						<th st-sort="bolNumber">BOL #</th>
+						<th st-sort="poNumber">PO #</th>
+						<th st-sort="shipperNumber">Shipper #</th>
+						<th st-sort="weight">Weight</th>
+						<th st-sort="adjWeight">Adj. Wgt</th>
+						<th st-sort="terms">Terms</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in displayedCollection">
+						<td ng-style="rowstyle"><a class="text-u-l" ng-click="seeDetails(row.probillNumber)"> {{row.formattedProbillNumber}} </a></td>
+						<td ng-style="rowstyle">{{row.formattedDeliveryDate}}</td>
+						<td ng-style="rowstyle">{{row.formattedDeliveryTime}}</td>
+						<td ng-style="rowstyle">{{row.shipper}}</td>
+						<td ng-style="rowstyle">{{row.shipperCity}}</td>
+						<td ng-style="rowstyle">{{row.consignee}}</td>
+						<td ng-style="rowstyle">{{row.consigneeCity}}</td>
+						<td ng-style="rowstyle">{{row.formattedPickupDate}}</td>
+						<td ng-style="rowstyle">{{row.receivedBy}}</td>
+						<td ng-style="rowstyle">{{row.bolNumber}}</td>
+						<td ng-style="rowstyle">{{row.poNumber}}</td>
+						<td ng-style="rowstyle">{{row.shipperNumber}}</td>
+						<td ng-style="rowstyle" align="right">{{row.weight}}</td>
+						<td ng-style="rowstyle" align="right">{{row.adjWeight}}</td>
+						<td ng-style="rowstyle">{{row.terms}}</td>
+					</tr>
+				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan="2"  class="text-left">
+							<div>
+								<small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+							</div>
+						</td>
+						<td colspan="13" class="text-center">
+							<div st-pagination="" st-items-by-page="itemsByPage2" ng-model="itemsByPage2" st-displayed-pages="7" class="no-margin"></div>
+						</td>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
+	</div>
+
+</div>

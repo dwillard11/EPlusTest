@@ -1,0 +1,54 @@
+<div class="panel panel-default">
+	<div class="panel-heading font-bold">Probills by Bill of
+		Lading,Shipper #,or PO #</div>
+	<div class="panel-body" ng-controller="TracingByBolShipperPoCtrl">
+		<form class="form-horizontal" method="get">
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label"></label>
+				<div class="col-sm-4">
+					<div class="radio">
+						<label> <input type="radio" name="checkType" ng-model="numberType"
+							id="optionsRadios1" value="bol" checked/> Bill of
+							Lading #
+						</label>
+					</div>
+					<div class="radio">
+						<label> <input type="radio" name="checkType" ng-model="numberType"
+							id="optionsRadios2" value="shipper"/> Shipper #
+						</label>
+					</div>
+					<div class="radio">
+						<label> <input type="radio" name="checkType" ng-model="numberType"
+							id="optionsRadios3" value="poNumber"/> Purchase Order #
+						</label>
+					</div>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-id-1">Number</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="input-id-1"
+						name="numberValue" ng-model="numberValue" required />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Choose Account:</label>
+				<div class="col-sm-4">
+					<select name="accountType" class="form-control m-b">
+						<option value="C">Use only the current Account</option>
+						<option value="G">Use Group Account Selection</option>
+					</select>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-4 col-sm-offset-2">
+					<button type="button" class="btn btn-primary"
+						ng-click="searchbybolshipperpo()" ng-disabled="disabledbutton">{{buttonText}}</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

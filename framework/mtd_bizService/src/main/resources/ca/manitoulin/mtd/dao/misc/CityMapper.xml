@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.CityMapper">
+
+	<select id="selectCityNameWithLongCode" parameterType="string" resultType="string">
+	SELECT CNCITY
+                FROM  ${schema}.AAP060    
+                WHERE cnpnam = #{code, jdbcType=VARCHAR}
+	</select>
+	<select id="selectCityNameWithShortCode" parameterType="string" resultType="string">
+	SELECT CT1NAM
+                FROM  ${schema}.AAL03002    
+                WHERE CT1AB = #{code, jdbcType=VARCHAR}
+	</select>	
+	<select id="selectStateWithLongCode" parameterType="string" resultType="string">
+	SELECT CNST
+                FROM  ${schema}.AAP060    
+                WHERE cnpnam = #{code, jdbcType=VARCHAR}
+	</select>
+	<select id="selectStateWithShortCode" parameterType="string" resultType="string">
+	SELECT CT1ST
+                FROM  ${schema}.AAL03002    
+                WHERE CT1AB = #{code, jdbcType=VARCHAR}
+	</select>	
+</mapper>

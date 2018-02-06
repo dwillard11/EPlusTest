@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.SecureUserMapper">
+	<sql id="SQL_USER_INFO">
+		SELECT
+			PUSER.MUUID as id,
+			PUSER.MUPWD as password,
+			PUSER.MUFNAM as firstname,
+			PUSER.MULNAM as lastname,
+			PUSER.MUEMAIL as email,
+			PUSER.MUPHONE as mobile,
+			PUSER.MUCOMP as company,
+			PUSER.MUGRP as 'group',
+			PUSER.MUADM as superAdminIndCode,
+			PUSER.MUPEXP as expireDate,
+			PUSER.MUPASSATTEMPTS as retryCount,
+			PUSER.MULANG as referLanguage,
+			PUSER.MULAST_LOGIN as lastLogin,
+			PUSER.MULAST_IP as lastIP,
+			PUSER.MULAST_HOST as lastHost,
+			PUSER.MUDACT as account,
+			USERROW.ROWHEIGHTCODE as rowHeightCode,
+			PUSER.MUCUST as customer, 
+			PUSER.MUTYPE as type, 
+			PUSER.MUDOMAIN as domain
+	</sql>
+
+	<select id="selectUserById" parameterType="string" resultType="SecureUser">
+		
+		<include refid="SQL_USER_INFO" />
+		FROM PMTUSR PUSER LEFT JOIN PMTUSERROWHEIGHT USERROW ON PUSER.MUUID =
+		USERROW.MUUID
+		WHERE PUSER.MUUID = #{value,jdbcType=VARCHAR}
+	</select>
+
+	<select id="selectUserByIdAndPassword" parameterType="map" resultType="SecureUser">
+		
+		<include refid="SQL_USER_INFO" />
+		FROM PMTUSR PUSER LEFT JOIN PMTUSERROWHEIGHT USERROW ON PUSER.MUUID =
+		USERROW.MUUID
+		WHERE MUUID = #{userId,jdbcType=VARCHAR}
+		AND MUPWD =
+		#{password,jdbcType=VARCHAR}
+	</select>
+
+	<update id="updateUserLastLoginInfo" parameterType="SecureUser">
+		update PMTUSR set
+
+			MULAST_LOGIN=#{lastLogin,jdbcType=TIMESTAMP},
+
+			MULAST_IP=#{lastIP,jdbcType=VARCHAR},
+
+			MULAST_HOST=#{lastHost,jdbcType=VARCHAR}
+
+		where MUUID=#{id}
+	</update>
+
+	<select id="updateUserInfo" parameterType="SecureUser"
+		resultType="Integer">
+		update PMTUSR set
+		<if test="referLanguage != null">
+			MULANG=#{referLanguage,jdbcType=VARCHAR}
+		</if>
+		where MUUID=#{id}
+	</select>
+
+	<insert id="updateUserRowHeightCode" parameterType="map">
+		INSERT INTO
+		PMTUSERROWHEIGHT (MUUID, ROWHEIGHTCODE) VALUES(#{id},		#{rowHeightCode,jdbcType=VARCHAR}) 
+		ON DUPLICATE KEY UPDATE		ROWHEIGHTCODE=#{rowHeightCode,jdbcType=VARCHAR}
+	</insert>
+	
+	<update id="updateUserExpiryDate" parameterType="map">
+		update PMTUSR set MUPEXP=#{expiryDate,jdbcType=TIMESTAMP}
+		where MUUID=#{userId,jdbcType=VARCHAR}
+	</update>
+
+	<update id="updateUserAttemptPasswordCount" parameterType="map">
+		update PMTUSR set MUPASSATTEMPTS=#{count,jdbcType=NUMERIC}
+		where MUUID=#{userId,jdbcType=VARCHAR}
+	</update>	
+</mapper>

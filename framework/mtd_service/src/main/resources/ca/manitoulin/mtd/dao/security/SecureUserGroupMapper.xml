@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.SecureUserGroupMapper" >
+  <resultMap id="RESULTMAP_GROUP_PROFILE" type="SecureUserGroup" >
+    <id column="GPID" property="id" jdbcType="NUMERIC" />
+    <result column="GPGRP" property="name" jdbcType="VARCHAR" />
+    <result column="GPCOMP" property="organizationCode" jdbcType="VARCHAR" />
+    <result column="GPDESC" property="description" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="SQL_GROUP_INFO" >
+    GPID, GPGRP, GPCOMP, GPDESC
+  </sql>
+  <select id="selectGroups" resultMap="RESULTMAP_GROUP_PROFILE" parameterType="Page" >
+    SELECT 
+    	GPID as id,
+    	GPGRP as name,
+    	GPCOMP as organizationCode,
+    	GPDESC as description
+    FROM PMTGRPT
+    WHERE 1=1
+    <if test="params.organizationCode != null">
+    	AND GPCOMP=UPPER(#{params.organizationCode})
+    </if>
+    <if test="params.name != null">
+    	AND GPGRP=UPPER(#{params.name})
+    </if>    
+  </select>
+  
+  <select id="selectLoginUserGroups" resultMap="RESULTMAP_GROUP_PROFILE" parameterType="SecureUser" >
+  	SELECT GPID AS ID, MUGRP AS NAME, GPDESC AS DESCRIPTION 
+	FROM PMTMGMNU, PMTGRPT 
+	WHERE GPCOMP = MUCOMP AND GPGRP = MUGRP 
+	AND MUCOMP = #{company,jdbcType=VARCHAR} 
+	AND MUUID = #{id,jdbcType=VARCHAR}
+  </select>  
+
+  <select id="selectUserGroupById" resultMap="RESULTMAP_GROUP_PROFILE">
+  	SELECT GPID AS ID, MUGRP AS NAME, GPDESC AS DESCRIPTION 
+	FROM PMTGRPT 
+	WHERE GPID = #{groupId,jdbcType=VARCHAR}
+  </select> 
+</mapper>

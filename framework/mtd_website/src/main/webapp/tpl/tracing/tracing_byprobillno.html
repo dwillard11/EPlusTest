@@ -1,0 +1,35 @@
+<div class="panel panel-default">
+	<div class="panel-heading font-bold">Probills by Number</div>
+	<div class="panel-body" ng-controller="TracingByProbillNoCtrl">
+		<form class="form-horizontal" method="get">
+
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-id-1">Pro
+					Bill #</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="input-id-1"
+						name="probillNo" ng-model="probillNo" maxlength="25"  required />
+				</div>
+
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">Choose Account:</label>
+				<div class="col-sm-4">
+					<select ng-model="accountType" class="form-control m-b">
+						<option value="C">Use only the current Account</option>
+						<option value="G">Use Group Account Selection</option>
+					</select>
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-9 col-sm-offset-2">
+					<button type="button" class="btn btn-primary"
+						ng-click="searchbyprobill()" ng-disabled="disabledbutton">{{buttonText}}</button>
+				</div>
+
+			</div>
+		</form>
+	</div>
+</div>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.messagecentral.MessageMapper">
+
+	<sql id="SQL_MESSAGE">
+		AUALREF# as id,
+		ATACTDESC as activity,
+		AUPRO as probillNo,
+		AUDATEADD as activityDate,
+		AUTIMEADD as activityTime,
+		ALVARDATA as information,
+		AUDELETE as auDelete
+	</sql>
+
+	<select id="selectMessages" resultType="Message" parameterType="Map">
+		SELECT
+		<include refid="SQL_MESSAGE" />
+		FROM ${schema}.mcl13001 as a, ${schema}.mcp120 as b
+		WHERE a.AUACTION=b.ATACTION
+
+		and ( AUMTDUSER = #{userid,		jdbcType=VARCHAR}
+		and AUCOMPMTD = UPPER(#{company,		jdbcType=VARCHAR})
+
+		and (AUDATEADD > (current date) - 1 MONTHS)
+		and AUACCOUNT = #{useraccount, jdbcType=VARCHAR})
+		<if test="advanceSearch != null">
+			AND (
+				VARCHAR_FORMAT(timestamp_iso(AUDATEADD),'yyyy-MM-dd') like '%'||#{advanceSearch, jdbcType=VARCHAR}||'%' OR
+				VARCHAR_FORMAT(timestamp_iso(AUTIMEADD),'HH:mm:ss') like '%'||#{advanceSearch, jdbcType=VARCHAR}||'%' OR
+				ALVARDATA like '%'||#{advanceSearch, jdbcType=VARCHAR}||'%' OR
+				AUPRO like '%'||#{advanceSearch, jdbcType=VARCHAR}||'%' OR
+				ATACTDESC like '%'||#{advanceSearch, jdbcType=VARCHAR}||'%'
+			)
+		</if>
+	</select>
+
+	<update id="updateMessageDeleteIndicator" parameterType="map">
+		UPDATE
+		${schema}.mcl13001
+		SET AUDELETE = 'Y'
+		WHERE AUALREF# = #{messageId, jdbcType=NUMERIC} 
+	</update>
+
+	<select id="selectMessageById" resultType="Message" parameterType="map">
+		SELECT 
+		<include refid="SQL_MESSAGE" />
+		FROM ${schema}.mcl13001 as a, ${schema}.mcp120 as b
+		WHERE a.AUACTION=b.ATACTION
+		AND AUALREF# = #{messageId, jdbcType=NUMERIC} 
+	</select>
+	<select id="selectMessageDetailById" resultType="map" parameterType="map">
+		SELECT MTDHEADING as heading, 
+			MTDDATA as data
+		FROM ${schema}.MCP150
+		WHERE MTALREF# = #{messageId, jdbcType=NUMERIC} 
+		ORDER BY MTALSEQ#
+	</select>	
+</mapper>

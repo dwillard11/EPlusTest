@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.AccountMapper" >
+ <select id="selectAccountsByNumberAndCompany" parameterType="map" resultType="Account">
+	SELECT ACCOMP AS company,
+		ACCUST as customer,
+		ACNUM AS accountNumber,
+		ACDESC AS description
+	FROM PMTACT
+	WHERE ACCOMP = #{company,jdbcType=VARCHAR}
+	 	AND ACNUM = #{accountNumber,jdbcType=VARCHAR}		
+  </select>    
+	<select id="selectGlobalAccount" parameterType="map" resultType="Account">
+	SELECT a.MACUST as customer, 
+		a.MANUM as accountNumber, 
+		b.ACDESC as description,
+		b.ACCOMP as company
+                        FROM PMTMAA a, PMTACT b
+                        WHERE a.MACOMP=b.ACCOMP AND a.MANUM=b.ACNUM 
+                        AND MACOMP=#{company,jdbcType=VARCHAR}
+                           and MACUST=#{customer,jdbcType=VARCHAR}
+                            AND MAUID=#{userid,jdbcType=VARCHAR}
+                         group by a.MANUM
+	
+  </select>  
+</mapper>

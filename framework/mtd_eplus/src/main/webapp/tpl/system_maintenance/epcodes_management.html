@@ -1,0 +1,141 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">EpCode Management</h1>
+</div>
+<div class="wrapper-md" >
+    <div class="panel panel-default">
+            <div class="row wrapper">
+                <div class="col-sm-4 m-b-xs">
+                    <form name="myForm">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Code Type:</label>
+                            <div class="col-sm-8">
+                                <select name="mySelect" id="mySelect" class="form-control input-sm"
+                                        ng-options="option.name for option in availableOptions track by option.id"
+                                        ng-model="selectedOption"></select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                    <div class="btn-group dropdown pull-right m-t-xs">
+                        <button class="btn btn-default" data-toggle="dropdown">
+                            Export
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a ng-click="exportpdf(epcodes,'codes')">PDF</a></li>
+                            <li><a ng-csv="exportcsv(epcodes,'codes')" filename="{{csvfilename}}">CSV</a></li>
+                        </ul>
+                    </div>
+                    <div class="btn-group  pull-right m-t-xs">
+                        <button class="btn btn-success " type="button" ng-click="addEpCode()"><i class="fa fa-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped b-t b-light">
+                    <thead>
+                    <tr>
+                        <th class="hidden">id</th>
+                        <th class="hidden">Name</th>
+                        <th style="width: 120px; text-align: center">Key</th>
+                        <th style="width: 150px; text-align: center">English</th>
+                        <th style="width: 150px; text-align: center">French</th>
+                        <th style="width: 150px; text-align: center">Chinese</th>
+                        <th style="width: 150px; text-align: center">German</th>
+                        <th style="width: 150px; text-align: center">Spanish</th>
+                        <th style="width: 100px; text-align: center">Status</th>
+                        <th style="width: 100px; text-align: center">Description</th>
+                        <th>Sequence</th>
+                        <th style="width: 50px; text-align: center">Action</th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="epcode in epcodes">
+                        <td class="hidden">
+                        <span editable-text="epcode.id" e-name="id" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.id || '' }}
+                        </span>
+                        </td>
+                        <td class="hidden">
+                            {{selectedOption.name}}
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.code" e-name="code" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.code || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.label_english" e-name="label_english" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-ng-blur="getOtherLable($data, $index)" e-required>
+                            {{ epcode.label_english || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.label_french" e-name="label_french" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.label_french || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.label_chinese" e-name="label_chinese" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.label_chinese || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.label_german" e-name="label_german" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.label_german || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.label_spanish" e-name="label_spanish" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.label_spanish || '' }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-select="epcode.status" e-name="status" e-form="rowform"
+                              e-ng-options="s.value as s.text for s in statuses">
+                            {{ showStatus(epcode) }}
+                        </span>
+                        </td>
+                        <td class="v-middle">
+                        <span editable-text="epcode.remarks" e-name="remarks" e-form="rowform"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.remarks || '' }}
+                        </span>
+                        </td>
+
+                        <td class="v-middle">
+                        <span editable-text="epcode.sortingOrder" e-name="sortingOrder" e-form="rowform" e-type="number"
+                              onbeforesave="checkEpCode($data, epcode.id)" e-required>
+                            {{ epcode.sortingOrder || '' }}
+                        </span>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <form editable-form name="rowform" onbeforesave="saveEpCode($data, epcode.id)"
+                                  ng-show="rowform.$visible" class="form-buttons form-inline" shown="inserted == epcode">
+                                <button type="submit" ng-disabled="rowform.$waiting" class="btn btn-sm btn-info">
+                                    <i class="fa  fa-check"></i>
+                                </button>
+                                <button type="button" ng-disabled="rowform.$waiting" ng-click="rowform.$cancel()"
+                                        class="btn btn-sm btn-primary">
+                                    <i class="fa fa-history"></i>
+                                </button>
+                            </form>
+                            <div class="buttons" ng-show="!rowform.$visible">
+                                <button class="btn btn-sm btn-info" tooltip="Edit" ng-click="rowform.$show()"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-danger" tooltip="Delete" ng-confirm-click="Are you sure you want to delete this record?"
+                                        confirmed-click="removeEpCode(epcode.id, $index)"><i class="fa fa-times"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+  

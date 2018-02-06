@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.AccountMapper" >
+ <select id="selectAccountsByNumberAndCompany" parameterType="map" resultType="Account">
+	SELECT ACCOMP AS company,
+		ACCUST as customer,
+		ACNUM AS accountNumber,
+		ACDESC AS description
+	FROM PMTACT
+	WHERE ACCOMP = #{company,jdbcType=VARCHAR}
+	 	AND ACNUM = #{accountNumber,jdbcType=VARCHAR}		
+  </select>    
+	<select id="selectGlobalAccount" parameterType="map" resultType="Account">
+	SELECT a.MACUST as customer, 
+		a.MANUM as accountNumber, 
+		b.ACDESC as description,
+		b.ACCOMP as company
+                        FROM PMTMAA a, PMTACT b
+                        WHERE a.MACOMP=b.ACCOMP AND a.MANUM=b.ACNUM 
+                        AND MACOMP=#{company,jdbcType=VARCHAR}
+                           and MACUST=#{customer,jdbcType=VARCHAR}
+                            AND MAUID=#{userid,jdbcType=VARCHAR}
+                         group by a.MANUM
+
+	</select>
+	<select id="selectAccountsByUserID" parameterType="Integer" resultType="Account">
+		SELECT
+			ea.ea_id AS id,
+			ea.ea_code AS code,
+			ea.ea_name AS name,
+			ea.ea_status AS status
+			FROM EpAccount ea
+		WHERE ea.ea_eu_id = #{id,jdbcType=INTEGER}
+	</select>
+	<insert id="insertAccount" parameterType="Account">
+		<selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO EpAccount(
+		ea_eu_id,
+		ea_code,
+		ea_name,
+		ea_satus,
+		ea_acomp,
+		ea_acust,
+		ea_auid,
+		ea_astamp
+		) VALUES (
+		#{secureUserId,jdbcType=INTEGER},
+		#{code,jdbcType=VARCHAR},
+		#{name,jdbcType=VARCHAR},
+		#{status,jdbcType=VARCHAR},
+		#{currentCompany,jdbcType=VARCHAR},
+		#{currentCustomer,jdbcType=VARCHAR},
+		#{updatedBy,jdbcType=VARCHAR},
+		NOW() <!--UTC_TIMESTAMP() -->
+		)
+	</insert>
+	<delete id="deleteAccountByUser" parameterType="Integer">
+		DELETE FROM EpAccount WHERE ea.ea_eu_id = #{secureUserId,jdbcType=INTEGER}
+	</delete>
+	<update id="updateAccount" parameterType="Account">
+		UPDATE EpAccount SET
+			ea_code = #{code,jdbcType=VARCHAR},
+			ea_name = #{name,jdbcType=VARCHAR},
+			ea_satus = #{status,jdbcType=VARCHAR},
+			ea_acomp = #{currentCompany,jdbcType=VARCHAR},
+            ea_acust = #{currentCustomer,jdbcType=VARCHAR},
+            ea_auid = #{updatedBy,jdbcType=VARCHAR},
+            ea_astamp = NOW() <!--UTC_TIMESTAMP() -->
+          WHERE ea.ea_eu_id = #{secureUserId,jdbcType=INTEGER}
+	</update>
+</mapper>

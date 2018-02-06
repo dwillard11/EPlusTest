@@ -1,0 +1,184 @@
+<div class="panel panel-default">
+	<div class="panel-heading font-bold">Trace by Pickup Number</div>
+	<div class="panel-body" ng-controller="TracingByPickupNumberCtrl">
+		<form class="form-horizontal" method="get">
+
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label" for="input-id-1">Pickup
+					#:</label>
+				<div class="col-sm-4">
+					<input type="text" class="form-control" id="input-id-1"
+						name="pickupNumber" ng-model="pickupNumber" maxlength="7" required />
+				</div>
+			</div>
+			<div class="line line-dashed b-b line-lg pull-in"></div>
+			<div class="form-group">
+				<div class="col-sm-9 col-sm-offset-2">
+					<button type="button" class="btn btn-primary"
+						ng-click="searchbypickupNumber()" ng-disabled="disabledbutton">{{buttonText}}</button>
+				</div>
+			</div>
+		</form>
+
+		<div class="panel panel-default" ng-show="showit">
+			<div class="panel-heading font-bold">Pickup Status Details</div>
+			<div class="panel-body">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-body">
+						<div class="table-responsive">
+							<table st-table="rowCollectionPage" st-safe-src="rowCollectionPage" class="table table-striped">
+								<thead>
+									<tr>
+										<th st-sort="formattedStatusDate">Date</th>
+										<th st-sort="formattedStatusTime">Time</th>
+										<th st-sort="action">Action</th>
+										<th st-sort="comments">Comments</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr ng-repeat="row in rowCollectionPage">
+										<td>{{row.formattedStatusDate}}</td>
+										<td>{{row.formattedStatusTime}}</td>
+										<td>{{row.action}}</td>
+										<td>{{row.comments}}</td>
+									</tr>
+								</tbody>
+							</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default" ng-show="showit">
+			<div class="panel-heading font-bold">If you require more
+				detailed information, please use the Tracing menu and trace by
+				Probill Number.</div>
+			<div class="panel-body">
+				<div class="col-lg-12">
+					<div class="panel panel-default">
+						<div class="panel-body">
+							<div class="col-lg-2">
+								<strong>{{probill.guaranteedDelivery}}</strong>
+							</div>
+							<div class="col-lg-4"></div>
+							<div class="col-lg-2">
+								
+							</div>
+							<div class="col-lg-4"></div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+							<div class="col-lg-2">
+								<strong>Freight Bill:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.formattedProbillNumber}}</div>
+							<div class="col-lg-2">
+								<strong>Pickup Date:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.formattedPickupDate}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Pieces:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.pieces}}</div>
+							<div class="col-lg-2">
+								<strong>{{probill.deliveryOnLabel}}</strong>
+							</div>
+							<div class="col-lg-4">{{probill.deliveryOn}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Weight:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.weight}}</div>
+							<div class="col-lg-2">
+								<strong>{{probill.deliveryApptLabel}}</strong>
+							</div>
+							<div class="col-lg-4">{{probill.deliveryApptValue}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Adjusted Weight:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.adjWeight}}</div>
+							
+							<div class="col-lg-2">
+								<strong>{{probill.deliveryCodeLabel}}</strong>
+							</div>
+					
+							<div ng-if="probill.deliveryCodeLabel != '' && probill.deliveryCodeLabel != null" class="col-lg-4">{{probill.deliveryCodeValue}}</div>
+							<div ng-if="probill.deliveryCodeLabel == '' || probill.deliveryCodeLabel == null" class="col-lg-4" ng-bind-html="probill.deliveryCodeValue"></div>
+					
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Bill of Lading:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.bolNumber}}</div>
+							<div class="col-lg-2">
+								<strong>Received By:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.receivedBy}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Shipper's Number:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.shipperNumber}}</div>
+							<div class="col-lg-2">
+								<strong>Purchase Order:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.poNumber}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Shipper:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.shipper}}</div>
+							<div class="col-lg-2">
+								<strong>Consignee:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.consignee}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>City:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.shipperCity}}</div>
+							<div class="col-lg-2">
+								<strong>City:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.consigneeCity}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Province/State:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.shipperProvince}}</div>
+							<div class="col-lg-2">
+								<strong>Province/State:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.consigneeProvince}}</div>
+							<div class="line line-dashed b-b line-lg pull-in"></div>
+
+							<div class="col-lg-2">
+								<strong>Postal/Zip:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.shipperZip}}</div>
+							<div class="col-lg-2">
+								<strong>Postal/Zip:</strong>
+							</div>
+							<div class="col-lg-4">{{probill.consigneeZip}}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+

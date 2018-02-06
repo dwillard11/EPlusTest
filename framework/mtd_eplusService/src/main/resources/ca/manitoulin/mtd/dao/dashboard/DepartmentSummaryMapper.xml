@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.dashboard.DepartmentSummaryMapper">
+    <select id="retrieveShipmentForDashboard" resultType="ShipmentSummary"  parameterType="map">
+		select IFNULL(t.countOpenShipments,0) as countOpenShipments,
+		IFNULL(t.countDeliveredShipments,0) as countDeliveredShipments,
+		IFNULL(t.countClosedShipments,0) as countClosedShipments,
+		IFNULL(t.totalOpenShipments,0) as totalOpenShipments,
+		IFNULL(t.totalDeliveredShipments,0) as totalDeliveredShipments,
+		IFNULL(t.totalClosedShipments,0) as totalClosedShipments
+		from EpAccessRight d left join
+			(SELECT
+				sum(case when tp.tp_status in ('QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH') then 1 else 0 end) as countOpenShipments,
+				sum(case when tp.tp_status in ('DEL') then 1 else 0 end) as countDeliveredShipments,
+				sum(case when tp.tp_status in ('CLO','ARC') then 1 else 0 end) as countClosedShipments,
+				sum(case when tp.tp_status in ('QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH') then tp_amt_to_bill else 0 end) as totalOpenShipments,
+				sum(case when tp.tp_status in ('DEL') then tp_amt_to_bill else 0 end) as totalDeliveredShipments,
+				sum(case when tp.tp_status in ('CLO','ARC') then tp_amt_to_bill else 0 end) as totalClosedShipments
+			from EpTrip tp 
+					LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+					LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+					LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+					LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+					LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+					LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+					INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+			WHERE tp.tp_status in ('QA','NEW','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH','DEL','CLO','ARC')
+				<if test="departmentId != null and departmentId != 0">
+					AND tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+				</if>
+				<if test="startDate != null and startDate != ''">
+					<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+					AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+				</if>
+				<if test="endDate != null and endDate != ''">
+					<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+					AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+				</if>
+			) t on 1 = 1
+		limit 0,1
+    </select>
+	<select id="retrieveShipmentForDashboardWithCurrency" resultType="ShipmentSummaryGrid"  parameterType="map">
+		select groupId,
+		groupDesc,
+		tp_amt_bill_currency as currency,
+		IFNULL(t.countShipments,0) as countShipments,
+		IFNULL(t.totalShipments,0) as totalShipments
+		from EpCode C left join (
+		SELECT groupId,
+		groupDesc,
+		tp_amt_bill_currency,
+		COUNT(tp_id) AS countShipments,
+		SUM(tp_amt_to_bill) AS totalShipments
+		FROM
+		(SELECT 1 AS groupId,
+		'Open Shipments' AS groupDesc,
+		tp_id,
+		tp_amt_bill_currency,
+		tp_amt_to_bill
+		from EpTrip tp
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_status in ('QA','NEW','WQ','TA','AD','DISP','PA','PB','PC','TIF','OFD','REC','OH')
+		<if test="departmentId != null and departmentId != 0">
+			AND tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		</if>
+		<if test="startDate != null and startDate != ''">
+			<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>
+		UNION
+		SELECT 2 AS groupId,
+		'Delivered/ Not Invoiced' AS groupDesc,
+		tp_id,
+		tp_amt_bill_currency,
+		tp_amt_to_bill
+		from EpTrip tp
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_status in ('DEL')
+		<if test="departmentId != null and departmentId != 0">
+			AND tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		</if>
+		<if test="startDate != null and startDate != ''">
+			<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>
+		UNION
+		SELECT 3 AS groupId,
+		'Closed/ Invoiced' AS groupDesc,
+		tp_id,
+		tp_amt_bill_currency,
+		tp_amt_to_bill
+		from EpTrip tp
+		INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+		WHERE tp.tp_status in ('CLO','ARC')
+		<if test="departmentId != null and departmentId != 0">
+			AND tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		</if>
+		<if test="startDate != null and startDate != ''">
+			<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+			AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+			AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+		</if>) A
+		GROUP BY groupId,
+		groupDesc,
+		tp_amt_bill_currency
+		) t on cd_key = tp_amt_bill_currency
+		WHERE cd_name = 'Currency'
+		AND EXISTS(SELECT 1 FROM EpTrip WHERE tp_amt_bill_currency = cd_key)
+		ORDER BY groupId,
+		groupDesc,
+		tp_amt_bill_currency
+	</select>
+
+	<select id="retrieveQuoteForDashboard" resultType="ShipmentSummary"  parameterType="map">
+		select IFNULL(t.countOpenQuotes,0) as countOpenQuotes,
+			t.countCancelledQuotes,
+			t.countApprovedQuotes,
+			t.totalOpenQuotes,
+			t.totalCancelledQuotes,
+			t.totalApprovedQuotes
+		from EpAccessRight d left join
+				(SELECT
+				sum(case when tp.tp_status in ('QUO','DRAFT') then 1 else 0 end) as countOpenQuotes,
+				sum(case when tp.tp_status in ('QC') then 1 else 0 end) as countCancelledQuotes,
+				sum(case when tp.tp_status in ('QA') then 1 else 0 end) as countApprovedQuotes,
+				sum(case when tp.tp_status in ('QUO','DRAFT') then tp_amt_to_bill else 0 end) as totalOpenQuotes,
+				sum(case when tp.tp_status in ('QC') then tp_amt_to_bill else 0 end) as totalCancelledQuotes,
+				sum(case when tp.tp_status in ('QA') then tp_amt_to_bill else 0 end) as totalApprovedQuotes
+				from EpTrip tp 
+						LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+						LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+						LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+						LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+						LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+						LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+						INNER JOIN EpDivision dep ON tp.tp_dp_id=dep.dp_id
+				WHERE tp.tp_status in ('QUO','DRAFT','QC','QA')
+					<if test="departmentId != null and departmentId != 0">
+						AND tp.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+					</if>
+					<if test="startDate != null and startDate != ''">
+						<!--AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR) >= #{startDate}]]>-->
+						AND <![CDATA[tp.tp_create_date >= #{startDate}]]>
+					</if>
+					<if test="endDate != null and endDate != ''">
+						<!--AND <![CDATA[DATE_ADD(DATE_ADD(tp.tp_create_date, INTERVAL IFNULL(dep.dp_default_timezone, 0) HOUR), INTERVAL -1 DAY) < #{endDate}]]>-->
+						AND <![CDATA[DATE_ADD(tp.tp_create_date, INTERVAL -1 DAY) < #{endDate}]]>
+					</if>
+				) t on 1 = 1
+		limit 0,1
+	</select>
+
+	<select id="retrieveOnlineUserCount" resultType="Role"  parameterType="map">
+		SELECT R.er_id as id,
+			R.er_name as name,
+			IFNULL(T.onlineUserCount,0) as onlineUserCount
+		FROM EpRole R LEFT OUTER JOIN
+			(SELECT UR.eur_er_id as id,
+				 COUNT(DISTINCT U.eu_id) AS onlineUserCount
+			FROM EpUser U,
+				EpUserRole UR
+			WHERE U.eu_id = UR.eur_eu_id
+				<if test="departmentId != null and departmentId != 0">
+					AND U.eu_dp_id = #{departmentId,jdbcType=INTEGER}
+				</if>
+				<if test="activeDate != null and activeDate != ''">
+					AND <![CDATA[U.eu_active_timestamp >= #{activeDate}]]>
+				</if>
+			GROUP BY UR.eur_er_id) T ON R.er_id = T.id
+		WHERE R.er_status = 'Active'
+	</select>
+
+	<select id="retrieveCriticalShipment" resultType="Date"  parameterType="integer">
+		select min(ev_est_date) as minEstDate
+		from EpEvent e, EpTrip t
+		where e.ev_tp_id = t.tp_id
+		and e.ev_act_date is null
+		and e.ev_est_date is not null
+		<if test="departmentId != null and departmentId != 0">
+			and t.tp_dp_id = #{departmentId,jdbcType=INTEGER}
+		</if>
+	</select>
+
+	<select id="retrieveMessageQueue" resultType="ShipmentSummary"  parameterType="integer">
+		SELECT SUM(ProceededMsg) AS ProceededMsg,
+			SUM(InboxMsg) AS InboxMsg
+		FROM (
+			SELECT 0 AS ProceededMsg,
+				0 AS InboxMsg
+
+			UNION ALL
+
+			SELECT SUM(case when ep.cm_status = 'Processed' AND ep.cm_tp_id IS NOT NULL then 1 else 0 end) as ProceededMsg,
+				SUM(case when (ep.cm_status = 'UnProcessed' AND ep.cm_tp_id IS NOT NULL) OR ep.cm_tp_id IS NULL then 1 else 0 end) as InboxMsg
+			FROM EpCommunication ep INNER JOIN EpDivision dep ON ep.cm_dp_id=dep.dp_id
+			WHERE ep.cm_type = 'In' AND ep.cm_dp_id IS NOT NULL
+				<if test="departmentId != null and departmentId != 0">
+					and ep.cm_dp_id = #{departmentId,jdbcType = INTEGER}
+				</if>
+				) A
+		LIMIT 0,1
+	</select>
+</mapper>

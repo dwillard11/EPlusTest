@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.TripNoteMapper" >
+	<sql id="SELECT_TRIP_NOTE">
+			en_id AS id,
+			en_tp_id as tripId,
+            en_note as content,
+            en_status as status,
+            en_author as createdBy,
+            en_cstamp as createTime,
+            en_acomp as currentCompany,
+			en_acust as currentCustomer,
+			en_auid as updatedBy,
+			en_astamp as updateTime
+	</sql>
+    <select id="selectTripNotes" resultType="TripNote" parameterType="Integer">
+        SELECT 
+			<include refid="SELECT_TRIP_NOTE"/>
+        FROM EpNote
+        WHERE en_tp_id=#{value,jdbcType=INTEGER}
+        ORDER BY en_astamp desc
+    </select>
+    
+    <insert id="insertTripNote" parameterType="TripNote">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpNote(
+			en_tp_id ,
+            en_note ,
+            en_status ,
+            en_author ,
+            en_cstamp ,
+           
+            en_acomp ,
+			en_acust ,
+			en_auid ,
+			en_astamp 
+	    ) VALUES (
+	    	#{tripId,jdbcType=INTEGER},
+	        #{content,jdbcType=VARCHAR},
+	        #{status,jdbcType=VARCHAR},	    	     
+	       	#{createdBy,jdbcType=VARCHAR},
+            NOW(), <!--UTC_TIMESTAMP(), -->
+	        #{currentCompany,jdbcType=VARCHAR},
+	        #{currentCustomer,jdbcType=VARCHAR},
+	        #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+
+    <update id="updateTripNote" parameterType="TripNote">
+        UPDATE EpNote SET
+        en_note			= #{content,jdbcType=VARCHAR},
+        en_acomp 		= #{currentCompany,jdbcType=VARCHAR},
+        en_acust 		= #{currentCustomer,jdbcType=VARCHAR},
+        en_auid 		= #{updatedBy,jdbcType=VARCHAR},
+        en_astamp 		= NOW() <!--UTC_TIMESTAMP() -->
+        WHERE en_id 	= #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteTripNote" parameterType="integer">
+        DELETE FROM EpNote
+        WHERE en_id = #{value,jdbcType=INTEGER}
+    </delete>
+   
+</mapper>

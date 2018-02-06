@@ -1,0 +1,313 @@
+<div  ng-controller="quotelistctrl">
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">{{IsQuotes ? 'Quotes List' : 'Trips List'}}</h1>
+</div>
+<div class="wrapper-md">
+    <div class="panel panel-default">
+        <div class="wrapper">
+            <div class="row">
+                <div class="col-sm-4 m-b-xs">
+                        <label for="pointInTime" class="col-sm-3 control-label m-t-xs">Point In Time:</label>
+                        <div class="col-sm-8">
+                            <select ng-model="advsearchfilter.pointInTime" id="pointInTime" class="form-control">
+                                <option value="1">Today</option>
+                                <option value="2">Yesterday</option>
+                                <option value="3">This week</option>
+                                <option value="4">Last week</option>
+                                <option value="5">This month</option>
+                                <option value="6">Last month</option>
+                                <option value="7">This year</option>
+                                <option value="8">This year to date</option>
+                                <option value="9">Last year</option>
+                                <option value="10">Last year to date</option>
+                            </select>
+                        </div>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                        <label for="txtStartDate" class="col-sm-3 control-label m-t-xs">Start:</label>
+                        <div class="col-sm-6">
+                            <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                                <input type="text" class="form-control"
+                                       datepicker-popup="yyyy-MM-dd" id="txtStartDate" ng-model="advsearchfilter.startDate"
+                                       is-open="opened" datepicker-options="dateOptions"
+                                       ng-required="false" close-text="Close"/> <span
+                                    class="input-group-btn">
+									<button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+                            </div>
+                        </div>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                    <label for="txtEndDate" class="col-sm-4 control-label m-t-xs">End:</label>
+                    <div class="col-sm-6">
+                        <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                            <input type="text" class="form-control"
+                                   datepicker-popup="yyyy-MM-dd" id="txtEndDate" ng-model="advsearchfilter.endDate"
+                                   is-open="opened" datepicker-options="dateOptions"
+                                   ng-required="false" close-text="Close"/> <span
+                                class="input-group-btn">
+                                        <button type="button" class="btn btn-default"
+                                                ng-click="open($event)">
+                                            <i class="glyphicon glyphicon-calendar"></i>
+                                        </button>
+                                    </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-show="IsQuotes">
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Division:</label>
+                    <div class="col-sm-8">
+                        <select name="mySelect" id="departmentSelect1" class="form-control input"
+                                ng-options="option.id as option.name for option in departmentOptions"
+                                ng-model="advsearchfilter.departmentId"></select>
+                    </div>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Showing:</label>
+                    <div class="col-sm-6">
+                        <select name="mySelect" id="showSelect1" class="form-control input"
+                                ng-options="option.id as option.name for option in showOptions"
+                                ng-model="advsearchfilter.tripStatus"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" ng-show="!IsQuotes">
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Division:</label>
+                    <div class="col-sm-8">
+                        <select name="mySelect" id="departmentSelect" class="form-control input"
+                                ng-options="option.id as option.name for option in departmentOptions"
+                                ng-model="advsearchfilter.departmentId"></select>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Charge Code:</label>
+                    <div class="col-sm-8">
+                        <div class="input-group" style="width:263px;">
+                            <select name="mychargeCode" id="chargeCodeSelect" class="form-control input"
+                                    ng-options="option.id as option.name for option in chargeCodeOptions"
+                                    ng-model="advsearchfilter.chargeCode"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-4 control-label m-t-xs">Charge Description:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="input form-control" placeholder="Charge Description" ng-model="advsearchfilter.chargeDesc">
+                    </div>
+                </div>
+            </div>
+            <div class="row" ng-show="!IsQuotes">
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Showing:</label>
+                    <div class="col-sm-8">
+                            <select name="mySelect" id="showSelect" class="form-control input"
+                                    ng-options="option.id as option.name for option in showOptions"
+                                    ng-model="advsearchfilter.tripStatus"></select>
+                    </div>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Event:</label>
+                    <div class="col-sm-9">
+                        <div class="input-group hide">
+                            <input type="text" class="input form-control" placeholder="Search"
+                                   ng-model="advsearchfilter.searchAWB">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default" type="button" ng-click="advsearch()">Search</button>
+                            </span>
+                        </div>
+                        <div class="input-group" style="width:263px;">
+                            <select name="myAwbSelect" id="myAwbSelect" class="form-control input"
+                                    ng-options="option.code as option.label for option in AWBList"
+                                    ng-model="selectAWBOption" style="width:190px;" ng-change="selectAWB()" ng-click="selectAWB()">
+                            </select>
+                            <input type="text" name="inputSelect" id="inputSelect" ng-model="advsearchfilter.searchAWB" class="input form-control"
+                                   style="position:relative;margin-left: -185px; margin-top: 2px; width: 165px;border: 0pt;height: 30px">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-4 control-label m-t-xs">Event Description:</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="input form-control" placeholder="Event Description" ng-model="advsearchfilter.eventDesc">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-4 m-b-xs">
+                    <label class="col-sm-3 control-label m-t-xs">Search:</label>
+                    <div class="col-sm-8">
+                            <input type="text" class="input form-control" placeholder="Search"
+                                   ng-model="advsearchfilter.searchKey">
+                    </div>
+                </div>
+
+                <div class="col-sm-4 m-b-xs">
+                </div>
+
+                <div class="col-md-4 m-b-xs text-right">
+                    <div class="col-sm-2 btn-group dropdown pull-right m-t-xs">
+                        <button class="btn btn-default" data-toggle="dropdown" translate="Export">
+                            Export
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" ng-show="!IsQuotes">
+                            <li><a ng-click="exportpdf(rowCollectionPage,'trip')">PDF</a></li>
+                            <li><a ng-csv="exportcsv(rowCollectionPage,'trip')" filename="{{csvfilename}}">CSV</a></li>
+                        </ul>
+                        <ul class="dropdown-menu" ng-show="IsQuotes">
+                            <li><a ng-click="exportpdf(rowCollectionPage,'quote')">PDF</a></li>
+                            <li><a ng-csv="exportcsv(rowCollectionPage,'quote')" filename="{{csvfilename}}">CSV</a></li>
+                        </ul>
+                    </div>
+                    <div class="pull-right m-t-xs">
+                        <button class="btn btn-default" type="button" ng-click="advsearch()" translate="Search">Search</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <script type="text/ng-template" id="changeTripDivision.html">
+            <div ng-include="'tpl/operation_console/trip_change_division.html'"></div>
+        </script>
+
+        <div class="table-responsive actionstyle">
+            <table st-table="displayedCollection" st-safe-src="rowCollectionPage" class="table table-striped" ng-show="IsQuotes">
+                <thead>
+                <tr>
+                    <th st-sort="quoteRefNo">Quote#</th>
+                    <th st-sort="clientName">Client</th>
+                    <th st-sort="shipperName" translate="Shipper">Shipper</th>
+                    <th st-sort="consigneeName">Consignee</th>
+                    <th st-sort="version">Version</th>
+                    <th st-sort="expireDate">Expires</th>
+                    <th st-sort="orig">Orig</th>
+                    <th st-sort="dest">Dest</th>
+                    <th st-sort="typeDesp">Type</th>
+                    <th style="width: 140px; text-align: center">Action</th>
+                </tr>
+                </thead>
+                <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.quoteRefNo}}</td>
+                    <td style="width:150px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.clientName}}</td>
+                    <td style="width:150px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.shipperName }}</td>
+                    <td style="width:150px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.consigneeName }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.version }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.expireDate | date:'yyyy-MM-dd HH:mm' }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.orig }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.dest }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.typeDesp }}</td>
+                    <td style="white-space: nowrap">
+                        <div class="buttons">
+                            <button class="btn btn-sm btn-info" ng-click="showEntity(row.id,'edit',row.departmentId)" tooltip="Edit Quote"><i class="fa fa-edit"></i></button>
+                            <button class="btn btn-sm btn-info" ng-click="changeTripDivision(row.id,row.departmentId)" tooltip="Change Division"><i class="fa fa-archive"></i></button>
+                            <button class="btn btn-sm btn-info" ng-click="btnQuotePDF(row.id)" tooltip="Quote PDF"><i class="fa fa-anchor"></i> </button>
+                            <button class="btn btn-sm btn-danger" ng-click="showEntity(row.id, 'fromQuoteToTrip')" tooltip="Edit Trip"><i class="fa fa-plane"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="10" class="text-center"><i
+                            class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+            <table st-table="displayedCollection" st-safe-src="rowCollectionPage" class="table table-striped" ng-show="!IsQuotes">
+                <thead>
+                <tr>
+                    <th st-sort="tripRefNo">Trip#</th>
+                    <th ng-hide="(advsearchfilter.chargeCode==null || advsearchfilter.chargeCode=='') && (advsearchfilter.chargeDesc==null || advsearchfilter.chargeDesc=='')" st-sort="chargeCode">Charge Code</th>
+                    <th ng-hide="(advsearchfilter.chargeCode==null || advsearchfilter.chargeCode=='') && (advsearchfilter.chargeDesc==null || advsearchfilter.chargeDesc=='')" st-sort="chargeDesc">Charge Details</th>
+                    <th ng-hide="(advsearchfilter.searchAWB==null || advsearchfilter.searchAWB=='') && (advsearchfilter.eventDesc==null || advsearchfilter.eventDesc=='')" st-sort="eventCode">Event Code</th>
+                    <th ng-hide="(advsearchfilter.searchAWB==null || advsearchfilter.searchAWB=='') && (advsearchfilter.eventDesc==null || advsearchfilter.eventDesc=='')" st-sort="eventDesc">Event Desc</th>
+                    <th st-sort="clientName">Client</th>
+                    <th st-sort="shipperName" translate="Shipper">Shipper</th>
+                    <th st-sort="consigneeName">Consignee</th>
+                    <th st-sort="statusDesp">Status</th>
+                    <th st-sort="orig">Orig</th>
+                    <th st-sort="dest">Dest</th>
+                    <th st-sort="criticalTime">Critical Time</th>
+                    <th st-sort="typeDesp">Type</th>
+                    <th style="width: 60px; text-align: center">Action</th>
+                </tr>
+                </thead>
+                <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.tripRefNo}}</td>
+                    <td ng-hide="(advsearchfilter.chargeCode==null || advsearchfilter.chargeCode=='') && (advsearchfilter.chargeDesc==null || advsearchfilter.chargeDesc=='')" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.chargeCode}}</td>
+                    <td ng-hide="(advsearchfilter.chargeCode==null || advsearchfilter.chargeCode=='') && (advsearchfilter.chargeDesc==null || advsearchfilter.chargeDesc=='')" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.chargeDesc}}</td>
+                    <td ng-hide="(advsearchfilter.searchAWB==null || advsearchfilter.searchAWB=='') && (advsearchfilter.eventDesc==null || advsearchfilter.eventDesc=='')" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.eventCode}}</td>
+                    <td ng-hide="(advsearchfilter.searchAWB==null || advsearchfilter.searchAWB=='') && (advsearchfilter.eventDesc==null || advsearchfilter.eventDesc=='')" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.eventDesc}}</td>
+                    <td style="width:210px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.clientName}}</td>
+                    <td style="width:210px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.shipperName }}</td>
+                    <td style="width:210px" ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.consigneeName }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.statusDesp }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.orig }}</td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.dest }}</td>
+                    <td ng-class="timeStatus(row.status, row.criticalUTCTime, row.shipperCountry, row.dest)"><a href class="text-info" tooltip="{{row.note}}" ng-click="showEntity(row.id,'focusnote',row.departmentId)"  tooltip-placement="top">{{ row.criticalTime | date:'yyyy-MM-dd HH:mm:ss' }}</a></td>
+                    <td ng-class="recordStatus(row.shipperCountry, row.dest)">{{ row.typeDesp }}</td>
+                    <td style="white-space: nowrap" ng-class="recordStatus(row.shipperCountry, row.dest)">
+                        <div class="btn-group dropdown">
+                            <button class="btn btn-default" data-toggle="dropdown">Action <span class="caret"></span></button>
+                            <ul class="dropdown-menu  pull-right" style="overflow:auto;position:absolute;top:0px;">
+                                <li><a ng-click="showEntity(row.id,'edit',row.departmentId)">Edit Trip</a></li>
+                                <li><a ng-click="changeTripDivision(row.id,row.departmentId)" >Change Division</a></li>
+                                <li><a ng-click="showEntity(row.id, 'read')" >ReadOnly</a></li>
+                                <li><a ng-click="showPickup(row.id, 'edit')" >Edit Pu/Del</a></li>
+                                <li><a ng-click="showBOL(row.id, 'edit')" >Edit BOL</a></li>
+                                <li><a ng-click="showInvoice(row.id,'new')" >Edit Invoice</a></li>
+                                <li><a ng-click="printTripPDF(row.id)" >Print Trip PDF</a></li>
+                            </ul>
+                        </div>
+                    </td>
+
+                </tr>
+                </tbody>
+                <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="11" class="text-center"><i class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+
+</div>

@@ -1,0 +1,23 @@
+<form class="form-horizontal" role="form" method="POST" name="changeDivision" ng-submit="ok(changeDivision.$valid)">
+    <div class="modal-header">Change Division</div>
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group">
+                    <div class="col-sm-2"></div>
+                    <label class="col-sm-2 control-label" translate="Division">Division:</label>
+                    <div class="col-sm-6">
+                        <select name="tripDept" id="tripDept" class="form-control" name="ddlTripDept"
+                                ng-options="Option3.id as Option3.name for Option3 in departmentOptions"
+                                ng-model="tripDivision.departmentId"></select>
+                    </div>
+                    <div class="col-sm-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary"><strong>Save</strong></button>
+        <button type="button" class="btn btn-default" ng-click="cancel()"><strong>Cancel</strong></button>
+    </div>
+</form>

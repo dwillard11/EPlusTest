@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.security.OrganizationMapper">
+    <sql id="SQL_SELECT_DEP">
+		dp.dp_id AS id,
+        dp.dp_status AS status,
+        dp.dp_name AS name,
+        dp.dp_shortname AS shortName,
+        dp.dp_city AS city,
+        dp.dp_address_1 AS address1,
+        dp.dp_address_2 AS address2,
+        dp.dp_postalcode AS postalCode,
+        dp.dp_province AS province,
+        dp.dp_country AS country,
+        dp.dp_phone_mobile AS phoneMobile,
+        dp.dp_phone_office AS phoneOffice,
+        dp.dp_phone_fax AS phoneFax,
+        dp.dp_phone_800 AS phone800,
+        dp.dp_notes AS notes,
+        dp.dp_invoice_office_seq AS invoiceOfficeSeq,
+        dp.dp_invoice_office_name AS invoiceOfficeName,
+        dp.dp_invoice_office_line_1 AS invoiceOfficeLine1,
+        dp.dp_invoice_office_line_2 AS invoiceOfficeLine2,
+        dp.dp_invoice_office_line_3 AS invoiceOfficeLine3,
+        dp.dp_default_currency AS defaultCurrency,
+        dp.dp_default_timezone as defaultTimezone,
+        dp.dp_default_email as defaultEmail,
+        dp.dp_email_host as mailHost,
+        dp.dp_email_username as mailUserName,
+        dp.dp_email_pwd as mailPassword
+	</sql>
+    <select id="selectDepartment" resultType="Organization" parameterType="string">
+        SELECT
+            dp.dp_id AS id,
+            IFNULL(EC.cd_${language},EC.cd_english) AS status,
+            dp.dp_name AS name,
+            dp.dp_shortname AS shortName,
+            dp.dp_city AS city,
+            dp.dp_address_1 AS address1,
+            dp.dp_address_2 AS address2,
+            dp.dp_postalcode AS postalCode,
+            dp.dp_province AS province,
+            dp.dp_country AS country,
+            dp.dp_phone_mobile AS phoneMobile,
+            dp.dp_phone_office AS phoneOffice,
+            dp.dp_phone_fax AS phoneFax,
+            dp.dp_phone_800 AS phone800,
+            dp.dp_notes AS notes,
+            dp.dp_invoice_office_seq AS invoiceOfficeSeq,
+            dp.dp_invoice_office_name AS invoiceOfficeName,
+            dp.dp_invoice_office_line_1 AS invoiceOfficeLine1,
+            dp.dp_invoice_office_line_2 AS invoiceOfficeLine2,
+            dp.dp_invoice_office_line_3 AS invoiceOfficeLine3,
+            dp.dp_default_currency AS defaultCurrency,
+            dp.dp_default_timezone as defaultTimezone,
+            dp.dp_default_email as defaultEmail,
+            dp.dp_email_host as mailHost,
+            dp.dp_email_username as mailUserName,
+            dp.dp_email_pwd as mailPassword
+        FROM EpDivision dp LEFT OUTER JOIN EpCode EC ON dp.dp_status = EC.cd_key AND EC.cd_name = 'Status'
+    </select>
+    <select id="selectDepartmentById" resultType="Organization" parameterType="Integer">
+        SELECT
+        <include refid="SQL_SELECT_DEP"/>
+        FROM EpDivision dp WHERE dp.dp_id = #{id,jdbcType=INTEGER}
+    </select>
+    
+    <select id="selectDepartmentsByUser" resultType="Organization" parameterType="Integer">
+        SELECT
+        <include refid="SQL_SELECT_DEP"/>
+        FROM EpDivision dp INNER JOIN EpUserDivision eud ON dp.dp_id=eud.eud_dp_id
+        WHERE eud.eud_eu_id = #{value,jdbcType=INTEGER}
+    </select>
+    <insert id="insertDepartment" parameterType="Organization">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpDivision(
+        dp_name,
+        dp_shortname,
+        dp_city,
+        dp_address_1,
+        dp_address_2,
+        dp_postalcode,
+        dp_province,
+        dp_country,
+        dp_phone_mobile,
+        dp_phone_office,
+        dp_phone_fax,
+        dp_phone_800,
+        dp_notes,
+        dp_invoice_office_seq,
+        dp_invoice_office_name,
+        dp_invoice_office_line_1,
+        dp_invoice_office_line_2,
+        dp_invoice_office_line_3,
+        dp_default_currency,
+        dp_default_timezone,
+        dp_default_email,
+        dp_email_host,
+        dp_email_username,
+        dp_email_pwd,
+        dp_status,
+        dp_acomp,
+        dp_acust,
+        dp_auid,
+        dp_astamp) VALUES (
+        #{name,jdbcType=VARCHAR},
+        #{shortName,jdbcType=VARCHAR},
+        #{city,jdbcType=VARCHAR},
+        #{address1,jdbcType=VARCHAR},
+        #{address2,jdbcType=VARCHAR},
+        #{postalCode,jdbcType=VARCHAR},
+        #{province,jdbcType=VARCHAR},
+        #{country,jdbcType=VARCHAR},
+        #{phoneMobile,jdbcType=VARCHAR},
+        #{phoneOffice,jdbcType=VARCHAR},
+        #{phoneFax,jdbcType=VARCHAR},
+        #{phone800,jdbcType=VARCHAR},
+        #{notes,jdbcType=VARCHAR},
+        #{invoiceOfficeSeq,jdbcType=INTEGER},
+        #{invoiceOfficeName,jdbcType=VARCHAR},
+        #{invoiceOfficeLine1,jdbcType=VARCHAR},
+        #{invoiceOfficeLine2,jdbcType=VARCHAR},
+        #{invoiceOfficeLine3,jdbcType=VARCHAR},
+        #{defaultCurrency,jdbcType=VARCHAR},
+        #{defaultTimezone,jdbcType=VARCHAR},
+        #{defaultEmail,jdbcType=VARCHAR},
+        #{mailHost,jdbcType=VARCHAR},
+        #{mailUserName,jdbcType=VARCHAR},
+        #{mailPassword,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <delete id="deleteDepartment" parameterType="Integer">
+              DELETE FROM EpDivision WHERE dp_id = #{id,jdbcType=INTEGER}
+       </delete>
+    <update id="updateDepartment" parameterType="Organization">
+              UPDATE EpDivision SET
+                     dp_name = #{name,jdbcType=VARCHAR},
+                     dp_shortname = #{shortName,jdbcType=VARCHAR},
+                     dp_city = #{city,jdbcType=VARCHAR},
+                     dp_address_1 = #{address1,jdbcType=VARCHAR},
+                     dp_address_2 = #{address2,jdbcType=VARCHAR},
+                     dp_postalcode = #{postalCode,jdbcType=VARCHAR},
+                     dp_province = #{province,jdbcType=VARCHAR},
+                     dp_country = #{country,jdbcType=VARCHAR},
+                     dp_phone_mobile = #{phoneMobile,jdbcType=VARCHAR},
+                     dp_phone_office = #{phoneOffice,jdbcType=VARCHAR},
+                     dp_phone_fax = #{phoneFax,jdbcType=VARCHAR},
+                     dp_phone_800 = #{phone800,jdbcType=VARCHAR},
+                     dp_notes = #{notes,jdbcType=VARCHAR},
+                     dp_invoice_office_seq = #{invoiceOfficeSeq,jdbcType=INTEGER},
+                     dp_invoice_office_name = #{invoiceOfficeName,jdbcType=VARCHAR},
+                     dp_invoice_office_line_1 = #{invoiceOfficeLine1,jdbcType=VARCHAR},
+                     dp_invoice_office_line_2 = #{invoiceOfficeLine2,jdbcType=VARCHAR},
+                     dp_invoice_office_line_3 = #{invoiceOfficeLine3,jdbcType=VARCHAR},
+                     dp_default_currency = #{defaultCurrency,jdbcType=VARCHAR},
+                     dp_default_timezone = #{defaultTimezone,jdbcType=VARCHAR},
+                     dp_default_email = #{defaultEmail,jdbcType=VARCHAR},
+                     dp_email_host = #{mailHost,jdbcType=VARCHAR},
+                     dp_email_username = #{mailUserName,jdbcType=VARCHAR},
+                     dp_email_pwd = #{mailPassword,jdbcType=VARCHAR},
+                     dp_status = #{status,jdbcType=VARCHAR},
+                    dp_acomp = #{currentCompany,jdbcType=VARCHAR},
+                    dp_acust = #{currentCustomer,jdbcType=VARCHAR},
+                    dp_auid = #{updatedBy,jdbcType=VARCHAR},
+                    dp_astamp = NOW() <!--UTC_TIMESTAMP() -->
+              WHERE dp_id = #{id,jdbcType=INTEGER}
+       </update>
+</mapper>

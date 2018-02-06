@@ -1,0 +1,2962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.23" id="1">
+    <property name="createdBy">Eclipse BIRT Designer Version 4.6.0.v201606072122</property>
+    <property name="units">in</property>
+    <method name="initialize"><![CDATA[var count = 0;
+var page = 0;]]></method>
+    <property name="iconFile">/templates/blank_report.gif</property>
+    <property name="layoutPreference">auto layout</property>
+    <property name="bidiLayoutOrientation">ltr</property>
+    <property name="imageDPI">96</property>
+    <parameters>
+        <scalar-parameter name="tripid" id="2588">
+            <property name="valueType">static</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">160047</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="invoiceid" id="2589">
+            <property name="valueType">static</property>
+            <property name="isRequired">true</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">160052</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="concealValue">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="invoicenumber" id="2597">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant">INV-ML-00464</value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="totalpieces" id="2605">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">integer</property>
+            <property name="distinct">true</property>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="actualweight" id="2607">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="pickupat" id="2609">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="chargeableweight" id="2611">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="hst" id="2627">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="subtotal" id="2727">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="totalamount" id="2729">
+            <property name="valueType">static</property>
+            <property name="isRequired">false</property>
+            <property name="dataType">string</property>
+            <property name="distinct">true</property>
+            <simple-property-list name="defaultValue">
+                <value type="constant"></value>
+            </simple-property-list>
+            <list-property name="selectionList"/>
+            <property name="paramType">simple</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+    </parameters>
+    <data-sources>
+        <oda-data-source extensionID="org.eclipse.birt.report.data.oda.jdbc" name="local" id="4">
+            <list-property name="privateDriverProperties">
+                <ex-property>
+                    <name>metadataBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledMetadataBidiFormatStr</name>
+                </ex-property>
+                <ex-property>
+                    <name>contentBidiFormatStr</name>
+                    <value>ILYNN</value>
+                </ex-property>
+                <ex-property>
+                    <name>disabledContentBidiFormatStr</name>
+                </ex-property>
+            </list-property>
+            <property name="odaDriverClass">com.mysql.jdbc.Driver</property>
+            <property name="odaURL">jdbc:mysql://192.168.1.8:3306/ePlusDev</property>
+            <property name="odaUser">root</property>
+            <encrypted-property name="odaPassword" encryptionID="base64">UGFzc3dvcmQx</encrypted-property>
+            <property name="odaJndiName">java:comp/env/jdbc/eplus</property>
+        </oda-data-source>
+    </data-sources>
+    <data-sets>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="deptlist" id="840">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">dp_invoice_office_name</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_invoice_office_name</text-property>
+                    <text-property name="heading">dp_invoice_office_name</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_invoice_office_line_1</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_invoice_office_line_1</text-property>
+                    <text-property name="heading">dp_invoice_office_line_1</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_invoice_office_line_2</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_invoice_office_line_2</text-property>
+                    <text-property name="heading">dp_invoice_office_line_2</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_invoice_office_line_3</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_invoice_office_line_3</text-property>
+                    <text-property name="heading">dp_invoice_office_line_3</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_phone_office</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_phone_office</text-property>
+                    <text-property name="heading">dp_phone_office</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_phone_fax</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_phone_fax</text-property>
+                    <text-property name="heading">dp_phone_fax</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dp_phone_800</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dp_phone_800</text-property>
+                    <text-property name="heading">dp_phone_800</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters"/>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">dp_invoice_office_name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">dp_invoice_office_line_1</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">dp_invoice_office_line_2</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">dp_invoice_office_line_3</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">dp_phone_office</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">dp_phone_fax</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">dp_phone_800</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">local</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">dp_invoice_office_name</property>
+                    <property name="nativeName">dp_invoice_office_name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">dp_invoice_office_line_1</property>
+                    <property name="nativeName">dp_invoice_office_line_1</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">dp_invoice_office_line_2</property>
+                    <property name="nativeName">dp_invoice_office_line_2</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">dp_invoice_office_line_3</property>
+                    <property name="nativeName">dp_invoice_office_line_3</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">dp_phone_office</property>
+                    <property name="nativeName">dp_phone_office</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">dp_phone_fax</property>
+                    <property name="nativeName">dp_phone_fax</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">dp_phone_800</property>
+                    <property name="nativeName">dp_phone_800</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select
+  ed.dp_invoice_office_name,
+  ed.dp_invoice_office_line_1,
+  ed.dp_invoice_office_line_2,
+  ed.dp_invoice_office_line_3,
+  ed.dp_phone_office,
+  ed.dp_phone_fax,
+  ed.dp_phone_800
+from EpDivision ed;]]></xml-property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>2.0</Version>
+  <design:ResultSets derivedMetaData="true">
+    <design:resultSetDefinitions>
+      <design:resultSetColumns>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>dp_invoice_office_name</design:name>
+              <design:position>1</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>50</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>dp_invoice_office_name</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>dp_invoice_office_name</design:label>
+            <design:formattingHints>
+              <design:displaySize>50</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>dp_invoice_office_line_1</design:name>
+              <design:position>2</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>NotNullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>dp_invoice_office_line_1</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>dp_invoice_office_line_1</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>dp_invoice_office_line_2</design:name>
+              <design:position>3</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>dp_invoice_office_line_2</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>dp_invoice_office_line_2</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+        <design:resultColumnDefinitions>
+          <design:attributes>
+            <design:identifier>
+              <design:name>dp_invoice_office_line_3</design:name>
+              <design:position>4</design:position>
+            </design:identifier>
+            <design:nativeDataTypeCode>12</design:nativeDataTypeCode>
+            <design:precision>100</design:precision>
+            <design:scale>0</design:scale>
+            <design:nullability>Nullable</design:nullability>
+            <design:uiHints>
+              <design:displayName>dp_invoice_office_line_3</design:displayName>
+            </design:uiHints>
+          </design:attributes>
+          <design:usageHints>
+            <design:label>dp_invoice_office_line_3</design:label>
+            <design:formattingHints>
+              <design:displaySize>100</design:displaySize>
+            </design:formattingHints>
+          </design:usageHints>
+        </design:resultColumnDefinitions>
+      </design:resultSetColumns>
+      <design:criteria/>
+    </design:resultSetDefinitions>
+  </design:ResultSets>
+</model:DesignValues>]]></xml-property>
+            <property name="rowFetchSize">1</property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="invoice" id="2590">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">id</text-property>
+                    <text-property name="heading">id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tripId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">tripId</text-property>
+                    <text-property name="heading">tripId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceDate</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">invoiceDate</text-property>
+                    <text-property name="heading">invoiceDate</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceFrom</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">invoiceFrom</text-property>
+                    <text-property name="heading">invoiceFrom</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceTo</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">invoiceTo</text-property>
+                    <text-property name="heading">invoiceTo</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">miles</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">miles</text-property>
+                    <text-property name="heading">miles</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">rate</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">rate</text-property>
+                    <text-property name="heading">rate</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">billingCurrency</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">billingCurrency</text-property>
+                    <text-property name="heading">billingCurrency</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceSubtotal</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">invoiceSubtotal</text-property>
+                    <text-property name="heading">invoiceSubtotal</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">totalAmount</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">totalAmount</text-property>
+                    <text-property name="heading">totalAmount</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">currentCompany</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">currentCompany</text-property>
+                    <text-property name="heading">currentCompany</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">currentCustomer</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">currentCustomer</text-property>
+                    <text-property name="heading">currentCustomer</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">updatedBy</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">updatedBy</text-property>
+                    <text-property name="heading">updatedBy</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">updateTime</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">updateTime</text-property>
+                    <text-property name="heading">updateTime</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">invoiceid</property>
+                    <property name="paramName">invoiceid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">id</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">tripId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">invoiceDate</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">invoiceFrom</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">invoiceTo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">miles</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">rate</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">billingCurrency</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">invoiceSubtotal</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">totalAmount</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">currentCompany</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">currentCustomer</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">updatedBy</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">updateTime</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">local</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">id</property>
+                    <property name="nativeName">iv_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">tripId</property>
+                    <property name="nativeName">iv_tp_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">invoiceDate</property>
+                    <property name="nativeName">iv_date</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">91</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">invoiceFrom</property>
+                    <property name="nativeName">iv_invoice_from</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">invoiceTo</property>
+                    <property name="nativeName">iv_invoice_to</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">miles</property>
+                    <property name="nativeName">iv_miles</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">rate</property>
+                    <property name="nativeName">iv_rate</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">billingCurrency</property>
+                    <property name="nativeName">iv_billing_currency</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">invoiceSubtotal</property>
+                    <property name="nativeName">iv_invoice_subtotal</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">totalAmount</property>
+                    <property name="nativeName">iv_billing_amount</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">currentCompany</property>
+                    <property name="nativeName">iv_acomp</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">currentCustomer</property>
+                    <property name="nativeName">iv_acust</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">updatedBy</property>
+                    <property name="nativeName">iv_auid</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">updateTime</property>
+                    <property name="nativeName">iv_astamp</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[ SELECT 
+		iv_id 			as id,
+			iv_tp_id 		as tripId,
+			iv_date 		as invoiceDate,
+			iv_invoice_from as invoiceFrom,
+			iv_invoice_to 	as invoiceTo,
+			iv_miles		as miles,
+			iv_rate			as rate,
+			iv_billing_currency as billingCurrency,
+			iv_invoice_subtotal as invoiceSubtotal,
+			iv_billing_amount as totalAmount,
+			iv_acomp AS currentCompany,
+			iv_acust AS currentCustomer,
+			iv_auid AS updatedBy,
+			iv_astamp AS updateTime
+        FROM EpInvoice
+        WHERE iv_id=?]]></xml-property>
+            <property name="rowFetchSize">1</property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="invoicedetails" id="2591">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">id</text-property>
+                    <text-property name="heading">id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">invoiceId</text-property>
+                    <text-property name="heading">invoiceId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">sequence</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">sequence</text-property>
+                    <text-property name="heading">sequence</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">item</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">item</text-property>
+                    <text-property name="heading">item</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">chargeCode</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">chargeCode</text-property>
+                    <text-property name="heading">chargeCode</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">chargeDesp</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">chargeDesp</text-property>
+                    <text-property name="heading">chargeDesp</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">amount</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">amount</text-property>
+                    <text-property name="heading">amount</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">taxCode</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">taxCode</text-property>
+                    <text-property name="heading">taxCode</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">taxCodeValue</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">taxCodeValue</text-property>
+                    <text-property name="heading">taxCodeValue</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">currentCompany</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">currentCompany</text-property>
+                    <text-property name="heading">currentCompany</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">currentCustomer</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">currentCustomer</text-property>
+                    <text-property name="heading">currentCustomer</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">updatedBy</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">updatedBy</text-property>
+                    <text-property name="heading">updatedBy</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">updateTime</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">updateTime</text-property>
+                    <text-property name="heading">updateTime</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">invoiceid</property>
+                    <property name="paramName">invoiceid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">id</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">invoiceId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">sequence</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">item</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">chargeCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">chargeDesp</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">amount</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">taxCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">taxCodeValue</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">currentCompany</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">currentCustomer</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">updatedBy</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">updateTime</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">local</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">id</property>
+                    <property name="nativeName">id_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">invoiceId</property>
+                    <property name="nativeName">id_iv_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">sequence</property>
+                    <property name="nativeName">id_sequence</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">item</property>
+                    <property name="nativeName">id_item</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">chargeCode</property>
+                    <property name="nativeName">id_charge_code</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">chargeDesp</property>
+                    <property name="nativeName">cd_english</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">amount</property>
+                    <property name="nativeName">id_amount</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">taxCode</property>
+                    <property name="nativeName">id_tax_code</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">taxCodeValue</property>
+                    <property name="nativeName">cd_english</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">currentCompany</property>
+                    <property name="nativeName">id_acomp</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">currentCustomer</property>
+                    <property name="nativeName">id_acust</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">updatedBy</property>
+                    <property name="nativeName">id_auid</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">updateTime</property>
+                    <property name="nativeName">id_astamp</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[
+ SELECT  
+id_id as id,
+			id_iv_id as invoiceId,
+			id_sequence as sequence,
+			id_item as item,
+			id_charge_code as chargeCode,
+		code.cd_english as chargeDesp,
+			id_amount as amount,
+			id_tax_code as taxCode,
+		tax.cd_english as taxCodeValue,
+			id_acomp AS currentCompany,
+			id_acust AS currentCustomer,
+			id_auid AS updatedBy,
+			id_astamp AS updateTime	
+FROM EpInvoiceDetail eid
+		LEFT JOIN EpCode code ON code.cd_name='Invoice Items' and code.cd_key=eid.id_charge_code
+		LEFT JOIN EpCode tax ON tax.cd_name='Tax Code' AND tax.cd_key = eid.id_tax_code
+        WHERE id_iv_id=? order by id_sequence]]></xml-property>
+            <property name="rowFetchSize">1</property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="trip" id="2592">
+            <property name="nullsOrdering">nulls lowest</property>
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">id</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">id</text-property>
+                    <text-property name="heading">id</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">invoiceHeader</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">invoiceHeader</text-property>
+                    <text-property name="heading">invoiceHeader</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">AsiaHeader</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">AsiaHeader</text-property>
+                    <text-property name="heading">AsiaHeader</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">departmentId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">departmentId</text-property>
+                    <text-property name="heading">departmentId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">departmentShortName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">departmentShortName</text-property>
+                    <text-property name="heading">departmentShortName</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">authorizedBy</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">authorizedBy</text-property>
+                    <text-property name="heading">authorizedBy</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">authorizationNo</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">authorizationNo</text-property>
+                    <text-property name="heading">authorizationNo</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">refId</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">refId</text-property>
+                    <text-property name="heading">refId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">type</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">type</text-property>
+                    <text-property name="heading">type</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">typeDesp</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">typeDesp</text-property>
+                    <text-property name="heading">typeDesp</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">consigneeId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">consigneeId</text-property>
+                    <text-property name="heading">consigneeId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">consigneeName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">consigneeName</text-property>
+                    <text-property name="heading">consigneeName</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tripToAddress</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">tripToAddress</text-property>
+                    <text-property name="heading">tripToAddress</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">shipperId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">shipperId</text-property>
+                    <text-property name="heading">shipperId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">shipperName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">shipperName</text-property>
+                    <text-property name="heading">shipperName</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">shipperAddress</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">shipperAddress</text-property>
+                    <text-property name="heading">shipperAddress</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">billedClientId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">billedClientId</text-property>
+                    <text-property name="heading">billedClientId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">billClientName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">billClientName</text-property>
+                    <text-property name="heading">billClientName</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">billClientAddress</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">billClientAddress</text-property>
+                    <text-property name="heading">billClientAddress</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pickupDate</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">pickupDate</text-property>
+                    <text-property name="heading">pickupDate</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">deliveryDate</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">deliveryDate</text-property>
+                    <text-property name="heading">deliveryDate</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">chargedWeight</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">chargedWeight</text-property>
+                    <text-property name="heading">chargedWeight</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">quoteTotal</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">quoteTotal</text-property>
+                    <text-property name="heading">quoteTotal</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">flightSchedule</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">flightSchedule</text-property>
+                    <text-property name="heading">flightSchedule</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">dutiesTax</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">dutiesTax</text-property>
+                    <text-property name="heading">dutiesTax</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">destinationCity</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">destinationCity</text-property>
+                    <text-property name="heading">destinationCity</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">pickupCity</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">pickupCity</text-property>
+                    <text-property name="heading">pickupCity</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">clientId</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">clientId</text-property>
+                    <text-property name="heading">clientId</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">clientName</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">clientName</text-property>
+                    <text-property name="heading">clientName</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">tripFromAddress</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">tripFromAddress</text-property>
+                    <text-property name="heading">tripFromAddress</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">tripid</property>
+                    <property name="paramName">tripid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">id</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">invoiceHeader</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">AsiaHeader</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">departmentId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">departmentShortName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">authorizedBy</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">7</property>
+                        <property name="name">authorizationNo</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">8</property>
+                        <property name="name">refId</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">9</property>
+                        <property name="name">type</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">10</property>
+                        <property name="name">typeDesp</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">11</property>
+                        <property name="name">consigneeId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">12</property>
+                        <property name="name">consigneeName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">13</property>
+                        <property name="name">tripToAddress</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">14</property>
+                        <property name="name">shipperId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">15</property>
+                        <property name="name">shipperName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">16</property>
+                        <property name="name">shipperAddress</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">17</property>
+                        <property name="name">billedClientId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">18</property>
+                        <property name="name">billClientName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">19</property>
+                        <property name="name">billClientAddress</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">20</property>
+                        <property name="name">pickupDate</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">21</property>
+                        <property name="name">deliveryDate</property>
+                        <property name="dataType">date-time</property>
+                    </structure>
+                    <structure>
+                        <property name="position">22</property>
+                        <property name="name">chargedWeight</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">23</property>
+                        <property name="name">quoteTotal</property>
+                        <property name="dataType">float</property>
+                    </structure>
+                    <structure>
+                        <property name="position">24</property>
+                        <property name="name">flightSchedule</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">dutiesTax</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">26</property>
+                        <property name="name">destinationCity</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">27</property>
+                        <property name="name">pickupCity</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">28</property>
+                        <property name="name">clientId</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">29</property>
+                        <property name="name">clientName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">30</property>
+                        <property name="name">tripFromAddress</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">local</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">id</property>
+                    <property name="nativeName">tp_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">invoiceHeader</property>
+                    <property name="nativeName">invoiceHeader</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">AsiaHeader</property>
+                    <property name="nativeName">AsiaHeader</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">departmentId</property>
+                    <property name="nativeName">tp_dp_id</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">departmentShortName</property>
+                    <property name="nativeName">dp_shortname</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">authorizedBy</property>
+                    <property name="nativeName">tp_authorizedby</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">authorizationNo</property>
+                    <property name="nativeName">tp_authorization_no</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">refId</property>
+                    <property name="nativeName">tp_reference</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">type</property>
+                    <property name="nativeName">cd_key</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">typeDesp</property>
+                    <property name="nativeName">cd_english</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">consigneeId</property>
+                    <property name="nativeName">tp_consignee</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">consigneeName</property>
+                    <property name="nativeName">em_name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">tripToAddress</property>
+                    <property name="nativeName">tripToAddress</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">shipperId</property>
+                    <property name="nativeName">tp_shipper</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">shipperName</property>
+                    <property name="nativeName">em_name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">shipperAddress</property>
+                    <property name="nativeName">shipperAddress</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">billedClientId</property>
+                    <property name="nativeName">tp_billed_client</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">billClientName</property>
+                    <property name="nativeName">em_name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">billClientAddress</property>
+                    <property name="nativeName">billClientAddress</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">pickupDate</property>
+                    <property name="nativeName">tp_pickup_date</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">deliveryDate</property>
+                    <property name="nativeName">tp_delivery_date</property>
+                    <property name="dataType">date-time</property>
+                    <property name="nativeDataType">93</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">chargedWeight</property>
+                    <property name="nativeName">tp_charge_wt</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">quoteTotal</property>
+                    <property name="nativeName">tp_quote_total</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">8</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">flightSchedule</property>
+                    <property name="nativeName">tp_quote_flight_schedule</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">dutiesTax</property>
+                    <property name="nativeName">tp_quote_duties_tax</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">26</property>
+                    <property name="name">destinationCity</property>
+                    <property name="nativeName">tp_quote_destination_city</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">27</property>
+                    <property name="name">pickupCity</property>
+                    <property name="nativeName">tp_quote_pickup_city</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">28</property>
+                    <property name="name">clientId</property>
+                    <property name="nativeName">tp_client</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">29</property>
+                    <property name="name">clientName</property>
+                    <property name="nativeName">em_name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">30</property>
+                    <property name="name">tripFromAddress</property>
+                    <property name="nativeName">tripFromAddress</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[SELECT distinct tp.tp_id as id,
+			CONCAT(IFNULL(Mdep.dp_invoice_office_line_1, ''), char(13), 
+				IFNULL(Mdep.dp_invoice_office_line_2, ''),char(13), 
+				IFNULL(Mdep.dp_invoice_office_line_3, '')) as invoiceHeader,
+			CONCAT(IFNULL(Adep.dp_invoice_office_line_1, ''), char(13), 
+				IFNULL(Adep.dp_invoice_office_line_2, ''),char(13), 
+				IFNULL(Adep.dp_invoice_office_line_3, '')) as AsiaHeader,
+			tp.tp_dp_id as departmentId,
+			dep.dp_shortname as departmentShortName,
+			tp.tp_authorizedby 	as authorizedBy,
+			tp.tp_authorization_no as authorizationNo,
+			tp.tp_reference as refId,
+			qType.cd_key as type,
+			qType.cd_english as typeDesp,
+			
+			tp.tp_consignee as consigneeId,
+			mCong.em_name as consigneeName,
+			CONCAT(pCong.el_address1, ', ', pCong.el_city, ', ', CASE WHEN pCong.el_state_prov IS NULL THEN '' ELSE IFNULL(PSCong.ep_description, pCong.el_state_prov) END) AS tripToAddress,
+			
+			tp.tp_shipper as shipperId,
+			mShipper.em_name as shipperName,
+			CONCAT(pShipper.el_address1, ', ', pShipper.el_city, ', ', CASE WHEN pShipper.el_state_prov IS NULL THEN '' ELSE IFNULL(PSShipper.ep_description, pShipper.el_state_prov) END,' ') as shipperAddress,
+			
+			tp.tp_billed_client	as billedClientId,
+			mBillClient.em_name as billClientName,
+			CONCAT(IFNULL(pBillClient.el_address1, ''), 
+				case when IFNULL(pBillClient.el_address2, '') <> '' then CONCAT(CHAR(13), pBillClient.el_address2) else '' end,
+				CONCAT(CHAR(13), IFNULL(pBillClient.el_city, ''), ', ', IFNULL(PSBillClient.ep_description, pBillClient.el_state_prov), ', ', IFNULL(pBillClient.el_postal_code, '')),
+				case when IFNULL(pBillClient.el_country, '') <> '' then CONCAT(CHAR(13), IFNULL(PSBillClient.ep_country, pBillClient.el_country)) else '' end) as billClientAddress,
+			
+			tp_pickup_date as pickupDate,
+			tp_delivery_date as deliveryDate,
+			
+			tp_charge_wt as chargedWeight,
+
+			tp_quote_total as quoteTotal,
+			tp_quote_flight_schedule as flightSchedule,
+			tp_quote_duties_tax as dutiesTax,
+			tp_quote_destination_city as destinationCity,
+			tp_quote_pickup_city as pickupCity,
+
+			tp.tp_client as clientId,
+			mClient.em_name as clientName,
+			CONCAT(pClient.el_address1, ', ', pClient.el_city, ', ', pClient.el_state_prov) AS tripFromAddress
+		FROM EpTrip tp LEFT JOIN EpCode statusCode on statusCode.cd_key=tp.tp_status and statusCode.cd_name = 'Trip Status'
+			LEFT JOIN EpCode qType on qType.cd_key=tp.tp_type  and qType.cd_name='Trip Type'
+			LEFT JOIN EpEntityLocation pClient on pClient.el_id=tp.tp_client
+			LEFT JOIN EpEntityMaster mClient on mClient.em_id = pClient.el_em_id
+			LEFT JOIN EpEntityLocation pCong on pCong.el_id=tp.tp_consignee
+			LEFT JOIN EpEntityMaster mCong on mCong.em_id = pCong.el_em_id
+			LEFT JOIN EpProvinceState PSCong ON pCong.el_country = PSCong.ep_country_code AND pCong.el_state_prov = PSCong.ep_code
+			LEFT JOIN EpEntityLocation pShipper on pShipper.el_id=tp.tp_shipper
+			LEFT JOIN EpEntityMaster mShipper on mShipper.em_id = pShipper.el_em_id
+			LEFT JOIN EpProvinceState PSShipper ON pShipper.el_country = PSShipper.ep_country_code AND pShipper.el_state_prov = PSShipper.ep_code
+			LEFT JOIN EpEntityLocation pBillClient on pBillClient.el_id=tp.tp_billed_client
+			LEFT JOIN EpEntityMaster mBillClient on mBillClient.em_id = pBillClient.el_em_id
+			LEFT JOIN EpProvinceState PSBillClient ON pBillClient.el_country = PSBillClient.ep_country_code AND pBillClient.el_state_prov = PSBillClient.ep_code
+			INNER JOIN EpDivision dep ON tp.tp_dp_id = dep.dp_id
+			LEFT JOIN EpDivision Mdep ON Mdep.dp_id = 3
+			LEFT JOIN EpDivision Adep ON Adep.dp_id = 5
+		WHERE tp.tp_id = ?]]></xml-property>
+            <property name="rowFetchSize">1</property>
+        </oda-data-set>
+        <oda-data-set extensionID="org.eclipse.birt.report.data.oda.jdbc.JdbcSelectDataSet" name="invoiceTax" id="3836">
+            <list-property name="columnHints">
+                <structure>
+                    <property name="columnName">groupNo</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">groupNo</text-property>
+                    <text-property name="heading">groupNo</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">groupText</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">groupText</text-property>
+                    <text-property name="heading">groupText</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">totalAmt</property>
+                    <property name="analysis">measure</property>
+                    <text-property name="displayName">totalAmt</text-property>
+                    <text-property name="heading">totalAmt</text-property>
+                </structure>
+                <structure>
+                    <property name="columnName">billingCurrency</property>
+                    <property name="analysis">dimension</property>
+                    <text-property name="displayName">billingCurrency</text-property>
+                    <text-property name="heading">billingCurrency</text-property>
+                </structure>
+            </list-property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">param_1</property>
+                    <property name="paramName">invoiceid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">1</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_2</property>
+                    <property name="paramName">invoiceid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">2</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">param_3</property>
+                    <property name="paramName">invoiceid</property>
+                    <property name="nativeName"></property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">-1</property>
+                    <property name="position">3</property>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">groupNo</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">groupText</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">totalAmt</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">billingCurrency</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">local</property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">groupNo</property>
+                    <property name="nativeName">groupNo</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">-5</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">groupText</property>
+                    <property name="nativeName">groupText</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">totalAmt</property>
+                    <property name="nativeName">totalAmt</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">billingCurrency</property>
+                    <property name="nativeName">billingCurrency</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">12</property>
+                </structure>
+            </list-property>
+            <xml-property name="queryText"><![CDATA[select *
+from (
+select 1 as groupNo, 'SubTotal'  as groupText, sum(id_amount) as totalAmt, iv_billing_currency as billingCurrency 
+from EpInvoiceDetail id, EpInvoice iv
+where id.id_iv_id = iv.iv_id and id_iv_id = ?
+union
+
+select distinct 2 as groupNo, CONCAT(id_tax_code, ' ', id_tax_code_value * 100 , '%') as groupText, sum(id_tax_amount) as totalAmt, iv_billing_currency as billingCurrency
+from EpInvoiceDetail id, EpInvoice iv
+where id.id_iv_id = iv.iv_id and id_iv_id = ? 
+ and IFNULL(id_tax_code_value, 0) > 0
+group by id_tax_code, id_tax_code_value
+
+union
+
+select 3 as groupNo, 'Total' as groupText, sum(IFNULL(id_tax_amount,0) + IFNULL(id_amount, 0)) as totalAmt, iv_billing_currency as billingCurrency 
+from EpInvoiceDetail id, EpInvoice iv
+ where id.id_iv_id = iv.iv_id and id_iv_id = ?) a
+order by groupNo, groupText]]></xml-property>
+        </oda-data-set>
+    </data-sets>
+    <page-setup>
+        <simple-master-page name="Simple MasterPage" id="2">
+            <property name="type">us-letter</property>
+            <property name="topMargin">1cm</property>
+            <property name="leftMargin">1cm</property>
+            <property name="bottomMargin">1cm</property>
+            <property name="rightMargin">1cm</property>
+            <property name="borderBottomStyle">solid</property>
+            <property name="borderBottomWidth">thin</property>
+            <property name="borderLeftStyle">solid</property>
+            <property name="borderLeftWidth">thin</property>
+            <property name="borderRightStyle">solid</property>
+            <property name="borderRightWidth">thin</property>
+            <property name="borderTopStyle">solid</property>
+            <property name="borderTopWidth">thin</property>
+            <property name="headerHeight">0.4in</property>
+            <property name="footerHeight">0.4in</property>
+            <page-header>
+                <grid id="3345">
+                    <property name="borderBottomStyle">none</property>
+                    <property name="borderLeftStyle">none</property>
+                    <property name="borderRightStyle">none</property>
+                    <property name="borderTopStyle">none</property>
+                    <property name="width">7.15in</property>
+                    <column id="3346">
+                        <property name="width">0.975in</property>
+                    </column>
+                    <column id="3348">
+                        <property name="width">1.8in</property>
+                    </column>
+                    <column id="3350">
+                        <property name="width">1.1in</property>
+                    </column>
+                    <column id="3352">
+                        <property name="width">1.5in</property>
+                    </column>
+                    <column id="3354">
+                        <property name="width">0.5in</property>
+                    </column>
+                    <column id="3355">
+                        <property name="width">1.8in</property>
+                    </column>
+                    <row id="3356">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <cell id="3357">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">1</property>
+                            <label id="3358">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">3pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <property name="textAlign">center</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">hidden</property>
+                                <text-property name="text">Invoice #: </text-property>
+                            </label>
+                        </cell>
+                        <cell id="3359">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">1</property>
+                            <data id="3360">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">3pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <property name="textAlign">left</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">hidden</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">invoicenumber</property>
+                                        <expression name="expression" type="javascript">params["invoicenumber"]</expression>
+                                        <property name="dataType">string</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">invoicenumber</property>
+                            </data>
+                        </cell>
+                        <cell id="3361">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">1</property>
+                            <label id="3362">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">3pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <property name="textAlign">left</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">hidden</property>
+                                <text-property name="text">Invoice Date:</text-property>
+                            </label>
+                        </cell>
+                        <cell id="3363">
+                            <property name="colSpan">1</property>
+                            <property name="rowSpan">1</property>
+                            <data id="3364">
+                                <property name="backgroundAttachment">scroll</property>
+                                <property name="backgroundPositionX">0%</property>
+                                <property name="backgroundPositionY">0%</property>
+                                <property name="backgroundRepeat">repeat</property>
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">10pt</property>
+                                <property name="fontWeight">normal</property>
+                                <property name="fontStyle">normal</property>
+                                <property name="fontVariant">normal</property>
+                                <property name="color">black</property>
+                                <property name="textLineThrough">none</property>
+                                <property name="textOverline">none</property>
+                                <property name="textUnderline">none</property>
+                                <property name="borderBottomColor">black</property>
+                                <property name="borderBottomStyle">none</property>
+                                <property name="borderBottomWidth">medium</property>
+                                <property name="borderLeftColor">black</property>
+                                <property name="borderLeftStyle">none</property>
+                                <property name="borderLeftWidth">medium</property>
+                                <property name="borderRightColor">black</property>
+                                <property name="borderRightStyle">none</property>
+                                <property name="borderRightWidth">medium</property>
+                                <property name="borderTopColor">black</property>
+                                <property name="borderTopStyle">none</property>
+                                <property name="borderTopWidth">medium</property>
+                                <property name="marginTop">0pt</property>
+                                <property name="marginLeft">0pt</property>
+                                <property name="marginBottom">0pt</property>
+                                <property name="marginRight">0pt</property>
+                                <property name="paddingTop">3pt</property>
+                                <property name="paddingLeft">1pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <property name="paddingRight">1pt</property>
+                                <structure name="dateTimeFormat">
+                                    <property name="category">Custom</property>
+                                    <property name="pattern">yyyy-MM-dd</property>
+                                </structure>
+                                <property name="textAlign">left</property>
+                                <property name="letterSpacing">normal</property>
+                                <property name="lineHeight">normal</property>
+                                <property name="orphans">2</property>
+                                <property name="textTransform">none</property>
+                                <property name="whiteSpace">normal</property>
+                                <property name="widows">2</property>
+                                <property name="wordSpacing">normal</property>
+                                <property name="display">block</property>
+                                <property name="pageBreakAfter">auto</property>
+                                <property name="pageBreakBefore">auto</property>
+                                <property name="pageBreakInside">auto</property>
+                                <property name="showIfBlank">false</property>
+                                <property name="canShrink">false</property>
+                                <property name="overflow">hidden</property>
+                                <property name="dataSet">invoice</property>
+                                <list-property name="boundDataColumns">
+                                    <structure>
+                                        <property name="name">invoiceDate</property>
+                                        <text-property name="displayName">invoiceDate</text-property>
+                                        <expression name="expression" type="javascript">dataSetRow["invoiceDate"]</expression>
+                                        <property name="dataType">date</property>
+                                    </structure>
+                                </list-property>
+                                <property name="resultSetColumn">invoiceDate</property>
+                            </data>
+                        </cell>
+                        <cell id="3365">
+                            <property name="colSpan">2</property>
+                            <property name="rowSpan">1</property>
+                            <grid id="3819">
+                                <column id="3833"/>
+                                <column id="3820">
+                                    <property name="width">0.4in</property>
+                                </column>
+                                <column id="3821">
+                                    <property name="width">0.2in</property>
+                                </column>
+                                <column id="3822">
+                                    <property name="width">0.4in</property>
+                                </column>
+                                <row id="3823">
+                                    <cell id="3832">
+                                        <text id="3834">
+                                            <property name="textAlign">right</property>
+                                            <property name="contentType">auto</property>
+                                            <text-property name="content"><![CDATA[Page]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="3824">
+                                        <auto-text id="3825">
+                                            <property name="textAlign">center</property>
+                                            <property name="type">page-number</property>
+                                        </auto-text>
+                                    </cell>
+                                    <cell id="3826">
+                                        <text id="3827">
+                                            <property name="fontFamily">"Calibri"</property>
+                                            <property name="contentType">plain</property>
+                                            <text-property name="content"><![CDATA[of]]></text-property>
+                                        </text>
+                                    </cell>
+                                    <cell id="3828">
+                                        <auto-text id="3829">
+                                            <property name="textAlign">center</property>
+                                            <property name="type">total-page</property>
+                                        </auto-text>
+                                    </cell>
+                                </row>
+                            </grid>
+                        </cell>
+                    </row>
+                </grid>
+            </page-header>
+            <page-footer>
+                <grid id="3805">
+                    <property name="width">7.15in</property>
+                    <column id="3806">
+                        <property name="width">2.5in</property>
+                    </column>
+                    <column id="3807">
+                        <property name="width">2.675in</property>
+                    </column>
+                    <column id="3808">
+                        <property name="width">2.5in</property>
+                    </column>
+                    <row id="3809">
+                        <cell id="3810">
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <text id="3813">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="contentType">auto</property>
+                                <text-property name="content"><![CDATA[H.S.T. # R 129796439]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="3811">
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <text id="3814">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="fontStyle">italic</property>
+                                <property name="paddingTop">3pt</property>
+                                <property name="textAlign">center</property>
+                                <property name="contentType">auto</property>
+                                <text-property name="content"><![CDATA[Thank you for using Expedite Plus]]></text-property>
+                            </text>
+                        </cell>
+                        <cell id="3812">
+                            <property name="borderTopStyle">solid</property>
+                            <property name="borderTopWidth">thin</property>
+                            <text id="3815">
+                                <property name="fontFamily">"Calibri"</property>
+                                <property name="fontSize">11pt</property>
+                                <property name="fontWeight">bold</property>
+                                <property name="textAlign">right</property>
+                                <property name="contentType">auto</property>
+                                <text-property name="content"><![CDATA[Terms: Payable upon presentation]]></text-property>
+                            </text>
+                        </cell>
+                    </row>
+                </grid>
+            </page-footer>
+        </simple-master-page>
+    </page-setup>
+    <body>
+        <grid id="3494">
+            <property name="height">8.885416666666666in</property>
+            <column id="3495">
+                <property name="width">1.1in</property>
+            </column>
+            <column id="3496">
+                <property name="width">0.35in</property>
+            </column>
+            <column id="3786">
+                <property name="width">1.35in</property>
+            </column>
+            <column id="3760">
+                <property name="width">0.85in</property>
+            </column>
+            <column id="3497">
+                <property name="width">1.35in</property>
+            </column>
+            <column id="3740">
+                <property name="width">1.25in</property>
+            </column>
+            <column id="3498">
+                <property name="width">1.45in</property>
+            </column>
+            <row id="3499">
+                <property name="height">0.59375in</property>
+                <cell id="3500">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">2</property>
+                    <image id="3818">
+                        <property name="display">block</property>
+                        <property name="height">0.854in</property>
+                        <property name="width">1.271in</property>
+                        <property name="source">embed</property>
+                        <property name="imageName">logo.jpg</property>
+                    </image>
+                </cell>
+                <cell id="3769">
+                    <label id="3555">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Head Office</text-property>
+                    </label>
+                </cell>
+                <cell id="3741">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <data id="3767">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">typeDesp</property>
+                                <text-property name="displayName">invoiceHeader</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["invoiceHeader"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">typeDesp</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3504">
+                <property name="height">0.4895833333333333in</property>
+                <cell id="3770">
+                    <label id="3556">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Asia Operations</text-property>
+                    </label>
+                </cell>
+                <cell id="3742">
+                    <property name="colSpan">4</property>
+                    <property name="rowSpan">1</property>
+                    <data id="3930">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">typeDesp</property>
+                                <text-property name="displayName">AsiaHeader</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["AsiaHeader"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">typeDesp</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3597">
+                <property name="height">0.2in</property>
+                <cell id="3598">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3509">
+                <property name="height">0.3958333333333333in</property>
+                <cell id="3510"/>
+                <cell id="3511">
+                    <property name="colSpan">5</property>
+                    <property name="rowSpan">1</property>
+                    <data id="3558">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">15pt</property>
+                        <property name="textAlign">center</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">typeDesp</property>
+                                <text-property name="displayName">typeDesp</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["typeDesp"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">typeDesp</property>
+                    </data>
+                </cell>
+                <cell id="3513"/>
+            </row>
+            <row id="3587">
+                <property name="height">0.2in</property>
+                <cell id="3588">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                    <label id="3602"/>
+                </cell>
+            </row>
+            <row id="3514">
+                <property name="height">0.9479166666666666in</property>
+                <cell id="3515">
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <label id="3559">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Invoice To:</text-property>
+                    </label>
+                </cell>
+                <cell id="3516">
+                    <property name="colSpan">6</property>
+                    <property name="rowSpan">1</property>
+                    <property name="borderBottomStyle">solid</property>
+                    <property name="borderBottomWidth">thin</property>
+                    <data id="2621">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">billClientName</property>
+                                <text-property name="displayName">billClientName</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["billClientName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">billClientName</property>
+                    </data>
+                    <data id="2622">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="paddingTop">1pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">billClientAddress</property>
+                                <text-property name="displayName">billClientAddress</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["billClientAddress"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">billClientAddress</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3519">
+                <cell id="3520"/>
+                <cell id="3521">
+                    <property name="colSpan">6</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3524">
+                <property name="height">0.9791666666666666in</property>
+                <cell id="3525">
+                    <label id="3560">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Shipper:</text-property>
+                    </label>
+                </cell>
+                <cell id="3526">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <data id="3932">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">shipperName</property>
+                                <text-property name="displayName">shipperName</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["shipperName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">shipperName</property>
+                    </data>
+                    <data id="3935">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">tripToAddress</property>
+                                <text-property name="displayName">shipperAddress</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["shipperAddress"]</expression>
+                                <property name="dataType">string</property>
+                                <property name="allowExport">true</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">tripToAddress</property>
+                    </data>
+                </cell>
+                <cell id="3527">
+                    <label id="3562">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Trip To:</text-property>
+                    </label>
+                </cell>
+                <cell id="3730">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="3691">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">consigneeName</property>
+                                <text-property name="displayName">consigneeName</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["consigneeName"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">consigneeName</property>
+                    </data>
+                    <data id="3694">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">tripToAddress</property>
+                                <text-property name="displayName">tripToAddress</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["tripToAddress"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">tripToAddress</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3529">
+                <property name="height">0.3in</property>
+                <cell id="3530">
+                    <label id="3563">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Pickup Date:</text-property>
+                    </label>
+                </cell>
+                <cell id="3531">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2601">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <structure name="dateTimeFormat">
+                            <property name="category">Custom</property>
+                            <property name="pattern">yyyy-MM-dd</property>
+                        </structure>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">pickupDate</property>
+                                <text-property name="displayName">pickupDate</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["pickupDate"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">pickupDate</property>
+                    </data>
+                </cell>
+                <cell id="3532">
+                    <label id="3564">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Delivery Date:</text-property>
+                    </label>
+                </cell>
+                <cell id="3731">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2602">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <structure name="dateTimeFormat">
+                            <property name="category">Custom</property>
+                            <property name="pattern">yyyy-MM-dd</property>
+                        </structure>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">deliveryDate</property>
+                                <text-property name="displayName">deliveryDate</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["deliveryDate"]</expression>
+                                <property name="dataType">date-time</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">deliveryDate</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3534">
+                <property name="height">0.3in</property>
+                <cell id="3535">
+                    <label id="3565">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Authorized No:</text-property>
+                    </label>
+                </cell>
+                <cell id="3536">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2603">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">authorizationNo</property>
+                                <text-property name="displayName">authorizationNo</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["authorizationNo"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">authorizationNo</property>
+                    </data>
+                </cell>
+                <cell id="3537">
+                    <label id="3566">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Authorized by:</text-property>
+                    </label>
+                </cell>
+                <cell id="3732">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2604">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <property name="dataSet">trip</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">authorizedBy</property>
+                                <text-property name="displayName">authorizedBy</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["authorizedBy"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">authorizedBy</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3621">
+                <property name="borderBottomStyle">solid</property>
+                <property name="borderBottomWidth">thin</property>
+                <property name="height">0.2in</property>
+                <cell id="3622">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3627">
+                <property name="height">0.2in</property>
+                <cell id="3628">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3539">
+                <property name="height">0.3in</property>
+                <cell id="3540">
+                    <label id="3567">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Pieces:</text-property>
+                    </label>
+                </cell>
+                <cell id="3541">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2606">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">totalpieces</property>
+                                <expression name="expression" type="javascript">params["totalpieces"]</expression>
+                                <property name="dataType">integer</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">totalpieces</property>
+                    </data>
+                </cell>
+                <cell id="3542">
+                    <label id="3568">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Actual Weight:</text-property>
+                    </label>
+                </cell>
+                <cell id="3735">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2619">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">actualweight</property>
+                                <expression name="expression" type="javascript">params["actualweight"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">actualweight</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3544">
+                <property name="height">0.3in</property>
+                <cell id="3545">
+                    <label id="3569">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Pickup At:</text-property>
+                    </label>
+                </cell>
+                <cell id="3546">
+                    <property name="colSpan">3</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2610">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">pickupat</property>
+                                <expression name="expression" type="javascript">params["pickupat"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">pickupat</property>
+                    </data>
+                </cell>
+                <cell id="3547">
+                    <label id="3570">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <text-property name="text">Chargeable Weight:</text-property>
+                    </label>
+                </cell>
+                <cell id="3736">
+                    <property name="colSpan">2</property>
+                    <property name="rowSpan">1</property>
+                    <data id="2620">
+                        <property name="fontFamily">"Calibri"</property>
+                        <property name="fontSize">10pt</property>
+                        <property name="textAlign">left</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">chargeableweight</property>
+                                <expression name="expression" type="javascript">params["chargeableweight"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                        </list-property>
+                        <property name="resultSetColumn">chargeableweight</property>
+                    </data>
+                </cell>
+            </row>
+            <row id="3633">
+                <property name="borderBottomStyle">solid</property>
+                <property name="borderBottomWidth">thin</property>
+                <property name="height">0.2in</property>
+                <cell id="3634">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3639">
+                <property name="height">0.1in</property>
+                <cell id="3640">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                </cell>
+            </row>
+            <row id="3549">
+                <property name="height">0in</property>
+                <cell id="3550">
+                    <property name="colSpan">7</property>
+                    <property name="rowSpan">1</property>
+                    <table id="3663">
+                        <property name="borderBottomStyle">solid</property>
+                        <property name="borderBottomWidth">thin</property>
+                        <property name="borderLeftStyle">solid</property>
+                        <property name="borderLeftWidth">thin</property>
+                        <property name="borderRightStyle">solid</property>
+                        <property name="borderRightWidth">thin</property>
+                        <property name="borderTopStyle">solid</property>
+                        <property name="borderTopWidth">thin</property>
+                        <property name="dataSet">invoicedetails</property>
+                        <list-property name="boundDataColumns">
+                            <structure>
+                                <property name="name">item</property>
+                                <text-property name="displayName">item</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["item"]</expression>
+                                <property name="dataType">string</property>
+                            </structure>
+                            <structure>
+                                <property name="name">amount</property>
+                                <text-property name="displayName">amount</text-property>
+                                <expression name="expression" type="javascript">dataSetRow["amount"]</expression>
+                                <property name="dataType">float</property>
+                            </structure>
+                        </list-property>
+                        <column id="3679"/>
+                        <column id="3680">
+                            <property name="width">10%</property>
+                        </column>
+                        <column id="3681">
+                            <property name="width">5%</property>
+                        </column>
+                        <column id="3682">
+                            <property name="width">15%</property>
+                        </column>
+                        <header>
+                            <row id="3664">
+                                <cell id="3665">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="backgroundColor">silver</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <label id="3583">
+                                        <property name="backgroundColor">white</property>
+                                        <property name="fontFamily">"Calibri"</property>
+                                        <property name="fontSize">10pt</property>
+                                        <property name="textAlign">left</property>
+                                        <text-property name="text">Item Description</text-property>
+                                    </label>
+                                </cell>
+                                <cell id="3764">
+                                    <property name="backgroundColor">silver</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <label id="3584">
+                                        <property name="backgroundColor">white</property>
+                                        <property name="fontFamily">"Calibri"</property>
+                                        <property name="fontSize">10pt</property>
+                                        <property name="textAlign">right</property>
+                                        <text-property name="text">Charge</text-property>
+                                    </label>
+                                </cell>
+                            </row>
+                        </header>
+                        <detail>
+                            <row id="3669">
+                                <cell id="3670">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <data id="3685">
+                                        <property name="fontFamily">"Calibri"</property>
+                                        <property name="fontSize">11pt</property>
+                                        <property name="resultSetColumn">item</property>
+                                    </data>
+                                </cell>
+                                <cell id="3762">
+                                    <property name="borderBottomStyle">solid</property>
+                                    <property name="borderBottomWidth">thin</property>
+                                    <property name="borderLeftStyle">solid</property>
+                                    <property name="borderLeftWidth">thin</property>
+                                    <property name="borderRightStyle">solid</property>
+                                    <property name="borderRightWidth">thin</property>
+                                    <property name="borderTopStyle">solid</property>
+                                    <property name="borderTopWidth">thin</property>
+                                    <data id="3686">
+                                        <property name="fontFamily">"Calibri"</property>
+                                        <property name="fontSize">11pt</property>
+                                        <structure name="numberFormat">
+                                            <property name="category">Currency</property>
+                                            <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                        </structure>
+                                        <property name="textAlign">right</property>
+                                        <property name="resultSetColumn">amount</property>
+                                    </data>
+                                </cell>
+                            </row>
+                        </detail>
+                        <footer>
+                            <row id="3893">
+                                <cell id="3894"/>
+                                <cell id="3895">
+                                    <property name="colSpan">3</property>
+                                    <property name="rowSpan">1</property>
+                                    <table id="3898">
+                                        <property name="dataSet">invoiceTax</property>
+                                        <list-property name="boundDataColumns">
+                                            <structure>
+                                                <property name="name">groupText</property>
+                                                <text-property name="displayName">groupText</text-property>
+                                                <expression name="expression" type="javascript">dataSetRow["groupText"]</expression>
+                                                <property name="dataType">string</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">totalAmt</property>
+                                                <text-property name="displayName">totalAmt</text-property>
+                                                <expression name="expression" type="javascript">dataSetRow["totalAmt"]</expression>
+                                                <property name="dataType">decimal</property>
+                                            </structure>
+                                            <structure>
+                                                <property name="name">billingCurrency</property>
+                                                <expression name="expression" type="javascript">dataSetRow["billingCurrency"]</expression>
+                                                <property name="dataType">string</property>
+                                                <property name="allowExport">true</property>
+                                            </structure>
+                                        </list-property>
+                                        <column id="3912">
+                                            <property name="width">0.75in</property>
+                                        </column>
+                                        <column id="3919">
+                                            <property name="width">0.4in</property>
+                                        </column>
+                                        <column id="3913"/>
+                                        <detail>
+                                            <row id="3904">
+                                                <cell id="3905">
+                                                    <data id="3906">
+                                                        <property name="fontFamily">"Calibri"</property>
+                                                        <property name="resultSetColumn">groupText</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="3918">
+                                                    <data id="3927">
+                                                        <property name="fontFamily">"Calibri"</property>
+                                                        <property name="resultSetColumn">billingCurrency</property>
+                                                    </data>
+                                                </cell>
+                                                <cell id="3907">
+                                                    <data id="3908">
+                                                        <property name="fontFamily">"Calibri"</property>
+                                                        <structure name="numberFormat">
+                                                            <property name="category">Currency</property>
+                                                            <property name="pattern">###0.00{RoundingMode=HALF_UP}</property>
+                                                        </structure>
+                                                        <property name="textAlign">right</property>
+                                                        <property name="resultSetColumn">totalAmt</property>
+                                                    </data>
+                                                </cell>
+                                            </row>
+                                        </detail>
+                                    </table>
+                                </cell>
+                            </row>
+                        </footer>
+                    </table>
+                </cell>
+            </row>
+        </grid>
+    </body>
+    <list-property name="images">
+        <structure>
+            <property name="name">logo.jpg</property>
+            <property name="data">
+                /9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsN
+                DhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQU
+                FBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCACGAL8DASIAAhEBAxEB/8QA
+                HwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIh
+                MUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVW
+                V1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXG
+                x8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQF
+                BgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAV
+                YnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOE
+                hYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq
+                8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooA80+OXxTf4M/DnUfFK6aNXFo8SLZ+f5G
+                7fIqff2v/e/u18x/8PJ2xn/hXg3ev9tf/c9ew/txKf8AhnXXy3/Pa04/7eI6/Mhx5k3C8+ma+/4fyfBY
+                7CSq14Xlfz/Q/M+Ic3xuBxXsqEuWNvI+2f8Ah5V/1Tsf+Dv/AO56P+HlX/VOx/4O/wD7nr4j49aOPWvq
+                v9XMs/59f+TP/M+R/wBZc0/5+fgv8j7bb/gpMO/w7DY/6jf/ANz16T8H/wBqbxf8bNQKaJ8M44NNjO2f
+                VLrWmSBD/dH+i/O3+7Xyt+zF+zXffGrVv7U1MSWvhCzfZLMv3rxv+eUft/eav0r8P+HLDwvpdtpul2sN
+                jYWyeXFbwLtRFr4fOI5Xg26GGpc0/V6fifd5HUzXHL22IqcsPRa/ga0L741apKKK+OPvzm/Fmpa7pemS
+                T6Fo9vrd8o+W1ur77IG+j+W/8q+UfEn/AAUB1fwtrU+kax8LptN1CE/PBcaxtb/0nr7KYt/vfpXlHx0+
+                APh/43+HXtdRX7LqUKt9j1KJMy27f+zL/s16OAq4SNXlxlPmj8/0PCzOnjJUubB1OWXyPJfhF+3DL8UP
+                iRovhQ+Cxpg1OR0+0jU/N8vbE7/d8hT/AAetfWJX5sfwmvzH+BPgfV/hv+1l4Z8P69b/AGW+s7uZcp92
+                VPs8u10/2Wr9OE+7ya9DPMLhcPWgsJ8Eo3OLIcVicVRl9bfvxZYooor54+qCiiigAooooAKKKKACiiig
+                AooooA+fP25v+Tdde/67Wn/pQlfmI/8ArTX6d/tzf8m669/12tP/AEoSvzEf/Wmv1rhP/cp/4v8AI/Ge
+                MP8AfY+g0jBIrvfgr8KdQ+MHj+y8PWe6K3b97fXS/wDLCBfvN/7J/wADrhki8xSfSv04/ZD+CafCX4a2
+                9zfwhPEOtBLq+Z1+eJcfuof+AA/99O9eln2Zf2fhrR+OWx5WQ5Z/aOJtL4I7nsXg/wAJ6d4J8O2Wi6Tb
+                LZ6dZxeVDCn8IpPFHjXRfBGky6lr2p2+l2MX3ri7kVE/OvLP2iP2l9I+Bul/Zo9up+JbqMta6eh6f9NJ
+                f7qV+cHxC+JXiT4oa8+q+JdSmvp/+WUIbZDAv91E/hr85yvI8Rmb9rU92J+kZpn1DKoewpe9I+4PF3/B
+                QjwVok0kGi6ZqGvurbFlXbBE3/ffz/8Ajlclb/8ABSJHuFW78BSQwf34dVDv/wB8mFa+JCMUquVr7ylw
+                vgIx5Zr8T8/lxTmMpc0JH6a/Dn9tH4b+OrqKzk1CXQL+XCpDrCeUrf8AbVdyf99NXvcEq3EavGysjfMr
+                KfvV+KC7XXbIle2fAX9qbxJ8Gb2KyuJZNZ8Mbv3unyt88X+3E38P+5/FXz+YcK+zjz4OXyPo8t4t55ey
+                xkfmfoh4p+FukeKvGfhnxVIjW2r6FI7QXEI5kidHRom/2fn3V3KrsFcn8O/iDovxO8NW2uaDeLeWU6/f
+                H3lb+JWX+Fq64twTXwFT2kfcq/ZP0aj7KX72l9okoooqDqCiiigAooooAKKKKACiiigAooooA+e/25f+
+                Tdde/wCu1p/6UJX5kS/6x6/Tf9uX/k3bXv8Artaf+lCV+Y8ib5TX61wn/uU/8R+M8Yf7/D0Pbf2RPhUP
+                il8XLI3MG/RtFVb+7LL8rOrful/4E3/jqPX3R+0Z8dNP+Bvg5rv5bnWbzdDp9n/z0l/vN/srXCfsm+Ft
+                O+Cf7Pr+K9bYWL6jE2s3k0v3kg2fuk/74+bb/edq+H/jR8UtQ+MHjy/8RX5kjtpP3VnaBv8Aj3t/4E/3
+                v4m/2mavLlQefZnKcv4VM9KOIjkOVxjD+JUOW8R+I9S8Ya1eapq91Je6jdt5k07cbv8A7GstutG6k6mv
+                0inRjTXJA/M6lSVSXNIKKKK1Mgo3n1oopAfQX7FHjrV/Dfxp0fRLW5H9l60zx3dvJ9xikLsrr/tfLX6b
+                xjCLX5Ufsktu/aI8Ff8AXxcf+k8tfqyDX45xTRhTxi5Ox+0cIVJSwUoy7ki/dFLRRXyB96FFFFABRRRQ
+                AUUUUAFFFFABRRRQB89ftyjH7Ouvj/ptaf8ApQlfnx8KfArfEr4naD4cVWeK+u0WfZ/DEvzy/wDjitX6
+                Eftzc/s7a8f+ni0/9KEr5e/Y5Wx8FweOfifq6s9h4f07yIN38cknzFV/2vlRf+2tfoOUYj6vk9WUPicj
+                8vzvDxxGcU4z+Gx2P7eHxaQNYfDbR5Fit4EiuNSSLsDjyIf03/8AfFfGmPnrY8SeJL3xd4g1LWtRk86/
+                1G5a6nYf3m/u/wDoK/7NY4PzV9xlGD+o4aNN7s+DzXGSxmJlUEooor2jxgooooAKKKKAPYv2Rv8Ak4jw
+                X/18XH/pPLX6s/wivym/ZG/5OI8F/wDXxcf+k8tfqz/CK/IuLf8AfIf4T9l4O/3OXqS0UUV8SfoAUUUU
+                AFFFFABRRRQAUUUUAFFFJQB8+ftzD/jHfX/ea0/9KI6+N/iBrI8E/s+eB/BFswhvNc3+JNT2d4mbba/+
+                Oqjf8Ar7a/a+0WXxL8F7vSICqTX1/YWqs/8At3cSf+zV+b/xW8VReNfHWsalZgJpqSrbWMSjG22jXyol
+                /wC+VWv0Phyi8TShDpGXMflfE1X6viZT/mjY5GiTvRRX6gflwUUUUAFFFFABRRRQB7F+yN/ycR4L/wCv
+                i4/9J5a/Vn+EV+U37I3/ACcR4L/6+Lj/ANJ5a/Vn+EV+RcW/75D/AAn7Lwd/ucvUlooor4k/QAooooAK
+                KKKACiiigAor5g+MH7fngD4K/EXVPBmuaN4mutU07yhLLp9rbvC3mRLKm1nnQ/db+7Xp3jf46aT4H+Et
+                v8RZtG1rVNGktYL022nxRNcxQSqreY6vKq7V3Lu+b5aAPUaK+W/Cn7fXw/8AH3ivwv4b8OaN4l1rVteV
+                Xjt7e0twbX52VvP3Trt2Km9iu5dtdx+0L+1R4U/ZobQR4o07WL8a15/2f+yYYpCvleVv3+ZKmP8AWpQB
+                1Xxk8A3fxJ8Balomn3cdhfTqPKuJFz5TZ+9XyD/w7l8Tr08W6Z/4DSf419L/AAH/AGpPBP7RUOof8ItJ
+                eQ31gFa6sdShWKdEb7j/ACMysv0avNvEn/BRb4beF/HmpeEbvRPFL6jp2py6VLLDZ27wtLFL5Tsv7/fs
+                3fxba9XB5li8FHloTseJjcnwmPl7SvE8v/4dy+J/+hr0z/wGk/xo/wCHcvif/oa9M/8AAaT/ABr6n+Pv
+                7Rfh79nPw/Ya14ksdUvrK+u/sUY0mKKV1k2M3zB5U7LXMfBP9s74cfHrW/7D8P3N/p+vGJ5Y9O1WBYpZ
+                VX7+zYzq23+7uru/1hzH/n4ef/qxlv8AIfPv/DuPxP8A9DXpn/gNJ/jR/wAO4/E//Q16Z/4DSf419N/E
+                z9qLwv8ACr4peEfAOrWGq3Gs+JXgitJrSKJrdGln8hN7PKrff/uq1ZH7QH7Yng39nLxLp2heJdL12+ur
+                6z+2RNpMEUqhNzLhvMlT+41H+seY/wDPwX+rOW/ynz3/AMO4/E//AENemf8AgNJ/jR/w7j8T/wDQ16Z/
+                4DSf419N/Cf9p/wx8Yvhd4g8f6Npur2ukaJJPFcQ30cS3DeVAk77FWVl+66/xVxHwg/b88AfGn4iaR4M
+                0PRvE1tqWqeb9nl1C2t0h/dRNK+5lndvur/do/1jzH/n4P8A1Zy7+Q8b/wCHcnif/obNN/8AAaT/ABo/
+                4dyeJ/8Aoa9N/wDAaT/Gvv8AT7teL/tDftTeE/2aDoI8T6drF+NZ8/7OdJiilK+V5W/d5kqf89Uo/wBZ
+                Mx/5+C/1Yy3+Q8f+DP7E+u/DP4n6H4nu/EllfQadI7tBFAyO+6J0/wDZq+yFO1K8Z+Av7Ufgn9omPUF8
+                Ly3tve2Cq9zY6nEsU6I3R/kd1Zfo1R/DX9qfwx8UvjH4p+G2labq8Gs+G/tP2u4vY4lt5PIuEgfymWVm
+                b52/iVa8bF46tj589eXvHtYHL6OAh7Oh8J7fRXi/x/8A2nPDH7OFvoc3iXT9Wv49Yllit/7Kiid1aPZn
+                d5sqf31p2j/tOeGNY+POp/CaHT9WXxJYRebNcPFELRhsV/lbzd38f9yuU9I9mor5++Of7Z/w9+AfiCPQ
+                tcGq6nrbRCeSx0m2WV4Ub7u9ndE/4Dur1n4d+ONP+JXgfRvFGlR3MWm6tbpdQJdxeVLtb+8vagDqKKKK
+                ACiiigD8qf2svCfjGP8AbE8X+ItK0LxfJp+21RdR8MQTpM3+gW6YWVF/vp/BX2x8WfiRqXgb9m2HUbbw
+                xqXiLWtS0eCzt9Ia1lunaeWDpcKq/dX5t+7buxt7ive/4qZs/wBugD8sf2VfDfjr9mX4ueGte8Q+A9Uv
+                NH8UafsluLfTpZZdNilm2oz7U/dN8iM6f3Xr2P8A4KVeDfEfjDVvhOvh/StU1KS3lv8AzLjT7Npzasz2
+                Wx32L8vf/vmvutKGkVV+Z9lZ86Qz5u/Zl/ZNk+APiTxP4o1bxRJ4t8S69lbi68jyFRWfzX/iZmZn5zXw
+                74i0Hxt4P/ac8f8AiG28M+Omsm8TX9xFLoEUsCXi/bXb5n2MrxMtfq7c+JNMs93n6hbp/svIorIuPiVo
+                Vq2Ptgf/AHVZv6VxzzDC0/4lRG0aFaXwwPmT/gph4V1rxd8JfCtvomjX2sTJrW94bG1e4ZF+zy/MyrXk
+                X7PXwx8c/E79p7wx49uPh5dfDvw7olnGk7SwPbrdNHb+R/EieYzt975fu190zfF3R4ztjhnm/wBxapy/
+                GS1A+Wwmb/eda4ZZ5gIf8vDphluLn/y7PmH9rTwhrut/tkfBDVbHRNSvdMsrjTnuru0tZZYrfZqG9t7r
+                8q8V2n/BRvwRd+Lvgbbf2NodxrGuLrFvt/s+zM9wkWyXd91d22vYn+MyKu1dMZ2/2pP/ALGmf8Lpf/oF
+                L/4Ef/YVh/rFl3/Pz/yWX+Rp/ZmM/lOb8I+F2039je20630v7Hqc3ghRPZxW22U3TaftYMv8T7vlr4z/
+                AGD9K8aeA/jBoVjqnh7xzY2V1PdeaksU9vpXzW/+tlR1+Z9yf52V94L8aX/i0v5P+u3/ANhVhfjFHJ96
+                wl2+quKv/WDL5/bH/ZuL/lPSVT5eF/Wvhb/gpX4L8S+L9X+FI8P6Rqeotby3/mT6fZvcfZtz2e132r8v
+                8X/fNfVMXxj0/wD5aWVyn4o3/s1XofitoMg+Z5Iv9+N/8K6I5xgJbVUYSwOJhvTPI/2Yv2SZPgN4m8Te
+                KNV8WS+LfE+vLtnuWtvs6orP5j/xtuZn/ir5N8G+IfH/AMC/2vviT4ssPhvrniSx1fVtS09WW0uIovKl
+                v1l+0K6ROrf6r/x6v0it/HGh3SgLqEADf89H2/8AoVa9tfW94m+CeORf7yturtp4uhW+GdzllCpH4onx
+                1/wUq+FviX4ieB/Ct94Z0W71tNIuZ3vLaxieWdElRfmES/M33K5P9lXw546+JX7XHib4ueIPBt/4L0u4
+                tZVEOowOv71kiiSJGZU3/Ku7dtr77RVpNldVzM/NP9ufwVruoftAXuteGPBPjdNbSztUtde0SKR7S6l2
+                /N9xdy7Ubb9/7y/c/ir7W/Zf0/xXpfwJ8GWfjozHxTDZlblbj/WInmv5Kv8A7SxeWrZ+bI+bmvWdv+1T
+                6sAooooAYM1G8gXqKo3t9Mm6O2tmnlx95vlT/vqsqfQL7VF/4mGoyJEf+Xez/dL/AN9feriq1pQ92nHm
+                NIx/mLereLNL0f8A4+LqNH/uL8zVgTePb28+XS9Furj/AKazfukre0rwvpmm4a3s4kk/v7cv/wB9VsLH
+                tXoBXHKhicQvfqcvp/maqdKH2bnn72/jbVRtaa109G/hTG//ANmpv/Csbq8OdQ1u5uP9njFehMf9n9aj
+                LfhWH9jUqn8WcpfM1+u1Ifw7RONtvhHosK5lNzc/78uP/QcVpW/w60G1HGnK3+87N/Wun/CjaPT9a3p5
+                Xg6fw0kZyxmJn8VR/eY0fg/R4f8AV6XaJ9IFq2mi2UP3LaNf92OtDml5Fd0cNRj8MTL2tT+YhW0iX7sa
+                r/wGpPKT+6Pyp26jdW3s4djPmfciMCN1RTUTafbSfegjb6rVmip9jT/lK5pGVN4d024/1mnW7f70S1Rl
+                8B6JN10+3X/dj210PFG3PauaWBw0/ipIqNaotpHHT/C3QZulsV/3ZG/xrOk+D9ojbrS/urdv9pt1ei7T
+                SVySynBy/wCXZvHGYiG0jzhfCPifSxmx1vz/APZuFH/2VTf274t0s5vdJjvo/wC9aP8AN+Vd2pbvzTmx
+                9Ky/stU9aFRx/rzH9b5v4kVL+vI5Gz+IunO6x3ay6dKf4LtNldRbX0F5CskEizI38SNuFFxptvdRmOWJ
+                ZF/usK5+XwPYwuZbAyabMR960baP++fu/pXXH67TXvWn+BnL2U/h906nf7VJXPQ/2rZtiby9Rh5y6L5U
+                v/fP3Wrbhk82MNtZfZl2mu+nU5zCUeUmooorYkSloooASiiigBaKKKACiiigAooooAKKKKACiiigAooo
+                oASloooAKKKKACiiigD/2Q==
+</property>
+        </structure>
+    </list-property>
+</report>

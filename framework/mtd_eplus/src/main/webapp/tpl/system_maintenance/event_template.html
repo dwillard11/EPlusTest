@@ -1,0 +1,626 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">Event Template Management</h1>
+</div>
+<div class="wrapper-md">
+    <div ng-controller="eventtemplatesctrl">
+        <div class="row">
+            <div class="col-md-5 m-width200">
+                <div class="panel panel-default" >
+                    <div class="panel-heading font-bold">&nbsp;
+                        <button class="btn btn-sm btn-success"  ng-click="addEvent()"> <i class="glyphicon glyphicon-plus"></i> Add
+                        </button>
+                        <button class="btn btn-sm btn-danger"  ng-click="remove()"> <i class="glyphicon glyphicon-minus"></i> Romeve
+                        </button>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-horizontal">
+                            <div>
+                                <ul id="dataTree" class="ztree" style="height: 900px; overflow:auto;"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-7">
+                    <div class="panel panel-default">
+                        <div class="panel-heading font-bold">
+                            Event Template Detail
+                        </div>
+                        <div class="panel-body">
+                            <form class="form-horizontal" name="eventTemplateForm" method="POST" ng-submit="submit(eventTemplateForm.$valid)">
+                                <input type="text"  ng-model="id" style="display: none;"/>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Class</label>
+                                    <div class="col-sm-4">
+                                        <select name="eventClass" id="eventClass" class="form-control" name ="ddlEventClass"
+                                                ng-options="Option.id as Option.name for Option in eventClassOption"
+                                                ng-model="eventClass" required="required">
+                                        </select>
+                                    </div>
+
+                                    <label class="col-sm-2 control-label">Category</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtCategory" class="form-control"  ng-model="category" placeholder="" required="required" maxlength="50" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Item</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" name ="txtItem" class="form-control"  ng-model="item"  placeholder="" required="required" maxlength="50" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+
+                                    <label class="col-sm-2 control-label">Status</label>
+                                    <div class="col-sm-4">
+                                        <select  class="form-control" name ="ddlStatus"
+                                                 ng-options="Option.id as Option.name for Option in statusOption"
+                                                 ng-model="status" required="required">
+                                        </select>
+                                    </div>
+
+                                    <label class="col-sm-2 control-label">Customer Notify</label>
+                                    <div class="col-sm-4">
+                                        <select  class="form-control" name ="ddlNotify"
+                                                 ng-options="Option.id as Option.name for Option in yesNoOption"
+                                                 ng-model="customerNotify" required="required">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Event Code</label>
+                                    <div class="col-sm-4">
+                                        <select name="code" id="code"  class="form-control" name ="ddlEventCode"
+                                                ng-options="Option.id as Option.name for Option in eventCodeOption"
+                                                ng-model="code">
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">Description</label>
+                                    <div class="col-sm-10">
+                                        <textarea name ="txtDescription" class="form-control" rows="6"  ng-model="description" placeholder="" maxlength="65535"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <label class="col-sm-6 control-label text-left">Event Cost Items</label>
+                                    <div class="col-sm-6 text-right">
+                                        <a class="btn btn-success"  ng-click="addCost()">Add</a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive m-xs" style="min-height:120px">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                <tr>
+                                                    <th class="hidden">Id</th>
+                                                    <th>Charge Code</th>
+                                                    <th>Est. Cost</th>
+                                                    <th>Est. Date</th>
+                                                    <th style="width: 60px; text-align: center">Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody ng-show="!isLoading">
+                                                <tr ng-repeat="row in CostList">
+                                                    <td class="hidden">{{row.id}}</td>
+                                                    <td>{{ row.chargeDesc}}</td>
+                                                    <td>{{ row.estCost}}</td>
+                                                    <td>{{ row.estDate | date:'yyyy-MM-dd'}}</td>
+                                                    <td style="white-space: nowrap">
+                                                        <div class="buttons">
+                                                            <a class="btn btn-sm btn-info" ng-click="editCost($index,row);" tooltip="Edit"><i class="fa fa-edit"></i></a>
+                                                            <a class="btn btn-sm btn-danger" ng-click="removeCost($index)" tooltip="Delete"><i class="fa fa-times"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                                <tbody ng-show="isLoading">
+                                                <tr>
+                                                    <td colspan="5" class="text-center">
+                                                        <i class="fa fa-spin fa-refresh"></i>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading font-bold">Location</div>
+                                            <div class="panel-body">
+
+                                                    <div class="hidden form-group">
+                                                        <div class="col-sm-5">
+                                                            <input class="form-control" type="text" id="contactLocationID"
+                                                                   ng-model="linkedEntity.id" disabled>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label">Search</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="input-group">
+                                                                <ui-select ng-model="linkedEntity.selected" theme="bootstrap"
+                                                                           ng-change="selectLocationContact(linkedEntity.selected,'event')">
+                                                                    <ui-select-match
+                                                                            placeholder="Select or search a contact in the list...">
+                                                                        {{$select.selected.genericInfo}}
+                                                                    </ui-select-match>
+                                                                    <ui-select-choices group-by="'customerName'"
+                                                                                       repeat="item in locations"
+                                                                                       refresh="searchLocationContact($select.search)"
+                                                                                       refresh-delay="400">
+                                                                        <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                                    </ui-select-choices>
+                                                                </ui-select>
+                                                                <span class="input-group-btn">
+                                                              <a ng-click="linkedEntity = {}"
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </a>
+                                                            </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Contact</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="input-group">
+                                                                <input class="form-control" type="text" id="contactName"
+                                                                   ng-model="linkedEntity.contactName" disabled />
+                                                                    <span class="input-group-btn">
+                                                                        <button class="btn btn-default" type="button" ng-click="showContact(linkedEntity)" ng-disabled="!linkedEntity || !linkedEntity.contactId">
+                                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                                        </button>
+                                                                    </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Name</label>
+                                                        <div class="col-sm-9">
+                                                            <div class="input-group">
+                                                                <input class="form-control" type="text" id="contactLocationName"
+                                                                       ng-model="linkedEntity.customerName" disabled />
+                                                                <span class="input-group-btn">
+                                                                    <button class="btn btn-default" type="button" ng-click="showEntity(linkedEntity)" ng-disabled="!linkedEntity || !linkedEntity.id">
+                                                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                                                    </button>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Address</label>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control" type="text"
+                                                                   ng-model="linkedEntity.address1" id="contactAddress"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+													<div class="form-group">
+														<label class="col-sm-2 control-label text-right">Postal</label>
+														<div class="col-sm-9">
+															<input class="form-control" type="text"
+																   ng-model="linkedEntity.postalCode" id="contactPostalCode"
+																   disabled>
+														</div>
+													</div>
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">City</label>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control" type="text" id="contactCity"
+                                                                   ng-model="linkedEntity.city"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Province</label>
+                                                        <div class="col-sm-3">
+                                                            <input class="form-control" type="text" id="contactProvince"
+                                                                   ng-model="linkedEntity.stateProvince"
+                                                                   disabled>
+                                                        </div>
+
+                                                        <div class="col-sm-1"></div>
+
+                                                        <label class="col-sm-2 control-label text-right">Country</label>
+                                                        <div class="col-sm-3">
+                                                            <input class="form-control" type="text" id="contactCountry"
+                                                                   ng-model="linkedEntity.country"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Phone #</label>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control" type="text"
+                                                                   ng-model="linkedEntity.busPhone1" id="contactPhoneNum"
+                                                                   disabled>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-sm-2 control-label text-right">Notes</label>
+                                                        <div class="col-sm-9">
+                                                            <textarea class="form-control" rows="6"
+                                                              ng-model="linkedEntity.notes"
+                                                              disabled></textarea>
+                                                        </div>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <label class="col-sm-12 control-label text-left" >
+                                            <input type="checkbox" ng-model="duplicateEmail"  ng-checked="duplicateEmail" />Duplicate Email Address List for all
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-6 text-right">
+                                        <a class="btn btn-success"  ng-click="addAddress()">Add</a>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="table-responsive m-xs" style="min-height:120px">
+                                            <table class="table table-striped">
+                                                <thead>
+                                                <tr>
+                                                    <th class="hidden">Id</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th style="width: 60px; text-align: center">Action</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody ng-show="!isLoading">
+                                                <tr ng-repeat="row in AddressList">
+                                                    <td class="hidden">{{row.id}}</td>
+                                                    <td>{{ row.name}}</td>
+                                                    <td>{{ row.email}}</td>
+                                                    <td style="white-space: nowrap">
+                                                        <div class="buttons">
+                                                            <a class="btn btn-sm btn-info" ng-click="editAddress($index,row);" tooltip="Edit"><i class="fa fa-edit"></i></a>
+                                                            <a class="btn btn-sm btn-danger" ng-click="removeAddress($index)" tooltip="Delete"><i class="fa fa-times"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                                <tbody ng-show="isLoading">
+                                                <tr>
+                                                    <td colspan="4" class="text-center">
+                                                        <i class="fa fa-spin fa-refresh"></i>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="line b-b line-lg pull-in" style="display: none"></div>
+                                <div class="form-group" style="display: none">
+                                    <label class="col-sm-2 control-label">Audit Company</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditCompany" class="form-control" ng-model="currentCompany" placeholder="" readonly />
+                                    </div>
+                                    <label class="col-sm-2 control-label">Audit User</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditUser" class="form-control" ng-model="updatedBy" placeholder="" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="form-group" style="display: none">
+                                    <label class="col-sm-2 control-label">Audit Customer</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditCustomer" class="form-control" ng-model="currentCustomer" placeholder="" readonly />
+                                    </div>
+                                    <label class="col-sm-2 control-label">Audit Stamp</label>
+                                    <div class="col-sm-4">
+                                        <input type="text" name ="txtAuditStamp" class="form-control" ng-model="updateTime"  placeholder="" readonly />
+                                    </div>
+                                </div>
+
+                                <div class="line line-dashed b-b line-lg pull-in"></div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <button type="button" class="btn btn-default" ng-click="btnCancel()">Cancel</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+            </div>
+        </div>
+
+
+        <div class="modal" id="costModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog" style="width:850px;">
+                <div class="modal-content">
+                    <form class="form-horizontal" name="costForm" id="costForm" method="POST" ng-submit="submitCost(costForm.$valid)">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title">Capture Cost Editor</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Charge Code</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group-btn dropdown" dropdown>
+                                        <select class="form-control" name="chargeType" id="chargeType"
+                                                ng-options="Option.name for Option in chargeCodeOption track by Option.id"
+                                                ng-model="costEntity.charge" required="required">
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <label class="col-sm-2 control-label">Visible</label>
+                                <div class="col-sm-4">
+                                    <select class="form-control" name="ddlVisible"
+                                            ng-options="option.id as option.name for option in yesNoOption"
+                                            ng-model="costEntity.visible"></select>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label text-right">Est. Cost</label>
+                                <div class="col-sm-2">
+                                    <input type="number" class="form-control" ng-model="costEntity.estCost" step="0.01" required max="99999999" min="0"/>
+                                </div>
+                                <div class="col-sm-2">
+                                    <div class="input-group-btn dropdown" dropdown>
+                                        <select class="form-control"
+                                                ng-options="Option.id as Option.name for Option in currencyOption"
+                                                ng-model="costEntity.estCurrency" required="required">
+                                        </select>
+                                    </div>
+                                </div>
+                                <label class="col-sm-2 control-label">Est. Date</label>
+                                <div class="col-sm-4">
+                                    <div class="input-group" ng-controller="DatepickerDemoCtrl">
+                                        <input type="text" class="form-control"
+                                               datepicker-popup="yyyy-MM-dd"
+                                               ng-model="costEntity.estDate" id="estDate"
+                                               is-open="opened" datepicker-options="dateOptions"
+                                               ng-required="false" close-text="Close"/> <span
+                                            class="input-group-btn">
+									<button type="button" class="btn btn-default"
+                                            ng-click="open($event)">
+										<i class="glyphicon glyphicon-calendar"></i>
+									</button>
+								</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading font-bold">Location</div>
+                                        <div class="panel-body">
+
+                                            <div class="hidden form-group">
+                                                <div class="col-sm-11">
+                                                    <input class="form-control" type="text" id="costContactLocationID"
+                                                           ng-model="costEntity.id" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label">Search</label>
+                                                <div class="col-sm-9">
+                                                    <div class="input-group">
+                                                        <ui-select ng-model="costEntity.linkedEntity.selected" theme="bootstrap"
+                                                                   ng-change="selectLocationContact(costEntity.linkedEntity.selected,'cost')">
+                                                            <ui-select-match
+                                                                    placeholder="Select or search a contact in the list...">
+                                                                {{$select.selected.genericInfo}}
+                                                            </ui-select-match>
+                                                            <ui-select-choices group-by="'customerName'"
+                                                                               repeat="item in locations"
+                                                                               refresh="searchLocationContact($select.search)"
+                                                                               refresh-delay="400">
+                                                                <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                            </ui-select-choices>
+                                                        </ui-select>
+                                                        <span class="input-group-btn">
+                                                              <a ng-click="costEntity.linkedEntity = {}"
+                                                                      class="btn btn-default">
+                                                                <span class="fa fa-close"></span>
+                                                              </a>
+                                                            </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Contact</label>
+                                                <div class="col-sm-9">
+                                                    <div class="input-group">
+                                                        <input class="form-control" type="text" id="costContactName"
+                                                               ng-model="costEntity.linkedEntity.contactName" disabled />
+                                                        <span class="input-group-btn">
+                                                            <button class="btn btn-default" type="button" ng-click="showContact(costEntity.linkedEntity)" ng-disabled="!costEntity.linkedEntity || !costEntity.linkedEntity.contactId">
+                                                                <span class="glyphicon glyphicon-eye-open"></span>
+                                                            </button>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Name</label>
+                                                <div class="col-sm-9">
+                                                    <div class="input-group">
+                                                        <input class="form-control" type="text" id="costContactLocationName"
+                                                               ng-model="costEntity.linkedEntity.customerName" disabled />
+                                                        <span class="input-group-btn">
+                                                        <button class="btn btn-default" type="button" ng-click="showEntity(costEntity.linkedEntity)" ng-disabled="!costEntity.linkedEntity || !costEntity.linkedEntity.locationId">
+                                                            <span class="glyphicon glyphicon-eye-open"></span>
+                                                        </button>
+                                                    </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Address</label>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" type="text"
+                                                           ng-model="costEntity.linkedEntity.address1" id="costContactAddress"
+                                                           disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Postal</label>
+                                                <div class="col-sm-9">
+                                                    <input class="form-control" type="text"
+                                                           ng-model="costEntity.linkedEntity.postalCode" id="costContactPostalCode"
+                                                           disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">City</label>
+                                                <div class="col-sm-3">
+                                                    <input class="form-control" type="text" id="costContactCity"
+                                                           ng-model="costEntity.linkedEntity.city"
+                                                           disabled>
+                                                </div>
+
+                                                <div class="col-sm-1"></div>
+
+                                                <label class="col-sm-2 control-label text-right">Province</label>
+                                                <div class="col-sm-3">
+                                                    <input class="form-control" type="text" id="costContactProvince"
+                                                           ng-model="costEntity.linkedEntity.stateProvince"
+                                                           disabled>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Country</label>
+                                                <div class="col-sm-3">
+                                                    <input class="form-control" type="text" id="costContactCountry"
+                                                           ng-model="costEntity.linkedEntity.country"
+                                                           disabled>
+                                                </div>
+
+                                                <div class="col-sm-1"></div>
+
+                                                <label class="col-sm-2 control-label text-right">Phone #</label>
+                                                <div class="col-sm-3">
+                                                    <input class="form-control" type="text"
+                                                           ng-model="costEntity.linkedEntity.busPhone1" id="costContactPhoneNum"
+                                                           disabled>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label text-right">Notes</label>
+                                                <div class="col-sm-9">
+                                                            <textarea class="form-control" rows="6"
+                                                                      ng-model="costEntity.linkedEntity.notes"
+                                                                      disabled></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Description</label>
+                                <div class="col-sm-10">
+                                    <textarea name ="txtcostEntityDescription" class="form-control" rows="6"  ng-model="costEntity.description" maxlength="500" ></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div></form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog ">
+                <div class="modal-content">
+                    <form class="form-horizontal" name="addressForm" id="addressForm" method="POST" ng-submit="submitAddress(addressForm.$valid)">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                            <h4 class="modal-title">{{isNewAddress ? "Add Email" : "Edit Email"}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <ul class="nav nav-tabs" role="tablist" ng-show="isNewAddress" id="tablist">
+                                <li role="presentation" class="active"><a aria-controls="addAddress" role="tab" data-toggle="tab">Add</a></li>
+                                <li role="presentation"><a aria-controls="importAddress" role="tab" data-toggle="tab">Import list</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="addAddress">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label text-right">Search</label>
+                                        <div class="col-sm-9">
+                                            <ui-select ng-model="addressEntity.Contact" theme="bootstrap" ng-change="addressContact()">
+                                                <ui-select-match placeholder="Select or search a contact in the list...">
+                                                </ui-select-match>
+                                                <ui-select-choices repeat="item in contacts | filter: $select.search"
+                                                                   refresh="searchContact($select.search)" refresh-delay="400">
+                                                    <span ng-bind-html="item.genericInfo | highlight: $select.search"></span>
+                                                </ui-select-choices>
+                                            </ui-select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label text-right">Name</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="text" ng-model="addressEntity.name" maxlength="100" id="txtAddressName"  />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 control-label text-right">Email</label>
+                                        <div class="col-sm-9">
+                                            <input class="form-control" type="text" ng-model="addressEntity.email" maxlength="255" id="txtAddressEmail"  />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="importAddress" ng-show="isNewAddress">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <textarea class="form-control"  ng-model="addressEntity.mailMsg" rows="6" id="txtAddressMsg" ></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Save</button>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div></form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>
+
+</div>
+
+</div>

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.RoleMapper">
+	<sql id="SQL_SELECT_ROLE">
+			er.er_id AS id,
+            er.er_name AS name,
+            er.er_desc AS description,
+            er.er_system_default as systemDefault,
+            er.er_status as status,
+            er.er_category as category,
+            er.er_acomp AS auditCompany,
+            er.er_acust AS auditCustomer,
+            er.er_auid AS auditUID,
+            er.er_astamp AS auditTime
+	</sql>
+    <select id="selectRole" resultType="Role"  parameterType="string">
+        SELECT 
+            er.er_id AS id,
+            er.er_name AS name,
+            er.er_desc AS description,
+            er.er_system_default as systemDefault,
+            IFNULL(EC.cd_${language},EC.cd_english) as status,
+            er.er_category as category,
+            er.er_acomp AS auditCompany,
+            er.er_acust AS auditCustomer,
+            er.er_auid AS auditUID,
+            er.er_astamp AS auditTime
+        FROM EpRole er LEFT OUTER JOIN EpCode EC ON er.er_status = EC.cd_key AND EC.cd_name = 'Status'
+    </select>
+    <select id="selectRoleById" resultType="Role" parameterType="Integer">
+        SELECT 
+		 <include refid="SQL_SELECT_ROLE"></include>
+        FROM EpRole er WHERE er.er_id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectRolesByUserID" resultType="Role" parameterType="Integer">
+        SELECT 
+		 <include refid="SQL_SELECT_ROLE"></include>
+        from EpRole er
+        where er.er_status = 'Active'
+          and er.er_id in (
+            select eur_er_id
+            from EpUserRole
+            where EpUserRole.eur_eu_id = #{id,jdbcType=INTEGER})
+    </select>
+    <insert id="insertRole" parameterType="Role">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpRole(
+            er_name,
+            er_desc,
+            er_system_default,
+            er_status,
+            er_acomp,
+            er_acust,
+            er_auid,
+            er_astamp)
+        VALUES (
+            #{name,jdbcType=VARCHAR},
+            #{description,jdbcType=VARCHAR},
+            #{systemDefault,jdbcType=BIT},
+            #{status,jdbcType=VARCHAR},
+            #{currentCompany,jdbcType=VARCHAR},
+            #{currentCustomer,jdbcType=VARCHAR},
+            #{updatedBy,jdbcType=VARCHAR},
+            NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <delete id="deleteRole" parameterType="Integer">
+        DELETE FROM EpRole WHERE er_id = #{id,jdbcType=INTEGER}
+    </delete>
+    <update id="updateRole" parameterType="Role">
+              UPDATE EpRole SET
+                     er_name = #{name,jdbcType=VARCHAR},
+                     er_desc = #{description,jdbcType=VARCHAR},
+                     er_system_default = #{systemDefault,jdbcType=BIT},
+                     er_status = #{status,jdbcType=VARCHAR},
+                     er_acomp = #{currentCompany,jdbcType=VARCHAR},
+                    er_acust = #{currentCustomer,jdbcType=VARCHAR},
+                    er_auid = #{updatedBy,jdbcType=VARCHAR},
+                    er_astamp = NOW() <!--UTC_TIMESTAMP() -->
+              WHERE er_id = #{id,jdbcType=INTEGER}
+       </update>
+    <select id="selectRoleAccessRight" resultType="RoleAccessRight" parameterType="Integer">
+        SELECT rar.rar_id AS id,
+			#{id,jdbcType=INTEGER} AS roleId,
+			ar.ar_id AS accessRightId,
+			ar.ar_group AS groupName,
+			ar.ar_name AS menuName,
+			ar.ar_url AS url,
+			ar.ar_sort AS sortSeq,
+			CASE WHEN rar.rar_id > 0 THEN 1 ELSE 0 END AS hasChecked
+        from EpAccessRight ar LEFT OUTER JOIN EpRoleAccessRight rar ON ar.ar_id = rar.rar_ar_id and rar.rar_er_id = #{id,jdbcType=INTEGER}
+        ORDER BY ar.ar_sort
+    </select>
+    
+    <select id="selectRoleAccessRightsByUserId" resultType="RoleAccessRight" parameterType="String">
+        SELECT  ur.eur_er_id AS roleId,
+			ar.ar_id AS accessRightId,
+			ar.ar_group AS groupName,
+			ar.ar_name AS menuName,
+			ar.ar_url AS url,
+			ar.ar_sort AS sortSeq
+        from EpUserRole ur inner join EpRoleAccessRight rar on ur.eur_er_id= rar.rar_er_id
+			inner join EpAccessRight ar on rar.rar_ar_id=ar.ar_id
+        where ur.eur_eu_id=#{value}
+        ORDER BY ar.ar_sort
+    </select>
+    
+    <insert id="insertRoleAccessRight" parameterType="RoleAccessRight">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpRoleAccessRight(
+        rar_er_id,
+        rar_ar_id,
+        rar_acomp,
+        rar_acust,
+        rar_auid,
+        rar_astamp)
+        VALUES (
+        #{roleId,jdbcType=INTEGER},
+        #{accessRightId,jdbcType=INTEGER},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <delete id="deleteRoleAccessRight" parameterType="Integer">
+        DELETE FROM EpRoleAccessRight WHERE rar_id = #{id,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteRoleAccessRightByRoleId" parameterType="Integer">
+        DELETE FROM EpRoleAccessRight WHERE rar_er_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+
+    <select id="selectOnlineUserCount" resultType="Role">
+	SELECT <include refid="SQL_SELECT_ROLE"></include>
+		, count(eu.eu_id) as onlineUserCount
+	FROM 
+		EpRole er left join EpUserRole eur on er.er_id=eur.eur_eu_id
+					left join EpUser eu on eu.eu_id = eur.eur_eu_id
+						and eu.eu_dp_id=#{depId, jdbcType=INTEGER}
+                        and (TIMESTAMPDIFF(SECOND,eu.eu_active_timestamp,NOW()) &lt; #{timeDiff,jdbcType=INTEGER})
+                      <!--and (TIMESTAMPDIFF(SECOND,eu.eu_active_timestamp,UTC_TIMESTAMP()) &lt; #{timeDiff,jdbcType=INTEGER})-->
+	
+	group by er.er_id
+
+	</select>
+</mapper>

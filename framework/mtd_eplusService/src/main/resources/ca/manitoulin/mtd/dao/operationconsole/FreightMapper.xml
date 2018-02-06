@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.operationconsole.FreightMapper">
+	<sql id="SELECT_FREIGHT">
+			fr_id as id, 
+        	fr_tp_id as tripId, 
+        	fr_description as description,
+			fr_est_cost as estimatedCost, 
+			fr_est_currency as estimatedCurrency, 
+			fr_est_dims as estimatedDimension, 
+			fr_est_weight as estimatedWeight, 
+			fr_est_charge_weight as estimatedChargeWt,
+			fr_est_uom as estimatedUOM,
+			fr_est_pieces as estimatedPieces,
+			fr_act_cost as actualCost, 
+			fr_act_currency as actualCurrency, 
+			fr_act_dims as actualDimension, 
+			fr_act_weight as actualWeight, 
+			fr_act_charge_weight as actualChargeWt,
+			fr_act_uom as actualUOM,
+			fr_act_pieces as actualPieces,
+			fr_itemname as item,
+			fr_bagtag as bagtag,
+			fr_usd_cost as usdCost,
+			fr_usd_rate as usdRate,
+			fr_acomp as currentCompany,
+			fr_acust as currentCustomer,
+			fr_auid as updatedBy,
+			fr_astamp as updateTime
+	</sql>
+    <select id="selectFreightByTripId" resultType="Freight" parameterType="integer">
+    
+        SELECT 
+        	<include refid="SELECT_FREIGHT" />        
+ 		FROM EpFreight
+ 		WHERE fr_tp_id=#{value,jdbcType=INTEGER}
+ 		ORDER BY fr_itemname
+    </select>
+    <select id="selectFreightById" resultType="Freight" parameterType="integer">
+    
+        SELECT 
+        	<include refid="SELECT_FREIGHT" />        
+ 		FROM EpFreight
+ 		WHERE fr_id=#{value,jdbcType=INTEGER}
+
+    </select>
+    <update id="updateFreight" parameterType="Freight">
+    	UPDATE EpFreight SET
+    		fr_itemname = #{item,jdbcType=VARCHAR},
+    		fr_description = #{description,jdbcType=VARCHAR},
+    		
+			fr_est_cost = #{estimatedCost,jdbcType=NUMERIC}, 
+			fr_est_currency = #{estimatedCurrency,jdbcType=VARCHAR}, 
+			fr_est_dims = #{estimatedDimension,jdbcType=VARCHAR},
+			fr_est_uom = #{estimatedUOM,jdbcType=VARCHAR},
+			fr_est_weight = #{estimatedWeight,jdbcType=NUMERIC}, 
+			fr_est_charge_weight = #{estimatedChargeWt,jdbcType=NUMERIC}, 
+			fr_est_pieces = #{estimatedPieces,jdbcType=NUMERIC},
+			
+			fr_act_cost = #{actualCost,jdbcType=NUMERIC},
+			fr_act_currency=#{actualCurrency,jdbcType=VARCHAR}, 
+			fr_act_dims =#{actualDimension,jdbcType=VARCHAR},  
+			fr_act_weight =#{actualWeight,jdbcType=NUMERIC},  
+			fr_act_charge_weight = #{actualChargeWt,jdbcType=NUMERIC},
+			fr_act_uom =#{actualUOM,jdbcType=VARCHAR},
+			fr_act_pieces =#{actualPieces,jdbcType=NUMERIC},
+			
+			fr_bagtag =#{bagtag,jdbcType=VARCHAR},
+			fr_usd_cost =#{usdCost,jdbcType=NUMERIC},
+			fr_usd_rate =#{usdRate,jdbcType=NUMERIC},
+			fr_acomp = #{currentCompany,jdbcType=VARCHAR},
+			fr_acust = #{currentCustomer,jdbcType=VARCHAR},
+			fr_auid = #{updatedBy,jdbcType=VARCHAR},
+			fr_astamp = NOW() <!--UTC_TIMESTAMP() -->
+    	WHERE fr_id=#{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insertFreight" parameterType="Freight">
+    	INSERT INTO EpFreight(
+    		fr_tp_id,
+    		fr_description ,
+    		fr_est_pieces,
+			fr_est_cost, 
+			fr_est_currency, 
+			fr_est_dims,
+			fr_est_uom, 
+			fr_est_weight, 
+			fr_est_charge_weight,
+			fr_itemname,
+			fr_act_cost ,
+			fr_act_currency, 
+			fr_act_dims ,  
+			fr_act_weight , 
+			fr_act_charge_weight, 
+			fr_act_uom ,
+			fr_act_pieces ,
+			
+			fr_bagtag ,
+			fr_usd_cost ,
+			fr_usd_rate ,
+			fr_acomp,
+			fr_acust,
+			fr_auid,
+			fr_astamp )
+		VALUES (
+		#{tripId,jdbcType=INTEGER},
+		#{description,jdbcType=VARCHAR},
+		#{estimatedPieces,jdbcType=NUMERIC},
+		#{estimatedCost,jdbcType=NUMERIC}, 
+		#{estimatedCurrency,jdbcType=VARCHAR}, 
+		#{estimatedDimension,jdbcType=VARCHAR},
+		#{estimatedUOM,jdbcType=VARCHAR},
+		#{estimatedWeight,jdbcType=NUMERIC}, 
+		 #{estimatedWeight,jdbcType=NUMERIC},
+		#{item,jdbcType=VARCHAR},
+		#{actualCost,jdbcType=NUMERIC},
+		#{actualCurrency,jdbcType=VARCHAR}, 
+		#{actualDimension,jdbcType=VARCHAR},  
+		#{actualWeight,jdbcType=NUMERIC},  
+		#{actualChargeWt,jdbcType=NUMERIC},
+		#{actualUOM,jdbcType=VARCHAR},
+		#{actualPieces,jdbcType=NUMERIC},
+			
+		#{bagtag,jdbcType=VARCHAR},
+		#{usdCost,jdbcType=NUMERIC},
+		#{usdRate,jdbcType=NUMERIC},
+		#{currentCompany,jdbcType=VARCHAR},
+		#{currentCustomer,jdbcType=VARCHAR},
+		#{updatedBy,jdbcType=VARCHAR},
+		NOW() <!--UTC_TIMESTAMP() -->
+		)	
+    	<selectKey resultType="int" order="AFTER" keyProperty="id">
+    		SELECT LAST_INSERT_ID()
+    	</selectKey>
+    </insert>
+    <delete id="deleteFreight" parameterType="integer">
+    	DELETE FROM EpFreight
+    	WHERE fr_id=#{value,jdbcType=INTEGER}
+    </delete>
+	<delete id="deleteFreightByTripId" parameterType="integer">
+    	DELETE FROM EpFreight
+    	WHERE fr_tp_id=#{value,jdbcType=INTEGER}
+    </delete>
+</mapper>

@@ -1,0 +1,192 @@
+<div ng-controller="departmenteditctrl">
+    <div class="bg-light lter b-b wrapper-md">
+        <h1 class="m-n font-thin h3">{{pagestatus}} Division</h1>
+    </div>
+    <div class="wrapper-md">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form class="form-horizontal" name="departmentForm" method="get" ng-submit="submit(departmentForm.$valid)">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Division ID</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" ng-model="departmentId" readonly placeholder="" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtDepartmentName" class="form-control" placeholder="" ng-model="name" required="required"  maxlength="100" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Short Name</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtShortName" class="form-control" placeholder="" ng-model="shortName" required="required"  maxlength="3" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Address</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="txtAddress1" class="form-control" placeholder="" ng-model="address1" required="required"  maxlength="150" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="txtAddress2" class="form-control" placeholder="" ng-model="address2"  maxlength="150" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">City</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtCity" class="form-control" placeholder="" ng-model="city" required="required"  maxlength="50" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Country</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="ddlbCountry"
+                                    ng-options="Option.id as Option.name for Option in countryOption"
+                                    ng-model="country" required="required">
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label">Province</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="ddlbProvince"
+                                    ng-options="Option.id as Option.name for Option in provinceOption"
+                                    ng-model="province">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Postal Code</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtPostalCode" class="form-control" placeholder="" ng-model="postalCode" required="required" maxlength="20" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Office #</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtPhoneOffice" class="form-control" placeholder="" ng-model="phoneOffice" required="required" maxlength="45" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Cell #</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtPhoneMobile" class="form-control" placeholder="" ng-model="phoneMobile" maxlength="45" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">800 #</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtPhone800" class="form-control" placeholder="" ng-model="phone800" maxlength="45" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Fax #</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtPhoneFax" class="form-control" placeholder="" ng-model="phoneFax" maxlength="45" />
+                        </div>
+                        <label class="col-sm-2 control-label">Default Currency</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="ddlCurrency"
+                                    ng-options="Option.id as Option.name for Option in currencyOption"
+                                    ng-model="defaultCurrency" required="required">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Default Timezone</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="ddlTimezone"
+                                    ng-options="Option.id as Option.name for Option in timezoneOption"
+                                    ng-model="defaultTimezone" required="required">
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label">Default Email</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtDefaultEmail" class="form-control" placeholder="" ng-model="defaultEmail" maxlength="255" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Email Host</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtMailHost" class="form-control" placeholder="" ng-model="mailHost" maxlength="255" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">User Name</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtMailUserName" class="form-control" placeholder="" ng-model="mailUserName" maxlength="255" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Password</label>
+                        <div class="col-sm-2">
+                            <input type="text" name="txtMailPassword" class="form-control" placeholder="" ng-model="mailPassword" maxlength="45" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Status</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="ddlStatus"
+                                    ng-options="Option.id as Option.name for Option in statusOption"
+                                    ng-model="status" required="required">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Notes</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" name="txtNotes" rows="4" placeholder="" ng-model="notes" maxlength="500"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="line b-b line-lg pull-in"></div>
+                    <div class="form-group text-center">
+                        <span class="col-sm-12 h3 text-center">Invoice Header Information</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Sequence</label>
+                        <div class="col-sm-2">
+                            <input type="number" name="txtInvoiceOfficeSeq" class="form-control" placeholder="" ng-model="invoiceOfficeSeq" required="required" max="99999" min="0" />
+                        </div>
+
+                        <label class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-6">
+                            <input type="text" name="txtInvoiceOfficeName" class="form-control" placeholder="" ng-model="invoiceOfficeName" required="required" maxlength="50" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Line</label>
+                        <div class="col-sm-10">
+                            <input type="text" name="txtInvoiceOfficeLine1" class="form-control" placeholder="" ng-model="invoiceOfficeLine1" required="required" maxlength="100" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="txtInvoiceOfficeLine2" class="form-control" placeholder="" ng-model="invoiceOfficeLine2" maxlength="100" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10">
+                            <input type="text" name="txtInvoiceOfficeLine3" class="form-control" placeholder="" ng-model="invoiceOfficeLine3" maxlength="100" />
+                        </div>
+                    </div>
+                    <div class="line line-dashed b-b line-lg pull-in"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                           <a ui-sref="app.system_maintenance.department_list" class="btn btn-default">Back</a>
+                            <button type="submit" class="btn btn-primary">Save</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

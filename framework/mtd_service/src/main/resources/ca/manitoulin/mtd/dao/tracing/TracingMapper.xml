@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.tracing.TracingMapper">
+	<select id="selectDownloadedImages" resultType="Attachment" parameterType="Map">
+		select image_id as id
+		from pro_img
+		where
+		probill_number=#{probillNumber,jdbcType=VARCHAR}
+	</select>
+	
+	<insert id="insertImagesRecords">
+		INSERT INTO
+		pro_img (probill_number, image_id) VALUES(#{probillNumber,jdbcType=VARCHAR},
+		#{imageId,jdbcType=VARCHAR}) ON DUPLICATE KEY UPDATE
+		probill_number=#{probillNumber,jdbcType=VARCHAR},
+		image_id = #{imageId,jdbcType=VARCHAR}
+	</insert>
+</mapper>

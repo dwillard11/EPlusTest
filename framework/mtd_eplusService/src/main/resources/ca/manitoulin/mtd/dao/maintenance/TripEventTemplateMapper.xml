@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.maintenance.TripEventTemplateMapper" >
+    <select id="selectTripEventTemplateListByType" resultType="TripEventTemplate">
+        SELECT DISTINCT
+            et.te_type as type,
+            IFNULL(c.cd_${language},c.cd_english) as typeDesc,
+            et.te_name as name
+        FROM EpEventTemplate et INNER JOIN EpCode c on et.te_type = c.cd_key
+        WHERE 1 = 1
+        <if test="tripType != null and tripType != '' ">
+            AND et.te_type =  #{tripType,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != '' ">
+            AND et.te_name =  #{name,jdbcType=VARCHAR}
+        </if>
+        order by et.te_type, et.te_name
+    </select>
+    <select id="selectTripEventTemplatesForTripTemplate" resultType="TripEventTemplate" parameterType="string">
+        SELECT min(te.te_id) AS id,
+             CONCAT(tripType.cd_english, " - ", te.te_name) as name
+        FROM EpEventTemplate te LEFT OUTER JOIN EpEntityLocation el ON te.te_linked_entity = el.el_id
+                        LEFT JOIN EpCode tripType on tripType.cd_key=te.te_type  and tripType.cd_name='Trip Type'
+        WHERE te.te_status = 'Active'
+        <if test="tripType != null and tripType != '' ">
+            AND te.te_type =  #{tripType,jdbcType=VARCHAR}
+        </if>
+        GROUP BY te.te_type, tripType.cd_english, te.te_name
+        order by tripType.cd_english, te.te_name
+    </select>
+
+    <select id="selectTripEventTemplates" resultType="TripEventTemplate">
+        SELECT te.te_id AS id,
+        te.te_type AS type,
+        te_class AS eventClass,
+        te.te_name AS name,
+        te.te_category_sequence AS categorySequence,
+        te.te_category AS category,
+        te.te_sequence AS sequence,
+        te.te_code AS code,
+        te.te_item AS item,
+        te.te_desc AS description,
+        te.te_cost AS cost,
+        te.te_linked_entity AS linkedEntity,
+        te.te_linked_entity_contact AS linkedEntityContact,
+        el.el_address1 AS linkedEntityAddress1,
+        te.te_customer_notify AS customerNotify,
+        te.te_status AS status
+        FROM EpEventTemplate te LEFT OUTER JOIN EpEntityLocation el ON te.te_linked_entity = el.el_id
+        WHERE 1 = 1
+        <if test="tripType != null and tripType != '' ">
+            AND te.te_type =  #{tripType,jdbcType=VARCHAR}
+        </if>
+        <if test="name != null and name != '' ">
+            AND te.te_name =  #{name,jdbcType=VARCHAR}
+        </if>
+        order by te.te_name, te.te_category_sequence, te.te_category, te.te_sequence, te.te_item
+    </select>
+    <select id="selectTripEventTemplateById" resultType="TripEventTemplate" parameterType="Integer">
+        SELECT te_id AS id,
+            te_type AS type,
+            te_class AS eventClass,
+            te_name AS name,
+            te_category_sequence AS categorySequence,
+            te_category AS category,
+            te_sequence AS sequence,
+            te_code AS code,
+            te_item AS item,
+            te_desc AS description,
+            te_cost AS cost,
+            te_linked_entity AS linkedEntity,
+            te_linked_entity_contact AS linkedEntityContact,
+            te_customer_notify AS customerNotify,
+            te_status AS status,
+            te_acomp AS currentCompany,
+            te_acust AS currentCustomer,
+            te_auid AS updatedBy,
+            te_astamp AS updateTime
+        FROM EpEventTemplate WHERE te_id = #{id,jdbcType=INTEGER}
+    </select>
+    <insert id="insertTripEventTemplate" parameterType="TripEventTemplate">
+        <selectKey resultType="java.lang.Integer" keyProperty="id" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO EpEventTemplate(
+        te_type,
+        te_class,
+        te_name,
+        te_category_sequence,
+        te_category,
+        te_sequence,
+        te_code,
+        te_item,
+        te_desc,
+        te_cost,
+        te_linked_entity,
+        te_linked_entity_contact,
+        te_customer_notify,
+        te_status,
+        te_acomp,
+        te_acust,
+        te_auid,
+        te_astamp) VALUES (
+        #{type,jdbcType=VARCHAR},
+        #{eventClass,jdbcType=VARCHAR},
+        #{name,jdbcType=VARCHAR},
+        #{categorySequence,jdbcType=INTEGER},
+        #{category,jdbcType=VARCHAR},
+        #{sequence,jdbcType=INTEGER},
+        #{code,jdbcType=VARCHAR},
+        #{item,jdbcType=VARCHAR},
+        #{description,jdbcType=VARCHAR},
+        #{cost,jdbcType=DOUBLE},
+        #{linkedEntity,jdbcType=INTEGER},
+        #{linkedEntityContact,jdbcType=INTEGER},
+        #{customerNotify,jdbcType=VARCHAR},
+        #{status,jdbcType=VARCHAR},
+        #{currentCompany,jdbcType=VARCHAR},
+        #{currentCustomer,jdbcType=VARCHAR},
+        #{updatedBy,jdbcType=VARCHAR},
+        NOW() <!--UTC_TIMESTAMP() -->
+        )
+    </insert>
+    <update id="updateTripEventTemplate" parameterType="TripEventTemplate">
+        UPDATE EpEventTemplate SET
+            te_type = #{type,jdbcType=VARCHAR},
+            te_class = #{eventClass,jdbcType=VARCHAR},
+            te_name = #{name,jdbcType=VARCHAR},
+            te_category_sequence = #{categorySequence,jdbcType=INTEGER},
+            te_category = #{category,jdbcType=VARCHAR},
+            te_sequence = #{sequence,jdbcType=INTEGER},
+            te_code = #{code,jdbcType=VARCHAR},
+            te_item = #{item,jdbcType=VARCHAR},
+            te_desc = #{description,jdbcType=VARCHAR},
+            te_cost = #{cost,jdbcType=DOUBLE},
+            te_linked_entity = #{linkedEntity,jdbcType=INTEGER},
+            te_linked_entity_contact = #{linkedEntityContact,jdbcType=INTEGER},
+            te_customer_notify = #{customerNotify,jdbcType=VARCHAR},
+            te_status = #{status,jdbcType=VARCHAR},
+            te_acomp = #{currentCompany,jdbcType=VARCHAR},
+            te_acust = #{currentCustomer,jdbcType=VARCHAR},
+            te_auid = #{updatedBy,jdbcType=VARCHAR},
+            te_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE te_id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateTripEventTemplateCategorySequence" parameterType="TripEventTemplate">
+        UPDATE EpEventTemplate
+        SET te_category_sequence = #{categorySequence,jdbcType=INTEGER},
+            te_sequence = #{sequence,jdbcType=INTEGER},
+            te_acomp = #{currentCompany,jdbcType=VARCHAR},
+            te_acust = #{currentCustomer,jdbcType=VARCHAR},
+            te_auid = #{updatedBy,jdbcType=VARCHAR},
+            te_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE te_id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateTripEventTemplateSequence" parameterType="TripEventTemplate">
+        UPDATE EpEventTemplate
+        SET te_sequence = #{sequence,jdbcType=INTEGER},
+            te_acomp = #{currentCompany,jdbcType=VARCHAR},
+            te_acust = #{currentCustomer,jdbcType=VARCHAR},
+            te_auid = #{updatedBy,jdbcType=VARCHAR},
+            te_astamp = NOW() <!--UTC_TIMESTAMP() -->
+        WHERE te_id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <delete id="deleteTripEventTemplateByCategory" parameterType="map">
+        DELETE FROM EpEventTemplate
+        WHERE te_type =  #{tripType,jdbcType=VARCHAR}
+          AND te_name =  #{name,jdbcType=VARCHAR}
+    </delete>
+
+    <delete id="deleteTripEventTemplate" parameterType="Integer">
+        DELETE FROM EpEventTemplate WHERE te_id = #{id,jdbcType=INTEGER}
+    </delete>
+
+    <select id="getCategorySequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT min(te_category_sequence)
+        FROM EpEventTemplate
+        WHERE te_name = #{name,jdbcType=VARCHAR}
+          AND te_category = #{category,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getLastCategorySequenceByName" resultType="Integer" parameterType="map">
+        SELECT max(te_category_sequence)
+        FROM EpEventTemplate
+        WHERE te_name = #{name,jdbcType=VARCHAR}
+        AND te_id != #{id,jdbcType=INTEGER}
+    </select>
+
+    <select id="getItemSequenceByCategory" resultType="Integer" parameterType="map">
+        SELECT max(te_sequence)
+        FROM EpEventTemplate
+        WHERE te_name = #{name,jdbcType=VARCHAR}
+        AND te_category = #{category,jdbcType=VARCHAR}
+    </select>
+</mapper>

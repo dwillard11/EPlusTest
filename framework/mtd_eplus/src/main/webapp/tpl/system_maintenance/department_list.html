@@ -1,0 +1,95 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">Division Management</h1>
+</div>
+<div class="wrapper-md" ng-controller="departmentlistctrl">
+    <div class="panel panel-default">
+        <div class="row wrapper">
+            <div class="col-sm-4 m-b-xs">
+                <div class="hidden input-group  pull-right m-t-xs">
+                    <input type="text" class="input form-control" placeholder="Search"
+                           ng-model="advsearchfilter"> <span class="input-group-btn">
+						<button class="btn btn-default" type="button" ng-click="advsearch()">Search</button>
+					</span>
+                </div>
+            </div>
+            <div class="col-sm-5"></div>
+            <div class="col-sm-3">
+                <div class="col-sm-2 btn-group dropdown pull-right m-t-xs">
+                    <button class="btn btn-default" data-toggle="dropdown" translate="Export">
+                        Export
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a ng-click="exportpdf(rowCollectionPage,'division')">PDF</a></li>
+                        <li><a ng-csv="exportcsv(rowCollectionPage,'division')"
+                               filename="{{csvfilename}}">CSV</a></li>
+                    </ul>
+                </div>
+
+                <div class="pull-right m-t-xs">
+                    <button class="btn btn-success " type="button" ng-click="addDepartment()"><i class="fa fa-plus"></i> Add</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table st-table="displayedCollection" st-safe-src="rowCollectionPage"
+                   class="table table-striped">
+                <thead>
+                <tr>
+                    <!--<th><input type="checkbox" ng-click="selectAllItems()" ng-model="check"></th>-->
+                    <th st-sort="id" class="hidden">ID</th>
+                    <th st-sort="name">Name</th>
+                    <th st-sort="address1">Address</th>
+                    <th st-sort="city">City</th>
+                    <th st-sort="country">Country</th>
+                    <th st-sort="phoneOffice">Office Phone</th>
+                    <th st-sort="status">Status</th>
+                    <th st-sort="invoiceOfficeSeq">Invoice Sequence</th>
+                    <th style="width: 60px; text-align: center">Action</th>
+                </tr>
+                </thead>
+                <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <!--<td><input type="checkbox" ng-model="row.selected"></td>-->
+                    <td class="hidden"><a class="text-u-l" ng-click="editDepartments(row.id)">{{row.id}}</a></td>
+                    <td>{{ row.name}}</td>
+                    <td>{{ row.address1}}</td>
+                    <td>{{ row.city }}</td>
+                    <td>{{ row.country }}</td>
+                    <td>{{ row.phoneOffice}}</td>
+                    <td>{{ row.status}}</td>
+                    <td>{{ row.invoiceOfficeSeq }}</td>
+                    <td style="white-space: nowrap">
+                        <div class="buttons">
+                            <button class="btn btn-sm btn-info" ng-click="editDepartments(row.id)" tooltip="Edit"><i class="fa fa-edit"></i></button>
+                           <!-- <button class="btn btn-sm btn-danger" ng-confirm-click="Are you sure you want to delete this record?"
+                                    confirmed-click="removeDepartments(row.id)" tooltip="Delete"><i class="fa fa-times"></i>
+                            </button>
+                            -->
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="6" class="text-center"><i
+                            class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>

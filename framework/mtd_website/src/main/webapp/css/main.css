@@ -1,0 +1,7 @@
+/* This is for common styles to apply globally to internal pages. */
+.headerLogo {
+	background-color: white;
+	height: 50px;
+	width: 100%;
+	padding: 3px;
+} 

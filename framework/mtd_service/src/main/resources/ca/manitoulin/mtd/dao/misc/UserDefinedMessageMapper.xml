@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ca.manitoulin.mtd.dao.misc.UserDefinedMessageMapper" >
+  
+
+  <sql id="SQL_PMLANG" >
+    LAREF as id,
+    LAMSG as content,
+    LALANG as language,
+    LATRANS as translatedContent,
+    LAKEY as uniqueKey
+  </sql>
+
+  <select id="selectMessageByKey" parameterType="string" resultType="UserDefinedMessage" >
+    SELECT 
+    <include refid="SQL_PMLANG" />
+    FROM PMLANG
+    WHERE LAKEY = #{value,jdbcType=VARCHAR}
+  </select>
+
+  <insert id="insertMessage" parameterType="UserDefinedMessage"  >
+    INSERT INTO PMLANG(LAMSG, LALANG, LATRANS, LAKEY)
+    VALUES (
+    #{content,jdbcType=VARCHAR},
+    #{language,jdbcType=VARCHAR},
+     #{translatedContent,jdbcType=VARCHAR},
+     #{uniqueKey,jdbcType=VARCHAR}
+    
+    )
+  </insert>
+ 
+</mapper>

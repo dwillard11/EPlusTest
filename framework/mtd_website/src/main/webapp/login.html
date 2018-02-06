@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+  <meta charset="utf-8" />
+  <title>MTDirect2</title>
+  <meta name="description" content="app, web app, responsive, responsive layout, admin, admin panel, admin dashboard, flat, flat ui, ui kit, AngularJS, ui route, charts, widgets, components" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <link rel="stylesheet" href="libs/assets/animate.css/animate.css" type="text/css" />
+  <link rel="stylesheet" href="libs/assets/font-awesome/css/font-awesome.min.css" type="text/css" />
+  <link rel="stylesheet" href="libs/assets/simple-line-icons/css/simple-line-icons.css" type="text/css" />
+  <link rel="stylesheet" href="libs/jquery/bootstrap/dist/css/bootstrap.css" type="text/css" />
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="stylesheet" href="css/font.css" type="text/css" />
+  <link rel="stylesheet" href="css/app.css" type="text/css" />
+  <link rel="stylesheet" href="css/login.css" type="text/css" />
+</head>
+<body onkeydown="keyLogin(event);">
+   <div id="loginContent">
+        <div id="loginleft">
+            <div class="loginform">
+                <div class="text-center">
+                    <h1 title="MT Direct Login">MT Direct Login</h1>
+                </div>
+                <div class="form-validation" ng-controller="SigninFormController" ng-init="app.settings.container = false;">
+                    <div class="form-group">
+                        <div class="text-danger wrapper text-center" ng-show="authError" id="msgArea" style="display:none;">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" class="form-control" ng-model="user.username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-control" ng-model="user.password" required>
+                    </div>
+
+                    <button type="submit" id="loginSubmit" class="btn btn-lg  btn-block" onclick="login()" ng-disabled='form.$invalid'>Log in</button>
+
+
+                    <hr class="m-t" />
+
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ul class="tip">
+                                <li>Note that your username and password are case sensitive.</li>
+                                <li>To bookmark this page, press ctrl + D</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer">
+                Copyright © Manitoulin Group of Companies. All Rights Reserved.
+            </div>
+        </div>
+        <div id="loginright">
+        </div>
+    </div>
+<script src="libs/jquery/jquery/dist/jquery.js"></script>
+<script src="libs/jquery/bootstrap/dist/js/bootstrap.js"></script>
+<script src="js/login/ui-load.js"></script>
+<script src="js/login/ui-jp.config.js"></script>
+<script src="js/login/ui-jp.js"></script>
+<script src="js/login/ui-nav.js"></script>
+<script src="js/login/ui-toggle.js"></script>
+<script src="js/login/ui-client.js"></script>
+<script src="js/login/login.js"></script>
+<script src="js/login/jquery.cookie.js"></script>
+
+</body>
+</html>

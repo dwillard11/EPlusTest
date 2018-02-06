@@ -1,0 +1,86 @@
+<div class="bg-light lter b-b wrapper-md">
+    <h1 class="m-n font-thin h3">Role Management</h1>
+</div>
+<div class="wrapper-md" ng-controller="rolelistctrl">
+    <div class="panel panel-default">
+        <div class="row wrapper">
+            <div class="col-sm-4 m-b-xs">
+                <div class="hidden input-group  pull-right m-t-xs">
+                    <input type="text" class="input form-control" placeholder="Search"
+                           ng-model="advsearchfilter"> <span class="input-group-btn">
+						<button class="btn btn-default" type="button" ng-click="advsearch()">Search</button>
+					</span>
+                </div>
+            </div>
+            <div class="col-sm-5"></div>
+            <div class="col-sm-3">
+                <div class="btn-group dropdown pull-right m-t-xs">
+                    <button class="btn btn-default" data-toggle="dropdown">
+                        Export
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <!--<li><a ng-click="exportpdf('currentPage')">Current Page PDF</a></li>-->
+                        <li><a ng-click="exportpdf('all')">PDF</a></li>
+                        <!--<li><a ng-csv="exportcsv('currentPage')" filename="{{csvfilename}}">Current Page CSV</a></li>-->
+                        <li><a ng-csv="exportcsv('all')" filename="{{csvfilename}}">CSV</a></li>
+                    </ul>
+                </div>
+                <div class="btn-group  pull-right m-t-xs">
+                    <button class="btn btn-success " type="button" ng-click="addRole()"><i class="fa fa-plus"></i> Add</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table st-table="displayedCollection" st-safe-src="rowCollectionPage"
+                   class="table table-striped">
+                <thead>
+                <tr>
+                    <!--<th><input type="checkbox" ng-click="selectAllItems()" ng-model="check"></th>-->
+                    <th class="hidden" st-sort="id">ID</th>
+                    <th st-sort="name">Name</th>
+                    <th st-sort="description">Description</th>
+                    <th st-sort="status">Status</th>
+                    <th style="width: 60px; text-align: center">Action</th>
+                </tr>
+                </thead>
+                <tbody ng-show="!isLoading">
+                <tr ng-repeat="row in displayedCollection">
+                    <!--<td><input type="checkbox" ng-model="row.selected"></td>-->
+                    <td class="hidden"><a class="text-u-l" ng-click="editRole(row.id)">{{row.id}}</a></td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.description }}</td>
+                    <td>{{ row.status }}</td>
+                    <td style="white-space: nowrap">
+                        <div class="buttons">
+                            <button class="btn btn-sm btn-info" tooltip="Edit" ng-click="editRole(row.id)"><i class="fa fa-edit"></i></button>
+                            <!--
+                            <button ng-show='{{!row.systemDefault}}' class="btn btn-sm btn-danger" ng-confirm-click="Are you sure you want to delete this record?"
+                                    confirmed-click="removeRole(row.id)" tooltip="Delete"><i class="fa fa-times"></i>
+                            </button>
+                            -->
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+                <tbody ng-show="isLoading">
+                <tr>
+                    <td colspan="6" class="text-center"><i
+                            class="fa fa-spin fa-refresh"></i></td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="2" class="text-left">
+                        <div>
+                            <small class="text-muted inline m-t-sm m-b-sm">Total item(s): {{conllectionLength}}</small>
+                        </div>
+                    </td>
+                    <td colspan="5" class="text-center">
+                        <div st-template="pagination.html" st-pagination="" st-items-by-page="itemsByPage"></div>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+    
