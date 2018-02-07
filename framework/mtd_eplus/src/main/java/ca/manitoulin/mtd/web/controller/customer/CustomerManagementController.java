@@ -557,4 +557,11 @@ public class CustomerManagementController {
         map.put(KEY_RESULT, RESPONSE_SUCCESS);
         return map;
     }
+    
+    public Object testMethod(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        //just adding for testing merge               
+        Map<String, Object> map = newHashMap();
+        map.put(KEY_RESULT, RESPONSE_SUCCESS);
+        return map;
+    }
 }
