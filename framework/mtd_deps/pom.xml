@@ -23,7 +23,7 @@
 		<dbcp.version>1.4</dbcp.version>
 		<aspectj.version>1.7.0</aspectj.version>
 		<slf4j.version>1.7.21</slf4j.version>
-		<mysql.version>5.1.31</mysql.version>
+		<mysql.version>8.0.16</mysql.version>
 		<jetty.version>7.6.15.v20140411</jetty.version> 
 		<!-- <jetty.version>9.2.20.v20161216</jetty.version>-->
 
